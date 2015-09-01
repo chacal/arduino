@@ -17,9 +17,10 @@
  * - A5 -> SCL
  */
 
-int FULL_TANK_VALUE = 1250;
-RH_ASK driver(1200);
+long FULL_TANK_VALUE = 1250;
+RH_ASK driver(2000);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+long latestVCC = -1;
 
 byte mark100[8] = {
   B11111,
@@ -121,20 +122,23 @@ void loop()
     if (driver.recv(buf, &buflen)) // Non-blocking
     {
         turnLedOn();
-        char message[buflen + 1];
-        strFromBuf(message, buf, buflen);
+        long* values = (long*)buf;
+        long value1 = values[0];
+        long value2 = values[1];
+        long vcc = -1;
+        if(buflen == 12) {
+          vcc = values[2];
+          latestVCC = vcc;
+        }
+
+        char message[50];
+        sprintf(message, "Val1: %ld Val2: %ld VCC: %ld", value1, value2, vcc);
+        printWithMillis(message);        
         
-        printWithMillis(message);
-        showOnLCD(message);
+        showOnLCD(value1, value2, latestVCC);
         
         turnLedOff();
     }
-}
-
-void strFromBuf(char* dst, uint8_t* src, uint8_t bufLen)
-{
-  strncpy(dst, (char*)src, bufLen);
-  dst[bufLen] = 0;
 }
 
 void turnLedOn()
@@ -154,28 +158,16 @@ void printWithMillis(char* message)
     Serial.println(message);  
 }
 
-void showOnLCD(char* message)
+void showOnLCD(long value1, long value2, long vcc)
 {
-    char* divider = strchr(message, ':');
-    int dividerIndex = divider - message;
-    
-    char val[16];
-    strncpy(val, message, dividerIndex);
-    val[dividerIndex] = '\0';
-    int valNumber = atoi(val);
-
-    char raw[16];
-    strncpy(raw, message+dividerIndex+1, strlen(message)-dividerIndex);
-    raw[strlen(message)-dividerIndex] = '\0';
-
-    int percentage = min((float)valNumber / FULL_TANK_VALUE * 100, 100);
+    int percentage = min((float)value1 / FULL_TANK_VALUE * 100, 100);
     char percentageStr[5];
     sprintf(percentageStr, "%3d%%", percentage);
     
     lcd.clear();
-    lcd.print(val);
+    lcd.print(value1);
     lcd.setCursor(0,1);
-    lcd.print(raw);
+    lcd.print(value2);
     lcd.setCursor(10,0);
     lcd.print(percentageStr);
     lcd.setCursor(15,0);
@@ -194,5 +186,16 @@ void showOnLCD(char* message)
       lcd.write(byte(5));
     else
       lcd.write(byte(6));
+
+    lcd.setCursor(10,1);
+    if(vcc != -1) {
+      int voltage1 = vcc / 1000;
+      int voltage2 = (((float)vcc / 1000) - voltage1) * 1000;
+      char voltageStr[7];
+      sprintf(voltageStr, "%d.%dV", voltage1, voltage2);
+      lcd.print(voltageStr);      
+    } else {
+      lcd.print("-.---V");
+    }
 }
 
