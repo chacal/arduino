@@ -5,11 +5,11 @@
 
 #define SENSOR_PIN_1 0  // 10 megohm resistor between pins D0 & D1. D1 is the sensor pin.
 #define SENSOR_PIN_2 1
-#define LED_PIN 3
 #define RF_RX_PIN 4
 #define RF_TX_PIN 2  // D2 is RF TX pin, D0 is used for PTT (it is not needed for capacitive sensing when radio is active)
 #define RF_PTT_PIN 0
 #define CAPACITIVE_ITERATIONS 30
+#define SLEEP_MS_BETWEEN_MEASUREMENTS 15000
 
 uint8_t vccReportCounter = 0;
 
@@ -19,30 +19,24 @@ ISR(WDT_vect) { AttinySleepy::watchdogEvent(); }
 
 void setup() {
   cs.set_CS_AutocaL_Millis(0xFFFFFFFF);     // turn off autocalibrate
-  pinMode(LED_PIN, OUTPUT);
   driver.init();
-  digitalWrite(LED_PIN, LOW);
 }
 
-void loop() {
-  digitalWrite(LED_PIN, HIGH);
-  
-  long values[3];
-  values[0] = cs.capacitiveSensor(CAPACITIVE_ITERATIONS);
-  values[1] = cs.capacitiveSensorRaw(CAPACITIVE_ITERATIONS);
-  uint8_t bytesToSend = 8;
+void loop() {  
+  long values[2];
+  values[0] = cs.capacitiveSensorRaw(CAPACITIVE_ITERATIONS);
+  uint8_t bytesToSend = 4;
 
-  if(++vccReportCounter == 12) {  // Report VCC ~once a minute
+  if(++vccReportCounter == 4) {  // Report VCC ~once a minute
     vccReportCounter = 0;
-    values[2] = readVcc();
-    bytesToSend = 12;
+    values[1] = readVcc();
+    bytesToSend = 8;
   }
 
   driver.send((uint8_t*)values, bytesToSend);  
   driver.waitPacketSent();
   
-  digitalWrite(LED_PIN, LOW);
-  AttinySleepy::loseSomeTime(5000);
+  AttinySleepy::loseSomeTime(SLEEP_MS_BETWEEN_MEASUREMENTS);
 }
 
 

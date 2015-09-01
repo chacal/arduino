@@ -16,8 +16,9 @@
  * - A4 -> SDA
  * - A5 -> SCL
  */
+long EMPTY_TANK_VALUE = 500;
+long FULL_TANK_VALUE = 2000;
 
-long FULL_TANK_VALUE = 1250;
 RH_ASK driver(2000);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 long latestVCC = -1;
@@ -124,18 +125,17 @@ void loop()
         turnLedOn();
         long* values = (long*)buf;
         long value1 = values[0];
-        long value2 = values[1];
         long vcc = -1;
-        if(buflen == 12) {
-          vcc = values[2];
+        if(buflen == 8) {
+          vcc = values[1];
           latestVCC = vcc;
         }
 
         char message[50];
-        sprintf(message, "Val1: %ld Val2: %ld VCC: %ld", value1, value2, vcc);
+        sprintf(message, "Val1: %ld VCC: %ld", value1, vcc);
         printWithMillis(message);        
         
-        showOnLCD(value1, value2, latestVCC);
+        showOnLCD(value1, latestVCC);
         
         turnLedOff();
     }
@@ -158,16 +158,14 @@ void printWithMillis(char* message)
     Serial.println(message);  
 }
 
-void showOnLCD(long value1, long value2, long vcc)
+void showOnLCD(long value1, long vcc)
 {
-    int percentage = min((float)value1 / FULL_TANK_VALUE * 100, 100);
+    int percentage = min((float)(value1 - EMPTY_TANK_VALUE) / (FULL_TANK_VALUE - EMPTY_TANK_VALUE) * 100, 100);
     char percentageStr[5];
     sprintf(percentageStr, "%3d%%", percentage);
     
     lcd.clear();
     lcd.print(value1);
-    lcd.setCursor(0,1);
-    lcd.print(value2);
     lcd.setCursor(10,0);
     lcd.print(percentageStr);
     lcd.setCursor(15,0);
