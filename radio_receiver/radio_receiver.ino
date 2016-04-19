@@ -30,8 +30,16 @@ void loop()
 
 void printMessageFromBuf(uint8_t* src, uint8_t srcLen)
 {
-    char message[srcLen + 1];
-    strFromBuf(message, src, srcLen);
+    char message[40];
+    if(srcLen == 12) {
+      sprintf(message, "Value1: %ld Value2: %ld VCC: %ld", *(long*)src, *(long*)(src+4), *(long*)(src+8));
+    } else {
+      sprintf(message, "Value1: %ld Value2: %ld", *(long*)src, *(long*)(src+4));
+    }
+    
+    //sprintf(message, "Value1: %ld", *(long*)src);
+    //char message[srcLen + 1];
+    //strFromBuf(message, src, srcLen);
     printWithMillis(message);
 }
 

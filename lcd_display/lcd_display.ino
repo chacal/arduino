@@ -25,13 +25,14 @@ void setup() {
   // initialize the LCD
   lcd.begin();
 
-  lcd.createChar(0, smiley);
+//  lcd.createChar(0, smiley);
   // Turn on the blacklight and print a message.
-  lcd.backlight();
+//  lcd.backlight();
+  lcd.setCursor(0,0);
   lcd.print("Heippa muru!");
   lcd.setCursor(0,1);
   lcd.print("Kuikka!!");
-  lcd.write(byte(0));
+//  lcd.write(byte(0));
 }
 
 void loop() {

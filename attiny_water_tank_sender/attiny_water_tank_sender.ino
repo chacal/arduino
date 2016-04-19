@@ -1,7 +1,7 @@
 #include <CapacitiveSensor.h>
 #include <RH_ASK.h>
 #include <AttinySleepy.h>
-#include <util/delay.h>
+#include <VCC.h>
 
 #define SENSOR_PIN_1 0  // 10 megohm resistor between pins D0 & D1. D1 is the sensor pin.
 #define SENSOR_PIN_2 1
@@ -11,56 +11,31 @@
 #define CAPACITIVE_ITERATIONS 30
 #define SLEEP_MS_BETWEEN_MEASUREMENTS 15000
 
-uint8_t vccReportCounter = 0;
-
 CapacitiveSensor cs = CapacitiveSensor(SENSOR_PIN_1, SENSOR_PIN_2);        
 RH_ASK driver(2000, RF_RX_PIN, RF_TX_PIN, RF_PTT_PIN);  
 ISR(WDT_vect) { AttinySleepy::watchdogEvent(); }
 
+struct {
+  char tag;
+  uint8_t instance;
+  long sensorValue;
+  int vcc;
+} measurements;
+
 void setup() {
+  measurements.tag = 'w';
+  measurements.instance = 1;
   cs.set_CS_AutocaL_Millis(0xFFFFFFFF);     // turn off autocalibrate
   driver.init();
 }
 
 void loop() {  
-  long values[2];
-  values[0] = cs.capacitiveSensorRaw(CAPACITIVE_ITERATIONS);
-  uint8_t bytesToSend = 4;
+  measurements.sensorValue = cs.capacitiveSensorRaw(CAPACITIVE_ITERATIONS);
+  measurements.vcc = readVcc();
 
-  if(++vccReportCounter == 4) {  // Report VCC ~once a minute
-    vccReportCounter = 0;
-    values[1] = readVcc();
-    bytesToSend = 8;
-  }
-
-  driver.send((uint8_t*)values, bytesToSend);  
+  driver.send((uint8_t*)&measurements, sizeof(measurements));
   driver.waitPacketSent();
   
   AttinySleepy::loseSomeTime(SLEEP_MS_BETWEEN_MEASUREMENTS);
 }
 
-
-long readVcc() {
-  // Read 1.1V reference against AVcc
-  // set the reference to Vcc and the measurement to the internal 1.1V reference
-  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-    ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  #elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-    ADMUX = _BV(MUX5) | _BV(MUX0);
-  #elif defined (__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-    ADMUX = _BV(MUX3) | _BV(MUX2);
-  #else
-    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  #endif  
- 
-  _delay_ms(2); // Wait for Vref to settle
-  ADCSRA |= _BV(ADSC); // Start conversion
-  while (bit_is_set(ADCSRA,ADSC)); // measuring
- 
-  uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH  
-  uint8_t high = ADCH; // unlocks both
-
-  long result = (high<<8) | low;  // This might return 0 sometimes?
-  result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
-  return result; // Vcc in millivolts
-}
