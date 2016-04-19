@@ -5,9 +5,9 @@
 
 /*
  * Measurements:
- *  - Sleep current 14µA
- *  - Run current 8,3mA
- *  - Loop run period 2,9 mS
+ *  - Sleep current 4µA
+ *  - Run current 30mA
+ *  - Loop run period 1,8 ms
  */
 
 RTClock rt(RTCSEL_LSE);
@@ -18,27 +18,21 @@ long int alarmDelay = 3;
 
 void setup() {
   adc_disable_all();
-  initializeRadio();
   disableAllPeripheralClocks();
+  rcc_clk_enable(RCC_SPI1);
   rcc_clk_enable(RCC_TIMER1);
   rcc_clk_enable(RCC_PWR);
   rcc_clk_enable(RCC_GPIOA);
   rcc_clk_enable(RCC_GPIOB);
   rcc_clk_enable(RCC_GPIOC);
+
+  initializeRadio();
 }
 
 void loop() {
-  // These are needed to configure GPIO pins correctly after sleep
-  SPI.begin();
-  pinMode(PB0, OUTPUT);
-  pinMode(PB1, OUTPUT);
-
   sendData();
-  
-  setGPIOModeToAllPins(GPIO_INPUT_ANALOG);
-  sleepAndWakeUp(STOP, &rt, alarmDelay);
+  sleepAndWakeUp(STANDBY, &rt, alarmDelay);
 }
-
 
 void initializeRadio() {
   SPI.begin();
