@@ -119,7 +119,6 @@ void initializeRadio() {
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
-  radio.setRetries(15, 15);
-  radio.setAutoAck(true);
+  radio.setAutoAck(false);    // Don't wait for ACKs to save power
 }
 
