@@ -138,8 +138,7 @@ void initializeRadio() {
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
-  // Use auto ACKs to avoid sleeping between radio transmissions, requires patched
-  // nrf library for Node if PA+LNA version of the radio is used
+  // Use auto ACKs to avoid sleeping between radio transmissions
   radio.setAutoAck(true);
-  radio.setRetries(2, 5);  // Retry every 500µS for maximum of 2,5mS
+  radio.setRetries(3, 2);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
 }
