@@ -88,6 +88,9 @@ void loop() {
   radio.write(&measurements, sizeof(measurements));
   radio.powerDown();
 
+//  Serial.println(micros() - start);
+//  Serial.flush();
+
   Sleepy::loseSomeTime(5000);
 }
 
@@ -119,6 +122,7 @@ void initializeRadio() {
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
-  radio.setAutoAck(false);    // Don't wait for ACKs to save power
+  radio.setAutoAck(true);
+  radio.setRetries(3, 2);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
 }
 
