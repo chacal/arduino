@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "RF24.h"
 #include <EEPROM.h>
+#include "main.h"
 
 
 /*
@@ -47,6 +48,7 @@ struct {
   uint8_t instance;
   float temp;
   int vcc;
+  unsigned long previousSampleTimeMicros;
 } measurements;
 
 struct Config {
@@ -61,6 +63,7 @@ void setup() {
   initializeConfig();
   measurements.tag = 't';
   initializeRadio();
+  measurements.previousSampleTimeMicros = 0;
 }
 
 void loop() {
@@ -87,6 +90,8 @@ void loop() {
   radio.powerUp();
   radio.write(&measurements, sizeof(measurements));
   radio.powerDown();
+
+  measurements.previousSampleTimeMicros = micros() - start;
 
 //  Serial.println(micros() - start);
 //  Serial.flush();
