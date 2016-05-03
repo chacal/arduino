@@ -13,8 +13,6 @@
  */
 
 /* Pins */
-#define ThermistorIN A1               // Temperature is measured from this pin
-#define ThermistorOUT A0              // This set to HIGH when measuring temperature
 #define RAW_IN A4                     // RAW voltage is read from this pin
 #define NRF_CE 2                      // Chip Enbale pin for NRF radio
 #define NRF_CSN 3                     // SPI Chip Select for NFR radio
@@ -44,6 +42,7 @@ struct {
   uint8_t instance;
   float value;
   int vcc;
+  unsigned long previousSampleTimeMicros;
 } measurements;
 
 struct Config {
@@ -60,6 +59,7 @@ void setup() {
   bmp180.begin();
   initializeConfig();
   initializeRadio();
+  measurements.previousSampleTimeMicros = 0;
 }
 
 
@@ -84,7 +84,9 @@ void loop() {
 
   radio.powerDown();
 
-  Serial.println(micros() - start);
+  measurements.previousSampleTimeMicros = micros() - start;
+
+  Serial.println(measurements.previousSampleTimeMicros);
   Serial.flush();
 
   Sleepy::loseSomeTime(5000);
