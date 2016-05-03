@@ -13,14 +13,14 @@
  */
 
 /* Pins */
-#define RAW_IN A4                     // RAW voltage is read from this pin
+#define RAW_IN A0                     // RAW voltage is read from this pin
 #define NRF_CE 2                      // Chip Enbale pin for NRF radio
 #define NRF_CSN 3                     // SPI Chip Select for NFR radio
 
 // Measured resistances for the voltage divider resistors (for calculating VCC)
-#define R1 1492000
-#define R2 982000
-#define AREF 3.0  // Regulated 3V used as board's VCC
+#define R1 1487000
+#define R2 980000
+#define AREF 3.01  // Regulated 3V used as board's VCC
 
 #define TEMP_CALIBRATION -2.0f  // Calibration value for temperature
 
