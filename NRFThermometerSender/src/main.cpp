@@ -1,8 +1,5 @@
-#include <math.h>
 #include <JeeLib.h>
 #include <Thermometer.h>
-#include <VCC.h>
-#include <SPI.h>
 #include "RF24.h"
 #include <EEPROM.h>
 #include "main.h"
