@@ -22,7 +22,7 @@
 #define R2 980000
 #define AREF 3.01  // Regulated 3V used as board's VCC
 
-#define TEMP_CALIBRATION -2.0f  // Calibration value for temperature
+#define TEMP_CALIBRATION -0.4f  // Calibration value for temperature
 
 #define INSTANCE 4
 
