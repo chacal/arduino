@@ -86,8 +86,8 @@ void loop() {
 
   measurements.previousSampleTimeMicros = micros() - start;
 
-  Serial.println(measurements.previousSampleTimeMicros);
-  Serial.flush();
+//  Serial.println(measurements.previousSampleTimeMicros);
+//  Serial.flush();
 
   Sleepy::loseSomeTime(5000);
 }
