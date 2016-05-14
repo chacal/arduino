@@ -1,47 +1,43 @@
 #include <Arduino.h>
-#include <EnableInterrupt.h>
 #include <avr/sleep.h>
 #include <util/atomic.h>
 
-#define INT_PIN 12
+#include "main.h"
+#include "buttons.h"
 
 /*
- * This sketch uses less that 1µA when in sleep, but Arduino is woken up when the button is pressed
+ * This sketch uses less that 1µA when in sleep, but Arduino is woken up when the buttons are pressed
  */
 
-int interruptCount = 0;
-bool buttonPressed = false;
+unsigned long wakeUpTime = 0;
 
-void interruptFunction();
-void goToSleep();
 
 void setup() {
-  pinMode(13, OUTPUT);
   Serial.begin(115200);
-  pinMode(INT_PIN, INPUT_PULLUP);
-  enableInterrupt(INT_PIN, interruptFunction, FALLING);
-}
-
-
-void loop() {
-  if(buttonPressed) {
-    buttonPressed = false;
-    Serial.print("Pin was interrupted: ");
-    Serial.print(interruptCount, DEC);
-    Serial.println(" times so far.");
-    Serial.flush();
-  }
-
+  setupPinChangeInterrupts();
+  setupButtonCallbacks();
   goToSleep();
 }
 
+void loop() {
+  updateButtonStates();
 
-void interruptFunction() {
-  interruptCount++;
-  buttonPressed = true;
+  if(hasMinAwakeTimeElapsed() && noButtonsPressed()) {
+    goToSleep();
+  }
 }
 
+
+bool hasMinAwakeTimeElapsed() { return millis() - wakeUpTime > MIN_AWAKE_TIME_MS; }
+
 void goToSleep() {
+  Serial.println("Sleeping");
+  Serial.flush();
+  powerDown();
+  wakeUpTime = millis();
+}
+
+void powerDown() {
   ADCSRA &= ~ bit(ADEN); // disable the ADC
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
