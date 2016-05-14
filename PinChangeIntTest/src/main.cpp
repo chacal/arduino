@@ -10,6 +10,7 @@
  */
 
 int interruptCount = 0;
+bool buttonPressed = false;
 
 void interruptFunction();
 void goToSleep();
@@ -18,16 +19,18 @@ void setup() {
   pinMode(13, OUTPUT);
   Serial.begin(115200);
   pinMode(INT_PIN, INPUT_PULLUP);
-  enableInterrupt(INT_PIN, interruptFunction, CHANGE);
+  enableInterrupt(INT_PIN, interruptFunction, FALLING);
 }
 
 
 void loop() {
-  Serial.println("---------------------------------------");
-  Serial.print("Pin was interrupted: ");
-  Serial.print(interruptCount, DEC);
-  Serial.println(" times so far.");
-  Serial.flush();
+  if(buttonPressed) {
+    buttonPressed = false;
+    Serial.print("Pin was interrupted: ");
+    Serial.print(interruptCount, DEC);
+    Serial.println(" times so far.");
+    Serial.flush();
+  }
 
   goToSleep();
 }
@@ -35,6 +38,7 @@ void loop() {
 
 void interruptFunction() {
   interruptCount++;
+  buttonPressed = true;
 }
 
 void goToSleep() {
