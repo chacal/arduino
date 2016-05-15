@@ -47,5 +47,6 @@ add_custom_target(
 )
 
 add_executable(PinChangeIntTest
+    src/buttons.cpp
     src/main.cpp
 )
