@@ -18,13 +18,13 @@
 #define NRF_CSN 3                     // SPI Chip Select for NFR radio
 
 // Measured resistances for the voltage divider resistors (for calculating VCC)
-#define R1 1487000
-#define R2 980000
-#define AREF 3.01  // Regulated 3V used as board's VCC
+#define R1 1520000
+#define R2 1001000
+#define AREF 3.00  // Regulated 3V used as board's VCC
 
 #define TEMP_CALIBRATION -0.4f  // Calibration value for temperature
 
-#define INSTANCE 4
+#define INSTANCE 5
 
 #define CONFIG_EEPROM_ADDR 0
 #define FORCE_CONFIG_SAVE 0
@@ -55,7 +55,7 @@ struct Config {
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   bmp180.begin();
   initializeConfig();
   initializeRadio();
