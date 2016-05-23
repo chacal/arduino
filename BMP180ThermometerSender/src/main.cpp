@@ -35,6 +35,8 @@ RF24 radio(NRF_CE, NRF_CSN);
 uint8_t address[6] = "1Node";
 ISR(WDT_vect) { Sleepy::watchdogEvent(); }
 
+unsigned long duration = 0;
+unsigned long start = 0;
 
 
 struct {
@@ -64,7 +66,7 @@ void setup() {
 
 
 void loop() {
-  unsigned long start = micros();
+  duration = 0;
 
   radio.powerUp();
 
@@ -84,22 +86,25 @@ void loop() {
 
   radio.powerDown();
 
-  measurements.previousSampleTimeMicros = micros() - start;
+  measurements.previousSampleTimeMicros = duration + (micros() - start);
 
-//  Serial.println(measurements.previousSampleTimeMicros);
-//  Serial.flush();
-
-  Sleepy::loseSomeTime(5000);
+  measureTimeAndSleep(5000);
 }
 
 void readTempAndPressure(double &temp, double &pressure, float tempCalibration) {
-  char d = bmp180.startTemperature();
-  delay(d);
+  bmp180.startTemperature();
+  measureTimeAndSleep(16);
   bmp180.getTemperature(temp);
-  d = bmp180.startPressure(0);
-  delay(d);
+  bmp180.startPressure(0);
+  measureTimeAndSleep(16);
   bmp180.getPressure(pressure, temp);
   temp = temp + tempCalibration;
+}
+
+void measureTimeAndSleep(int msecs) {
+  duration += micros() - start;
+  Sleepy::loseSomeTime(msecs);
+  start = micros();
 }
 
 int readRawVcc() {

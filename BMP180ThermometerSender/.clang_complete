@@ -9,14 +9,14 @@
 -I/Users/jihartik/.platformio/packages/framework-arduinoavr/libraries/EEPROM/src
 -I/Users/jihartik/.platformio/lib/.git
 -I/Users/jihartik/.platformio/lib/Bounce2_ID1106
--I/Users/jihartik/.platformio/lib/Button/src
 -I/Users/jihartik/.platformio/lib/EnableInterrupt_ID311
 -I/Users/jihartik/.platformio/lib/I2Cdevlib_ADS1115_ID95
 -I/Users/jihartik/.platformio/lib/I2Cdevlib_Core_ID11
--I/Users/jihartik/.platformio/lib/PushButton/src
 -I/Users/jihartik/.platformio/lib/Thermometer
 -I/Users/jihartik/.platformio/lib/Utils
 -I/Users/jihartik/.platformio/lib/VCC
+-I/Users/jihartik/.platformio/lib/r89m_Buttons_ID444/src
+-I/Users/jihartik/.platformio/lib/r89m_PushButton_ID314/src
 -I/Users/jihartik/.platformio/packages/framework-arduinoavr/libraries/Bridge/src
 -I/Users/jihartik/.platformio/packages/framework-arduinoavr/libraries/Esplora/src
 -I/Users/jihartik/.platformio/packages/framework-arduinoavr/libraries/Ethernet/src
