@@ -1,7 +1,6 @@
 #include "Arduino.h"
 #include <SFE_BMP180.h>
 #include <Wire.h>
-#include <JeeLib.h>
 #include "RF24.h"
 #include <EEPROM.h>
 #include "main.h"
@@ -33,11 +32,9 @@
 SFE_BMP180 bmp180;
 RF24 radio(NRF_CE, NRF_CSN);
 uint8_t address[6] = "1Node";
-ISR(WDT_vect) { Sleepy::watchdogEvent(); }
 
 unsigned long duration = 0;
 unsigned long start = 0;
-
 
 struct {
   char tag;
@@ -88,22 +85,22 @@ void loop() {
 
   measurements.previousSampleTimeMicros = duration + (micros() - start);
 
-  measureTimeAndSleep(5000);
+  measureTimeAndSleep(WAKEUP_DELAY_4_S, WAKEUP_DELAY_1_S);
 }
 
 void readTempAndPressure(double &temp, double &pressure, float tempCalibration) {
   bmp180.startTemperature();
-  measureTimeAndSleep(16);
+  measureTimeAndSleep(WAKEUP_DELAY_16_MS);
   bmp180.getTemperature(temp);
   bmp180.startPressure(0);
-  measureTimeAndSleep(16);
+  measureTimeAndSleep(WAKEUP_DELAY_16_MS);
   bmp180.getPressure(pressure, temp);
   temp = temp + tempCalibration;
 }
 
-void measureTimeAndSleep(int msecs) {
+void measureTimeAndSleep(WatchdogTimerPrescaler delay1, WatchdogTimerPrescaler delay2) {
   duration += micros() - start;
-  Sleepy::loseSomeTime(msecs);
+  powerDown(delay1, delay2);
   start = micros();
 }
 

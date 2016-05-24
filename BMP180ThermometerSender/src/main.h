@@ -1,5 +1,7 @@
+#include <power.h>
+
 void initializeConfig();
 void initializeRadio();
 void readTempAndPressure(double &temp, double &pressure, float tempCalibration);
 int readRawVcc();
-void measureTimeAndSleep(int msecs);
+void measureTimeAndSleep(WatchdogTimerPrescaler delay1, WatchdogTimerPrescaler delay2 = WAKEUP_DELAY_NO_SLEEP);
