@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <INA219.h>
 #include "main.hpp"
+#include <power.h>
 
 INA219 ina219;
 
@@ -15,8 +16,7 @@ void setup()
 void loop()
 {
   configureINA219(TRIGGER_SHUNT);
-  delay(75);
-
+  powerDown(WAKEUP_DELAY_64_MS);  // It takes ~34 ms to measure shunt with 64 samples
 
   Serial.print("raw shunt voltage: ");
   Serial.println(ina219.shuntVoltageRaw());
@@ -30,10 +30,10 @@ void loop()
   Serial.println(" mA");
 
   Serial.println(" ");
+  Serial.flush();
 
   configureINA219(POWER_DOWN);
-
-  delay(1000);
+  powerDown(WAKEUP_DELAY_2_S);
 }
 
 
