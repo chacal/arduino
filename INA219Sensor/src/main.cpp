@@ -104,6 +104,7 @@ void initializeConfig() {
   Serial.println("Used configuration:");
   Serial.print("Instance = ");
   Serial.println(config.instance);
+  Serial.flush();
 }
 
 void initializeRadio() {
