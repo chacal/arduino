@@ -86,7 +86,7 @@ void loop()
 void initializeINA219() {
   ina219.begin(0x40);
   configureINA219(TRIGGER_SHUNT);
-  ina219.calibrate(0.0005, 0.05, 15, 100);     // 5mΩ shunt, 40mV max shunt voltage, max bus voltage, max current in shunt
+  ina219.calibrate(0.0005, 0.05, 15, 50);     // 5mΩ shunt, 40mV max shunt voltage, max bus voltage, max current in shunt
 }
 
 void configureINA219(Ina219Mode mode) {
