@@ -9,7 +9,6 @@
 
 
 /* Pins */
-#define RAW_IN A0                     // RAW voltage is read from this pin
 #define NRF_CE 2                      // Chip Enbale pin for NRF radio
 #define NRF_CSN 3                     // SPI Chip Select for NFR radio
 
@@ -85,13 +84,14 @@ void loop()
 
 
 void initializeINA219() {
-  ina219.begin(0x40);
+  ina219.begin();
   configureINA219(TRIGGER_SHUNT);
   ina219.calibrate(0.0005, 0.05, 15, 50);     // 5mΩ shunt, 40mV max shunt voltage, max bus voltage, max current in shunt
 }
 
 void configureINA219(Ina219Mode mode) {
-  ina219.configure(0, 0, 3, 0xE, mode);        // 0-16V bus voltage range, ±40mV scale, 12-bit bus ADC, 12-bit + 64 sample avg shunt ADC, measure shunt only triggered / power down
+  // 0-16V bus voltage range, ±40mV scale, 12-bit bus ADC, 12-bit + 64 sample avg shunt ADC, measure shunt only triggered / power down
+  ina219.configure(INA219::RANGE_16V, INA219::GAIN_1_40MV, INA219::ADC_12BIT, INA219::ADC_64SAMP, (INA219::t_mode)mode);  // Force cast mode as INA219 library doesn't support triggered modes..
 }
 
 
