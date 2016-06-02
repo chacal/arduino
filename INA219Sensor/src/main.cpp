@@ -5,6 +5,7 @@
 #include <power.h>
 #include "RF24.h"
 #include <EEPROM.h>
+#include <VCC.h>
 
 
 /* Pins */
@@ -64,7 +65,7 @@ void loop()
   measurements.rawMeasurement = ina219.shuntVoltageRaw();
   measurements.shuntVoltageMilliVolts = ina219.shuntVoltage() * 1000;
   measurements.shuntCurrent = ina219.shuntCurrent();
-  measurements.vcc = 4000;
+  measurements.vcc = readVcc();
   measurements.instance = config.instance;
 
   configureINA219(POWER_DOWN);
