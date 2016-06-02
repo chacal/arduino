@@ -26,8 +26,8 @@ uint8_t address[6] = "1Node";
 struct {
   char tag;
   uint8_t instance;
-  int16_t rawShuntVoltage;
-  float shuntVoltage;
+  int16_t rawMeasurement;
+  float shuntVoltageMilliVolts;
   float shuntCurrent;
   int vcc;
   unsigned long previousSampleTimeMicros;
@@ -61,8 +61,8 @@ void loop()
   powerDown(WAKEUP_DELAY_64_MS);  // It takes ~34 ms to measure shunt with 64 samples
   start = micros();
 
-  measurements.rawShuntVoltage = ina219.shuntVoltageRaw();
-  measurements.shuntVoltage = ina219.shuntVoltage();
+  measurements.rawMeasurement = ina219.shuntVoltageRaw();
+  measurements.shuntVoltageMilliVolts = ina219.shuntVoltage() * 1000;
   measurements.shuntCurrent = ina219.shuntCurrent();
   measurements.vcc = 4000;
   measurements.instance = config.instance;
