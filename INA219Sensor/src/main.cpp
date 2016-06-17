@@ -5,14 +5,17 @@
 #include <power.h>
 #include "RF24.h"
 #include <EEPROM.h>
-#include <VCC.h>
 
 
 /* Pins */
-#define NRF_CE 2                      // Chip Enbale pin for NRF radio
-#define NRF_CSN 3                     // SPI Chip Select for NFR radio
+#define NRF_CE 6                      // Chip Enbale pin for NRF radio
+#define NRF_CSN 8                     // SPI Chip Select for NFR radio
+#define EXT_VOLTAGE_SENSE A3
 
-#define AREF 3.00  // Regulated 3V used as board's VCC
+// Measured resistances for the voltage divider resistors
+#define R1 39100
+#define R2 9900
+#define AREF 3.30  // Regulated 3V used as board's VCC
 #define INSTANCE 6
 
 #define CONFIG_EEPROM_ADDR 0
@@ -34,6 +37,8 @@ struct {
 } measurements;
 
 struct Config {
+  long r1;
+  long r2;
   uint8_t instance;
 } config;
 
@@ -64,7 +69,7 @@ void loop()
   measurements.rawMeasurement = ina219.shuntVoltageRaw();
   measurements.shuntVoltageMilliVolts = ina219.shuntVoltage() * 1000;
   measurements.shuntCurrent = ina219.shuntCurrent();
-  measurements.vcc = readVcc();
+  measurements.vcc = readExternalVoltage();
   measurements.instance = config.instance;
 
   configureINA219(POWER_DOWN);
@@ -86,7 +91,7 @@ void loop()
 void initializeINA219() {
   ina219.begin();
   configureINA219(TRIGGER_SHUNT);
-  ina219.calibrate(0.0005, 0.05, 15, 50);     // 5mΩ shunt, 40mV max shunt voltage, max bus voltage, max current in shunt
+  ina219.calibrate(0.00025, 0.05, 15, 200);     // 0.25mΩ shunt, 50mV max shunt voltage, max bus voltage, max current in shunt
 }
 
 void configureINA219(Ina219Mode mode) {
@@ -94,15 +99,30 @@ void configureINA219(Ina219Mode mode) {
   ina219.configure(INA219::RANGE_16V, INA219::GAIN_1_40MV, INA219::ADC_12BIT, INA219::ADC_64SAMP, (INA219::t_mode)mode);  // Force cast mode as INA219 library doesn't support triggered modes..
 }
 
+int readExternalVoltage() {
+  // Read and wait to get the ADC settled
+  analogRead(EXT_VOLTAGE_SENSE);
+  delayMicroseconds(100);
+  int sensorValue = analogRead(EXT_VOLTAGE_SENSE);
+  float voltageAtPin = sensorValue * (AREF / 1023.0);
+  int externalVoltageInMilliVolts = (config.r1 + config.r2) / (float)config.r2 * voltageAtPin * 1000;
+  return externalVoltageInMilliVolts;
+}
 
 void initializeConfig() {
   EEPROM.get(CONFIG_EEPROM_ADDR, config);
-  if(FORCE_CONFIG_SAVE || config.instance == -1 || config.instance == 255) {
+  if(FORCE_CONFIG_SAVE || config.instance == -1 || config.instance == 255 || (config.r1 == -1 && config.r2 == -1)) {
+    config.r1 = R1;
+    config.r2 = R2;
     config.instance = INSTANCE;
     Serial.println("Saving defaults to EEPROM...");
     EEPROM.put(CONFIG_EEPROM_ADDR, config);
   }
   Serial.println("Used configuration:");
+  Serial.print("R1 = ");
+  Serial.println(config.r1);
+  Serial.print("R2 = ");
+  Serial.println(config.r2);
   Serial.print("Instance = ");
   Serial.println(config.instance);
   Serial.flush();

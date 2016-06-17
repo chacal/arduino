@@ -5,3 +5,4 @@ void initializeINA219();
 void configureINA219(Ina219Mode mode);
 void initializeConfig();
 void initializeRadio();
+int readExternalVoltage();
