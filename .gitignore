@@ -1,1 +1,6 @@
 .DS_Store
+.idea/
+CMakeListsPrivate.txt
+.travis.yml
+.clang_complete
+.gcc-flags.json
