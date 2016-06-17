@@ -50,5 +50,5 @@ void initializeRadio() {
   radio.openWritingPipe(address);
   // Use auto ACKs to avoid sleeping between radio transmissions
   radio.setAutoAck(true);
-  radio.setRetries(3, 2);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
+  radio.setRetries(3, 10);  // Retry every 1ms for maximum of 10 times
 }
