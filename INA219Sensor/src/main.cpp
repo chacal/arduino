@@ -85,7 +85,7 @@ void loop()
   // Serial.println(measurements.previousSampleTimeMicros);
   // Serial.flush();
 
-  powerDown(WAKEUP_DELAY_2_S);
+  powerDown(WAKEUP_DELAY_500_MS);
 }
 
 
