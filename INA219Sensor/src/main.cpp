@@ -15,7 +15,8 @@
 // Measured resistances for the voltage divider resistors
 #define R1 39100
 #define R2 9900
-#define AREF 3.30  // Regulated 3V used as board's VCC
+#define AREF 3.27  // Regulated 3V used as board's VCC
+
 #define INSTANCE 6
 
 #define CONFIG_EEPROM_ADDR 0
