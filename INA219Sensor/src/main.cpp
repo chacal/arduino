@@ -69,7 +69,7 @@ void loop()
 
   measurements.rawMeasurement = ina219.shuntVoltageRaw();
   measurements.shuntVoltageMilliVolts = ina219.shuntVoltage() * 1000;
-  measurements.shuntCurrent = ina219.shuntCurrent();
+  measurements.shuntCurrent = -ina219.shuntCurrent();
   measurements.vcc = readExternalVoltage();
   measurements.instance = config.instance;
 
