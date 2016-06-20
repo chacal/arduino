@@ -63,7 +63,7 @@ void loop()
   configureINA219(TRIGGER_SHUNT);
 
   duration += micros() - start;
-  powerDown(WAKEUP_DELAY_64_MS);  // It takes ~34 ms to measure shunt with 64 samples
+  powerDown(WAKEUP_DELAY_64_MS, WAKEUP_DELAY_16_MS);  // It takes ~68 ms to measure shunt with 128 samples => sleep for 82ms
   start = micros();
 
   measurements.rawMeasurement = ina219.shuntVoltageRaw();
@@ -95,8 +95,8 @@ void initializeINA219() {
 }
 
 void configureINA219(Ina219Mode mode) {
-  // 0-16V bus voltage range, ±40mV scale, 12-bit bus ADC, 12-bit + 64 sample avg shunt ADC, measure shunt only triggered / power down
-  ina219.configure(INA219::RANGE_16V, INA219::GAIN_1_40MV, INA219::ADC_12BIT, INA219::ADC_64SAMP, (INA219::t_mode)mode);  // Force cast mode as INA219 library doesn't support triggered modes..
+  // 0-16V bus voltage range, ±40mV scale, 12-bit bus ADC, 12-bit + 128 sample avg shunt ADC, measure shunt only triggered / power down
+  ina219.configure(INA219::RANGE_16V, INA219::GAIN_1_40MV, INA219::ADC_12BIT, INA219::ADC_128SAMP, (INA219::t_mode)mode);  // Force cast mode as INA219 library doesn't support triggered modes..
 }
 
 int readExternalVoltage() {
