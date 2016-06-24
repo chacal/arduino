@@ -64,6 +64,7 @@ void setup() {
 
 void loop() {
   unsigned long start = micros();
+  radio.powerUp();
 
   digitalWrite(WaterTankOUT, HIGH);
   // Read and wait to get the ADC settled
@@ -81,7 +82,6 @@ void loop() {
   int externalVoltageInMilliVolts = (config.r1 + config.r2) / (float)config.r2 * voltageAtPin * 1000;
   measurements.vcc = externalVoltageInMilliVolts;
 
-  radio.powerUp();
   radio.write(&measurements, sizeof(measurements));
   radio.powerDown();
 

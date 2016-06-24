@@ -64,6 +64,7 @@ void setup() {
 }
 
 void loop() {
+  radio.powerUp();
   pinMode(ThermistorOUT, OUTPUT);
   digitalWrite(ThermistorOUT, HIGH);
   unsigned long start = micros();
@@ -84,7 +85,6 @@ void loop() {
   int externalVoltageInMilliVolts = (config.r1 + config.r2) / (float)config.r2 * voltageAtPin * 1000;
   measurements.vcc = externalVoltageInMilliVolts;
 
-  radio.powerUp();
   radio.write(&measurements, sizeof(measurements));
   radio.powerDown();
 
