@@ -115,6 +115,7 @@ void initializeConfig() {
   Serial.println(config.tempCalibration);
   Serial.print("Instance = ");
   Serial.println(config.instance);
+  Serial.flush();
 }
 
 void initializeRadio() {
