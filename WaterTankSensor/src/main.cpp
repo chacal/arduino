@@ -22,8 +22,9 @@
 #define NRF_CSN 3                     // SPI Chip Select for NFR radio
 
 #define WATER_MEASUREMENT_DIVIDER_RESISTOR 472          // balance/pad resistor value
-#define WATER_TANK_MAX_RESISTOR 180                     // Resistance of full tank meter
-#define WATER_TANK_ADC_FULL_VALUE (float)((WATER_TANK_MAX_RESISTOR / ((float)WATER_TANK_MAX_RESISTOR + WATER_MEASUREMENT_DIVIDER_RESISTOR)) * 1023)
+#define WATER_TANK_MAX_RESISTOR 178                     // Resistance of full tank meter
+#define VOLTAGE_AT_WATERTANK_OUT 2.85                   // Voltage drops ~15mV at the pin as there is ~5mA current flowing there -> this needs to be compensated when measuring with ADC
+#define WATER_TANK_ADC_FULL_VALUE (float)((WATER_TANK_MAX_RESISTOR / ((float)WATER_TANK_MAX_RESISTOR + WATER_MEASUREMENT_DIVIDER_RESISTOR)) * (VOLTAGE_AT_WATERTANK_OUT / AREF) * 1023)
 
 // Measured resistances for the voltage divider resistors
 #define R1 1468000
