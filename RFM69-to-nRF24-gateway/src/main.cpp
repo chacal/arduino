@@ -61,13 +61,13 @@ void loop() {
 void initializeNrfRadio() {
   nrf.begin();
   nrf.setPALevel(RF24_PA_MAX);
-  nrf.setDataRate(RF24_2MBPS);
+  nrf.setDataRate(RF24_250KBPS);
   nrf.setPayloadSize(32);
   nrf.enableDynamicPayloads();
   nrf.openWritingPipe(address);
   // Use auto ACKs to avoid sleeping between radio transmissions
   nrf.setAutoAck(true);
-  nrf.setRetries(0, 10);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
+  nrf.setRetries(1, 15);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
 }
 
 void initializeRfmRadio() {
