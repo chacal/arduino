@@ -43,7 +43,7 @@ void goToSleep() {
 void initializeRadio() {
   radio.initialize(FREQUENCY, INSTANCE, NETWORKID);
   radio.setHighPower();
-  radio.setPowerLevel(0);
+  radio.setPowerLevel(20);
   radio.sleep();
 }
 

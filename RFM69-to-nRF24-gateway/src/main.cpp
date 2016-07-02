@@ -94,7 +94,7 @@ void initializeNrfRadio() {
 void initializeRfmRadio() {
   rfm69.initialize(RFM_FREQUENCY, RFM_NETWORK_INSTANCE, RFM_NETWORK_ID);
   rfm69.setHighPower();
-  rfm69.setPowerLevel(0);
+  rfm69.setPowerLevel(20);
 }
 
 void initializeConfig() {
