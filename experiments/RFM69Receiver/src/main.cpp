@@ -4,30 +4,23 @@
 #include <power.h>
 #include <RFM69registers.h>
 
-#define NETWORKID     100  //the same on all nodes that talk to each other
-#define NODEID        2
-
+#define NETWORKID            50
+#define NODEID                1
+#define RFM69_NSS            10    // SPI Chip Select / NSS for RFM69
+#define RFM69_IRQ_PIN         2    // IRQ pin for RFM69
+#define RFM69_IRQ_NUM         0    // Pin 2 is EXT_INT0
 #define FREQUENCY     RF69_433MHZ
-#define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
-
 #define SERIAL_BAUD   57600
 
-RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, true);
+RFM69 radio(RFM69_NSS, RFM69_IRQ_PIN, true, RFM69_IRQ_NUM);
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.setHighPower();
-  radio.encrypt(ENCRYPTKEY);
-  // radio.writeReg(REG_BITRATEMSB, RF_BITRATEMSB_300000);
-  // radio.writeReg(REG_BITRATELSB, RF_BITRATELSB_300000);
+  radio.setPowerLevel(0);
 
-  radio.sleep();
-
-  char buff[50];
-  sprintf(buff, "\nListening at %d Mhz...", 433);
-  Serial.println(buff);
-  Serial.flush();
+  Serial.println("Listening at 433 Mhz...");
 }
 
 void loop() {
@@ -38,16 +31,14 @@ void loop() {
       unsigned long start = micros();
       radio.sendACK();
       unsigned long duration = micros() - start;
-      Serial.print(" - ACK sent in ");
+      Serial.print("ACK sent in ");
       Serial.print(duration);
-      Serial.println(" us");
+      Serial.print(" us. ");
     }
 
-    //print message received to serial
-    Serial.print('[');Serial.print(radio.SENDERID);Serial.print("] ");
-    Serial.print((char*)radio.DATA);
-    Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+    Serial.print("[");Serial.print(radio.SENDERID);Serial.print("] ");
+    Serial.print("  [TX duration: ");Serial.print(*(long*)radio.DATA);Serial.print("] ");
+    Serial.print("  [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+    Serial.println("");
   }
-
-  radio.receiveDone(); //put radio in RX mode
 }

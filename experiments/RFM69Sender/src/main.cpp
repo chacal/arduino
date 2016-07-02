@@ -1,19 +1,19 @@
 #include <Arduino.h>
 #include <RFM69.h>    //get it here: https://www.github.com/lowpowerlab/rfm69
 #include <SPI.h>
-#include <power.h>
-#include <RFM69registers.h>
+
 
 #define NETWORKID     50  //the same on all nodes that talk to each other
-#define INSTANCE      9
+#define INSTANCE      2
 #define RECEIVER_ID   1  // Gateway is ID 1
-
+#define RFM69_NSS_PIN 8
 #define FREQUENCY     RF69_433MHZ
-
 #define SERIAL_BAUD   57600
 
-RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, true);
-unsigned long counter = 0;
+RFM69 radio(RFM69_NSS_PIN, RF69_IRQ_PIN, true);
+
+int previousRssi;
+long previousDuration;
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
@@ -21,30 +21,22 @@ void setup() {
   radio.setHighPower();
   radio.setPowerLevel(0);
 
-  radio.sleep();
-
-  char buff[50];
-  sprintf(buff, "\nSending at %d Mhz...", 433);
-  Serial.println(buff);
-  Serial.flush();
+  Serial.println("Sending at 433 Mhz...");
 }
 
 void loop() {
   long start = micros();
 
-  // radio.send(2, "Here is some longer test data", 29, false);
-  if(radio.sendWithRetry(RECEIVER_ID, &counter, sizeof(counter), 2, 10)) {
-    long duration = micros() - start;
-    Serial.print(radio.RSSI);
-    Serial.print(" ");
-    Serial.println(duration);
-  } else {
-    Serial.println("failed");
-  }
+  bool ret = radio.sendWithRetry(RECEIVER_ID, &previousDuration, sizeof(previousDuration), 2, 50);
+  long duration = micros() - start;
+  previousRssi = radio.RSSI;
+  previousDuration = duration;
 
-  counter++;
-  radio.sleep();
-  Serial.flush();
+  Serial.print(previousRssi);
+  Serial.print(" ");
+  Serial.print(duration);
+  Serial.println(ret ? " OK" : " failed");
 
-  powerDown(WAKEUP_DELAY_1_S);
+
+  delay(1000);
 }
