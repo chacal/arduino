@@ -132,11 +132,11 @@ void initializeConfig() {
 void initializeRadio() {
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_250KBPS);
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
   // Use auto ACKs to avoid sleeping between radio transmissions
   radio.setAutoAck(true);
-  radio.setRetries(0, 10);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
+  radio.setRetries(1, 10);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
 }

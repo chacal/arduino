@@ -9,7 +9,7 @@
  * Wiring for thermistor:
  * - 10k resistor between GND and ThermistorIN
  * - thermistor between ThermistorOUT and ThermistorIN
- * 
+ *
  * Wiring for external voltage measurement:
  * - 1.5 MOhm resistor between RAW and RAW_IN
  * - 1 MOhm resistor between RAW_IN and GND
@@ -121,11 +121,10 @@ void initializeConfig() {
 void initializeRadio() {
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_250KBPS);
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
   radio.setAutoAck(true);
-  radio.setRetries(0, 10);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
+  radio.setRetries(1, 10);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
 }
-

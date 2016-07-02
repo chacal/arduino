@@ -113,10 +113,10 @@ void initializeConfig() {
 void initializeRadio() {
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_250KBPS);
   radio.setPayloadSize(32);
   radio.enableDynamicPayloads();
   radio.openWritingPipe(address);
   radio.setAutoAck(true);
-  radio.setRetries(0, 10);  // Retry every 250us for 10 times + send times (~1ms)
+  radio.setRetries(1, 10);  // Retry every 250us for 10 times + send times (~1ms)
 }
