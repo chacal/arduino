@@ -6,6 +6,8 @@
 #include "main.hpp"
 #include <EEPROM.h>
 
+#define DEBUG                 0
+
 #define RFM_NETWORK_ID        50
 #define RFM_FREQUENCY         RF69_433MHZ
 #define RFM_NETWORK_INSTANCE  1    // Use 1 as gateway address
@@ -29,12 +31,21 @@ struct Config {
   uint8_t instance;
 } config;
 
+struct RFMGatewayData {
+  char tag;
+  uint8_t instance;
+  int rssi;
+  bool ackSent;
+  unsigned long previousSampleTimeMicros;
+} gwData;
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
   initializeConfig();
   initializeRfmRadio();
   initializeNrfRadio();
+  gwData.tag = 's';
+  gwData.instance = RFM_NETWORK_INSTANCE;
 }
 
 void loop() {
@@ -44,15 +55,25 @@ void loop() {
 
     bool ret = nrf.write((void*)rfm69.DATA, rfm69.DATALEN);
     if (rfm69.ACKRequested() && ret) {
+      gwData.ackSent = true;
       rfm69.sendACK();
+    } else {
+      gwData.ackSent = false;
     }
     unsigned long duration = micros() - start;
 
+    gwData.rssi = rfm69.RSSI;
+    gwData.previousSampleTimeMicros = duration;
+    delay(20);  // Give nRF gateway some time to process the previous packet
+    nrf.write(&gwData, sizeof(gwData));
+
+#if DEBUG
     Serial.print(ret);
     Serial.print(" ");
     Serial.print(rfm69.RSSI);
     Serial.print(" ");
     Serial.println(duration);
+#endif
   }
 }
 
