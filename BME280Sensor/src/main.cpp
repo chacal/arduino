@@ -17,8 +17,8 @@
 #define NRF_CSN 10                     // SPI Chip Select for NFR radio
 
 // Measured resistances for the voltage divider resistors (for calculating VCC)
-#define R1 1500000
-#define R2 1000000
+#define R1 2000000
+#define R2 2000000
 #define AREF 3.33  // Regulated 3V3 used as board's VCC
 
 #define TEMP_CALIBRATION -0.0f  // Calibration value for temperature
@@ -26,7 +26,7 @@
 #define INSTANCE 8
 
 #define CONFIG_EEPROM_ADDR 0
-#define FORCE_CONFIG_SAVE 1
+#define FORCE_CONFIG_SAVE 0
 
 
 BME280I2C bme(0x01, 0x01, 0x01, 0x01); // x1 oversampling for all, forced mode
