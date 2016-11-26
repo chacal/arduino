@@ -14,7 +14,7 @@
 /* Pins */
 #define RAW_IN A3                     // RAW voltage is read from this pin
 #define NRF_CE 9                      // Chip Enbale pin for NRF radio
-#define NRF_CSN 10                     // SPI Chip Select for NFR radio
+#define NRF_CSN 10                    // SPI Chip Select for NFR radio
 
 // Measured resistances for the voltage divider resistors (for calculating VCC)
 #define R1 2000000
