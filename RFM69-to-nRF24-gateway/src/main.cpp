@@ -16,7 +16,8 @@
 #define RFM69_NSS            10    // SPI Chip Select / NSS for RFM69
 #define RFM69_IRQ_PIN         2    // IRQ pin for RFM69
 #define RFM69_IRQ_NUM         0    // Pin 2 is EXT_INT0
-uint8_t address[6] =         "1Node";
+uint8_t nrfServerAddress[6] = "1Node";    // Packets from RFM69 are forwarded to this address
+uint8_t listenAddress[6]    = "gwnod";    // This address is listened and incoming packets are forwarded to RFM69
 
 #define SERIAL_BAUD           57600
 #define FORCE_CONFIG_SAVE     0
@@ -44,6 +45,7 @@ void setup() {
   initializeConfig();
   initializeRfmRadio();
   initializeNrfRadio();
+  nrf.startListening();
   gwData.tag = 's';
   gwData.instance = RFM_NETWORK_INSTANCE;
 }
@@ -53,6 +55,7 @@ void loop() {
   {
     unsigned long start = micros();
 
+    nrf.stopListening();
     bool ret = nrf.write((void*)rfm69.DATA, rfm69.DATALEN);
     if (rfm69.ACKRequested() && ret) {
       gwData.ackSent = true;
@@ -66,6 +69,7 @@ void loop() {
     gwData.previousSampleTimeMicros = duration;
     delay(20);  // Give nRF gateway some time to process the previous packet
     nrf.write(&gwData, sizeof(gwData));
+    nrf.startListening();
 
 #if DEBUG
     Serial.print(ret);
@@ -74,6 +78,21 @@ void loop() {
     Serial.print(" ");
     Serial.println(duration);
 #endif
+  }
+
+  noInterrupts();
+  if(nrf.available()) {
+    uint8_t size = nrf.getDynamicPayloadSize();
+    uint8_t buf[size];
+    nrf.read(&buf, size);
+    interrupts();
+
+    if(size > 2 && buf[0] == 'g') {
+      uint8_t rfmToAddress = buf[1];
+      rfm69.sendWithRetry(rfmToAddress, buf+2, size-2, 3, 5);
+    }
+  } else {
+    interrupts();
   }
 }
 
@@ -85,7 +104,8 @@ void initializeNrfRadio() {
   nrf.setDataRate(RF24_250KBPS);
   nrf.setPayloadSize(32);
   nrf.enableDynamicPayloads();
-  nrf.openWritingPipe(address);
+  nrf.openWritingPipe(nrfServerAddress);
+  nrf.openReadingPipe(1, listenAddress);
   // Use auto ACKs to avoid sleeping between radio transmissions
   nrf.setAutoAck(true);
   nrf.setRetries(1, 15);  // Retry every 1ms for maximum of 3ms + send times (~1ms)
