@@ -5,12 +5,12 @@
 #include <RFM69registers.h>
 
 #define NETWORKID            50
-#define NODEID                1
+#define NODEID               50
 #define RFM69_NSS            10    // SPI Chip Select / NSS for RFM69
 #define RFM69_IRQ_PIN         2    // IRQ pin for RFM69
 #define RFM69_IRQ_NUM         0    // Pin 2 is EXT_INT0
-#define FREQUENCY     RF69_433MHZ
-#define SERIAL_BAUD   57600
+#define FREQUENCY            RF69_433MHZ
+#define SERIAL_BAUD          57600
 
 RFM69 radio(RFM69_NSS, RFM69_IRQ_PIN, true, RFM69_IRQ_NUM);
 
@@ -26,6 +26,10 @@ void setup() {
 void loop() {
   if (radio.receiveDone())
   {
+    uint8_t size = radio.DATALEN;
+    uint8_t buf[size];
+    memcpy(buf, (const void*)radio.DATA, size);
+
     if (radio.ACKRequested())
     {
       unsigned long start = micros();
@@ -37,8 +41,11 @@ void loop() {
     }
 
     Serial.print("[");Serial.print(radio.SENDERID);Serial.print("] ");
-    Serial.print("  [TX duration: ");Serial.print(*(long*)radio.DATA);Serial.print("] ");
-    Serial.print("  [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+    Serial.print("  [Data: ");
+    for(uint8_t i = 0; i < size; i++) {
+      Serial.print((char)buf[i]);
+    }
+    Serial.print("]  [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
     Serial.println("");
   }
 }
