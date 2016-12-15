@@ -55,8 +55,11 @@ void loop() {
   {
     unsigned long start = micros();
 
+    noInterrupts();
     nrf.stopListening();
     bool ret = nrf.write((void*)rfm69.DATA, rfm69.DATALEN);
+    interrupts();
+
     if (rfm69.ACKRequested() && ret) {
       gwData.ackSent = true;
       rfm69.sendACK();
@@ -68,8 +71,11 @@ void loop() {
     gwData.rssi = rfm69.RSSI;
     gwData.previousSampleTimeMicros = duration;
     delay(20);  // Give nRF gateway some time to process the previous packet
+
+    noInterrupts();
     nrf.write(&gwData, sizeof(gwData));
     nrf.startListening();
+    interrupts();
 
 #if DEBUG
     Serial.print(ret);
