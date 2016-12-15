@@ -4,13 +4,14 @@
 
 #include <Arduino.h>
 
-#define GATE_PIN 3
+#define GATE_PIN 6
 
 void setup()
 {
-  // initialize LED digital pin as an output.
+  Serial.begin(57600);
   pinMode(GATE_PIN, OUTPUT);
   digitalWrite(GATE_PIN, HIGH);
+  Serial.println("Starting..");
 }
 
 void loop()
@@ -19,7 +20,7 @@ void loop()
   // delay(5000);
   // analogWrite(GATE_PIN, 255);
   // delay(5000);
-
+  Serial.println("Looping..");
   for(int i = 0; i<360; i++){
     //convert 0-360 angle to radian (needed for sin function)
     float rad = DEG_TO_RAD * i;
