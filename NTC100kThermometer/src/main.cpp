@@ -14,7 +14,7 @@
  */
 
 /* Pins */
-#define ThermistorIN A2                 // Temperature is measured from this pin
+#define ThermistorIN A4                 // Temperature is measured from this pin
 #define ThermistorOUT A5                // This set to HIGH when measuring temperature
 #define RAW_IN A3                       // RAW voltage is read from this pin
 #define NRF_CE 9                        // Chip Enbale pin for NRF radio
