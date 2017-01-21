@@ -98,13 +98,14 @@ float sampleAdc(uint8_t adcPin, uint8_t sampleCount) {
 
 double calculateTemperature(int rawADC) {
   float steinhart;
-  steinhart = rawADC / THERMISTOR_RESISTANCE;             // (R/Ro)
+  double R = THERMISTOR_RESISTANCE * (1024.0f / rawADC - 1);
+  steinhart = R / THERMISTOR_RESISTANCE;                  // (R/Ro)
   steinhart = log(steinhart);                             // ln(R/Ro)
   steinhart /= THERMISTOR_BETA_COEF;                      // 1/B * ln(R/Ro)
   steinhart += 1.0 / (THERMISTOR_NOMINAL_TEMP + 273.15);  // + (1/To)
   steinhart = 1.0 / steinhart;                            // Invert
   steinhart -= 273.15;                                    // convert to C
-  return steinhart / 10;
+  return steinhart;
 }
 
 int readRawVcc() {
