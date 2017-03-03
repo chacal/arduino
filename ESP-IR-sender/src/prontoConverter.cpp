@@ -71,14 +71,15 @@ bool convertProntoToRaw(const char *prontoHex, RawSampleData *sampleData) {
     //  Read and validate once and repeat code lengths
     codeLength = (uint8_t)readWordAndSkip(&cp);
     repeatLength = (uint8_t)readWordAndSkip(&cp);
-    if(codeLength + repeatLength > sampleData->sampleCount) {
+    int totalSamples = codeLength * 2 + repeatLength * 2;
+    if(totalSamples > sampleData->sampleCount) {
         return false;
     }
-    sampleData->sampleCount = codeLength + repeatLength;
+    sampleData->sampleCount = totalSamples;
 
 
     //  Read and convert actual samples
-    for(int i = 0; i < codeLength + repeatLength; i++) {
+    for(int i = 0; i < totalSamples; i++) {
         sampleData->samples[i] = readWordAndSkip(&cp) * usec;
     }
 
