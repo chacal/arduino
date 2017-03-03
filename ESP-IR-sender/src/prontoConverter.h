@@ -4,7 +4,7 @@
 #define MAX_RAW_SAMPLES 200
 
 struct RawSampleData {
-    uint16_t samples[MAX_RAW_SAMPLES];
+    unsigned int samples[MAX_RAW_SAMPLES];
     uint8_t sampleCount = MAX_RAW_SAMPLES;
     uint8_t freq;
 };
