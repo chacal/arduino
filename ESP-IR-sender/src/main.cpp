@@ -4,9 +4,8 @@
 #include <LoopbackStream.h>
 #include <PubSubClient.h>
 #include <StreamPrint.h>
+#include <WiFiManager.h>
 
-const char *ssid = "<SSID>";
-const char *password = "<PASSWORD>";
 const char *mqtt_server = "mqtt-home.chacal.online";
 
 
@@ -40,15 +39,13 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
 }
 
 void connectWiFi() {
-    WiFi.begin(ssid, password);
-    Serial << endl;
+    Serial << "Connecting to WiFi.." << endl;
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial << ".";
-    }
+    WiFiManager wifiManager;
+    wifiManager.autoConnect("ESP-IR-sender");
+
     Serial << endl
-           << "Connected to " << ssid << endl
+           << "Connected to WiFi: " << WiFi.SSID() << endl
            << "IP address: " << WiFi.localIP() << endl;
 }
 
