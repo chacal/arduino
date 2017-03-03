@@ -5,6 +5,7 @@
 #include <PubSubClient.h>
 #include <StreamPrint.h>
 #include <WiFiManager.h>
+#include "prontoConverter.h"
 
 const char *mqtt_server = "mqtt-home.chacal.online";
 
@@ -35,7 +36,23 @@ void loop(void) {
 }
 
 void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
-    Serial << "Message arrived [" << topic << "] " << mqttInputBuffer.readString() << endl;
+    String msg = mqttInputBuffer.readString();
+    Serial << "Message arrived [" << topic << "] " << msg << endl;
+
+    RawSampleData sampleData;
+    bool ret = convertProntoToRaw(msg.c_str(), &sampleData);
+
+    if(ret) {
+        Serial << "Got valid pronto data. Freq: " << (int) sampleData.freq << " Sample count: "
+               << (int) sampleData.sampleCount << endl;
+        for (int i = 0; i < sampleData.sampleCount; i++) {
+            Serial << sampleData.samples[i] << " ";
+        }
+        Serial << endl;
+
+    } else {
+        Serial << "Couldn't convert message to raw samples!" << endl;
+    }
 }
 
 void connectWiFi() {
