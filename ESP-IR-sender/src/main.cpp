@@ -36,19 +36,16 @@ void loop(void) {
 }
 
 void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
-    String msg = mqttInputBuffer.readString();
-    Serial << "Message arrived [" << topic << "] " << msg << endl;
-
     RawSampleData sampleData;
-    bool ret = convertProntoToRaw(msg.c_str(), &sampleData);
+    bool ret = convertProntoToRaw(mqttInputBuffer.readString().c_str(), &sampleData);
 
     if(ret) {
         Serial << "Got valid pronto data. Freq: " << (int) sampleData.freq << " Sample count: "
                << (int) sampleData.sampleCount << endl;
-        for (int i = 0; i < sampleData.sampleCount; i++) {
-            Serial << sampleData.samples[i] << " ";
+        for (int i = 0; i < 3; ++i) {
+            irsend.sendRaw(sampleData.samples, sampleData.sampleCount, sampleData.freq);
+            delay(20);
         }
-        Serial << endl;
 
     } else {
         Serial << "Couldn't convert message to raw samples!" << endl;
