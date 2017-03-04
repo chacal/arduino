@@ -93,27 +93,7 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
 }
 
 void connectWiFi() {
-  Serial << "Connecting to WiFi.." << endl;
-
-  WiFiManagerParameter serverParam("server", "MQTT server", mqttConfig.server, 100);
-  WiFiManagerParameter portParam("port", "MQTT port", mqttConfig.port, 6);
-  WiFiManagerParameter topicRootParam("topic_root", "MQTT topic root", mqttConfig.topicRoot, 100);
-
-  wifiManager.addParameter(&serverParam);
-  wifiManager.addParameter(&portParam);
-  wifiManager.addParameter(&topicRootParam);
-
-  wifiManager.setSaveConfigCallback([]() { shouldSaveMQTTConfig = true; });
-
-  wifiManager.autoConnect("ESP-IR-sender");
-
-  strcpy(mqttConfig.server, serverParam.getValue());
-  strcpy(mqttConfig.topicRoot, topicRootParam.getValue());
-  strcpy(mqttConfig.port, portParam.getValue());
-
-  Serial << endl
-         << "Connected to WiFi: " << WiFi.SSID() << endl
-         << "IP address: " << WiFi.localIP() << endl;
+  connectWiFi(wifiManager, mqttConfig, []() { shouldSaveMQTTConfig = true; });
 }
 
 void connectMQTT() {
