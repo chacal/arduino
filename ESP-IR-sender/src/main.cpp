@@ -8,14 +8,13 @@
 #include "prontoConverter.h"
 #include "ConfigSaver.h"
 
-bool shouldSaveConfig = false;
 
 void connectWiFi();
 void connectMQTT();
 
 
-ConfigSaver configSaver;
-MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/kuikkeloinen/test");
+MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/irsender/1/prontohex");
+bool shouldSaveMQTTConfig = false;
 LoopbackStream mqttInputBuffer(1024);
 WiFiClient wifiClient;
 PubSubClient mqttClient;
@@ -23,15 +22,18 @@ IRsend irsend(3);
 
 
 void setup(void) {
+  ConfigSaver configSaver;
+
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
+  randomSeed(micros());
   irsend.begin();
+
   configSaver.loadConfiguration(mqttConfig);
   connectWiFi();
-  if(shouldSaveConfig) {
+  if(shouldSaveMQTTConfig) {
     configSaver.saveConfiguration(mqttConfig);
   }
   connectMQTT();
-  randomSeed(micros());
 }
 
 void loop(void) {
@@ -58,11 +60,6 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
   }
 }
 
-void saveConfigCallback () {
-  Serial << "Should save config" << endl;
-  shouldSaveConfig = true;
-}
-
 void connectWiFi() {
   Serial << "Connecting to WiFi.." << endl;
 
@@ -75,7 +72,7 @@ void connectWiFi() {
   wifiManager.addParameter(&portParam);
   wifiManager.addParameter(&topicParam);
 
-  wifiManager.setSaveConfigCallback(saveConfigCallback);
+  wifiManager.setSaveConfigCallback([]() { shouldSaveMQTTConfig = true; });
 
   wifiManager.autoConnect("ESP-IR-sender");
 
@@ -98,7 +95,7 @@ void connectMQTT() {
   while(!mqttClient.connected()) {
     String clientId = "ESP8266Client-" + String(random(0xffff), HEX);
 
-    Serial << "Connecting to " << mqttConfig.server << ":" << mqttConfig.port << " as " << clientId << endl;
+    Serial << "Connecting to " << mqttConfig.server << ":" << mqttConfig.port << mqttConfig.topic << " as " << clientId << endl;
 
     if(mqttClient.connect(clientId.c_str())) {
       Serial << "connected" << endl;
