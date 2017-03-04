@@ -12,6 +12,8 @@
 
 void connectWiFi();
 void connectMQTT();
+void resetConfigAndReboot();
+void handleProntoHexMessage(const char *msg);
 
 
 ConfigSaver configSaver;
@@ -23,6 +25,8 @@ LoopbackStream mqttInputBuffer(1024);
 PubSubClient mqttClient;
 IRsend irsend(3);
 
+
+// Setup & loop
 
 void setup(void) {
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
@@ -44,24 +48,19 @@ void loop(void) {
   mqttClient.loop();
 }
 
-bool endsWith(const char *string, const char *suffix) {
-  if(!string || !suffix)
-    return false;
 
-  string = strrchr(string, suffix[0]);
+// MQTT message handling
 
-  if(string != NULL)
-    return strcmp(string, suffix) == 0;
+void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
+  Serial << "Got MQTT message: " << topic << endl;
 
-  return false;
-}
+  if(endsWith(topic, "/reset")) {
+    resetConfigAndReboot();
+  } else if(endsWith(topic, "/prontohex")) {
+    handleProntoHexMessage(mqttInputBuffer.readString().c_str());
+  }
 
-void resetConfigAndReboot() {
-  Serial << "Resetting configuration." << endl;
-  configSaver.removeSavedConfig();
-  wifiManager.resetSettings();
-  Serial << "Rebooting.." << endl;
-  ESP.restart();
+  return;
 }
 
 void handleProntoHexMessage(const char *msg) {
@@ -80,17 +79,8 @@ void handleProntoHexMessage(const char *msg) {
   }
 }
 
-void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
-  Serial << "Got MQTT message: " << topic << endl;
 
-  if(endsWith(topic, "/reset")) {
-    resetConfigAndReboot();
-  } else if(endsWith(topic, "/prontohex")) {
-    handleProntoHexMessage(mqttInputBuffer.readString().c_str());
-  }
-
-  return;
-}
+// Helpers
 
 void connectWiFi() {
   connectWiFi(wifiManager, mqttConfig, []() { shouldSaveMQTTConfig = true; });
@@ -98,4 +88,12 @@ void connectWiFi() {
 
 void connectMQTT() {
   connectMQTT(mqttClient, mqttConfig, wifiClient, mqttInputBuffer, mqttCallback);
+}
+
+void resetConfigAndReboot() {
+  Serial << "Resetting configuration." << endl;
+  configSaver.removeSavedConfig();
+  wifiManager.resetSettings();
+  Serial << "Rebooting.." << endl;
+  ESP.restart();
 }
