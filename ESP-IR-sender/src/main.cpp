@@ -6,24 +6,30 @@
 #include <StreamPrint.h>
 #include <WiFiManager.h>
 #include "prontoConverter.h"
+#include "ConfigSaver.h"
 
-const char *mqtt_server = "mqtt-home.chacal.online";
-
+bool shouldSaveConfig = false;
 
 void connectWiFi();
 void connectMQTT();
 
 
+ConfigSaver configSaver;
+MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/kuikkeloinen/test");
 LoopbackStream mqttInputBuffer(1024);
 WiFiClient wifiClient;
-PubSubClient mqttClient(mqtt_server, 1883, wifiClient, mqttInputBuffer);
+PubSubClient mqttClient;
 IRsend irsend(3);
 
 
 void setup(void) {
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
   irsend.begin();
+  configSaver.loadConfiguration(mqttConfig);
   connectWiFi();
+  if(shouldSaveConfig) {
+    configSaver.saveConfiguration(mqttConfig);
+  }
   connectMQTT();
   randomSeed(micros());
 }
@@ -52,11 +58,30 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
   }
 }
 
+void saveConfigCallback () {
+  Serial << "Should save config" << endl;
+  shouldSaveConfig = true;
+}
+
 void connectWiFi() {
   Serial << "Connecting to WiFi.." << endl;
 
   WiFiManager wifiManager;
+  WiFiManagerParameter serverParam("server", "MQTT server", mqttConfig.server, 100);
+  WiFiManagerParameter portParam("port", "MQTT port", mqttConfig.port, 6);
+  WiFiManagerParameter topicParam("topic", "MQTT topic", mqttConfig.topic, 100);
+
+  wifiManager.addParameter(&serverParam);
+  wifiManager.addParameter(&portParam);
+  wifiManager.addParameter(&topicParam);
+
+  wifiManager.setSaveConfigCallback(saveConfigCallback);
+
   wifiManager.autoConnect("ESP-IR-sender");
+
+  strcpy(mqttConfig.server, serverParam.getValue());
+  strcpy(mqttConfig.topic, topicParam.getValue());
+  strcpy(mqttConfig.port, portParam.getValue());
 
   Serial << endl
          << "Connected to WiFi: " << WiFi.SSID() << endl
@@ -64,17 +89,20 @@ void connectWiFi() {
 }
 
 void connectMQTT() {
+  mqttClient.setServer(mqttConfig.server, (uint16_t)atoi(mqttConfig.port));
+  mqttClient.setClient(wifiClient);
+  mqttClient.setStream(mqttInputBuffer);
   mqttClient.setCallback(mqttCallback);
 
   // Loop until we're connected
   while(!mqttClient.connected()) {
     String clientId = "ESP8266Client-" + String(random(0xffff), HEX);
 
-    Serial << "Connecting to " << mqtt_server << " as " << clientId << endl;
+    Serial << "Connecting to " << mqttConfig.server << ":" << mqttConfig.port << " as " << clientId << endl;
 
     if(mqttClient.connect(clientId.c_str())) {
       Serial << "connected" << endl;
-      mqttClient.subscribe("/kuikkeloinen/test");
+      mqttClient.subscribe(mqttConfig.topic);
     } else {
       Serial << "failed, rc=" << mqttClient.state() << " trying again in 5 seconds" << endl;
       delay(5000);
