@@ -2,11 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <IRremoteESP8266.h>
 #include <LoopbackStream.h>
-#include <PubSubClient.h>
-#include <StreamPrint.h>
-#include <WiFiManager.h>
 #include "prontoConverter.h"
-#include "ConfigSaver.h"
 #include "utils.h"
 
 
