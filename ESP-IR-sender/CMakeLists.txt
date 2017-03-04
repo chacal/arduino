@@ -3,6 +3,8 @@ project(ESP-IR-sender)
 
 include(CMakeListsPrivate.txt)
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 add_custom_target(
     PLATFORMIO_BUILD ALL
     COMMAND ${PLATFORMIO_CMD} -f -c clion run
