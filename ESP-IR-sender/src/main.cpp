@@ -13,17 +13,17 @@ void connectWiFi();
 void connectMQTT();
 
 
-MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/irsender/1/prontohex");
+ConfigSaver configSaver;
+WiFiManager wifiManager;
+WiFiClient wifiClient;
+MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/irsender/1");
 bool shouldSaveMQTTConfig = false;
 LoopbackStream mqttInputBuffer(1024);
-WiFiClient wifiClient;
 PubSubClient mqttClient;
 IRsend irsend(3);
 
 
 void setup(void) {
-  ConfigSaver configSaver;
-
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
   randomSeed(micros());
   irsend.begin();
@@ -43,9 +43,29 @@ void loop(void) {
   mqttClient.loop();
 }
 
-void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
+bool endsWith(const char *string, const char *suffix) {
+  if(!string || !suffix)
+    return false;
+
+  string = strrchr(string, suffix[0]);
+
+  if(string != NULL)
+    return strcmp(string, suffix) == 0;
+
+  return false;
+}
+
+void resetConfigAndReboot() {
+  Serial << "Resetting configuration." << endl;
+  configSaver.removeSavedConfig();
+  wifiManager.resetSettings();
+  Serial << "Rebooting.." << endl;
+  ESP.restart();
+}
+
+void handleProntoHexMessage(const char *msg) {
   RawSampleData sampleData;
-  bool ret = convertProntoToRaw(mqttInputBuffer.readString().c_str(), &sampleData);
+  bool ret = convertProntoToRaw(msg, &sampleData);
 
   if(ret) {
     Serial << "Got valid pronto data. Freq: " << (int) sampleData.freq << " Sample count: "
@@ -54,30 +74,40 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
       irsend.sendRaw(sampleData.samples, sampleData.sampleCount, sampleData.freq);
       delay(20);
     }
-
   } else {
     Serial << "Couldn't convert message to raw samples!" << endl;
   }
 }
 
+void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
+  Serial << "Got MQTT message: " << topic << endl;
+
+  if(endsWith(topic, "/reset")) {
+    resetConfigAndReboot();
+  } else if(endsWith(topic, "/prontohex")) {
+    handleProntoHexMessage(mqttInputBuffer.readString().c_str());
+  }
+
+  return;
+}
+
 void connectWiFi() {
   Serial << "Connecting to WiFi.." << endl;
 
-  WiFiManager wifiManager;
   WiFiManagerParameter serverParam("server", "MQTT server", mqttConfig.server, 100);
   WiFiManagerParameter portParam("port", "MQTT port", mqttConfig.port, 6);
-  WiFiManagerParameter topicParam("topic", "MQTT topic", mqttConfig.topic, 100);
+  WiFiManagerParameter topicRootParam("topic_root", "MQTT topic root", mqttConfig.topicRoot, 100);
 
   wifiManager.addParameter(&serverParam);
   wifiManager.addParameter(&portParam);
-  wifiManager.addParameter(&topicParam);
+  wifiManager.addParameter(&topicRootParam);
 
   wifiManager.setSaveConfigCallback([]() { shouldSaveMQTTConfig = true; });
 
   wifiManager.autoConnect("ESP-IR-sender");
 
   strcpy(mqttConfig.server, serverParam.getValue());
-  strcpy(mqttConfig.topic, topicParam.getValue());
+  strcpy(mqttConfig.topicRoot, topicRootParam.getValue());
   strcpy(mqttConfig.port, portParam.getValue());
 
   Serial << endl
@@ -95,13 +125,15 @@ void connectMQTT() {
   while(!mqttClient.connected()) {
     String clientId = "ESP8266Client-" + String(random(0xffff), HEX);
 
-    Serial << "Connecting to " << mqttConfig.server << ":" << mqttConfig.port << mqttConfig.topic << " as " << clientId << endl;
+    Serial << "Connecting to " << mqttConfig.server << ":" << mqttConfig.port << " as " << clientId << endl;
 
     if(mqttClient.connect(clientId.c_str())) {
-      Serial << "connected" << endl;
-      mqttClient.subscribe(mqttConfig.topic);
+      Serial << "Connected. Subscribing to " << mqttConfig.topicRoot << "/prontohex and " << mqttConfig.topicRoot << "/reset" <<  endl;
+      String s(mqttConfig.topicRoot);
+      mqttClient.subscribe((s + "/prontohex").c_str());
+      mqttClient.subscribe((s + "/reset").c_str());
     } else {
-      Serial << "failed, rc=" << mqttClient.state() << " trying again in 5 seconds" << endl;
+      Serial << "MQTT connection failed, rc=" << mqttClient.state() << " trying again in 5 seconds" << endl;
       delay(5000);
     }
   }

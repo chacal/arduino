@@ -17,7 +17,7 @@ void ConfigSaver::loadConfiguration(MqttConfiguration &conf) {
     JsonObject &json = jsonBuffer.parseObject(buf.get());
     if(json.success()) {
       strcpy(conf.server, json["mqtt_server"]);
-      strcpy(conf.topic, json["mqtt_topic"]);
+      strcpy(conf.topicRoot, json["mqtt_topic_root"]);
       strcpy(conf.port, json["mqtt_port"]);
 
       Serial << "Read JSON configuration: ";
@@ -35,7 +35,7 @@ void ConfigSaver::saveConfiguration(MqttConfiguration &conf) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject &json = jsonBuffer.createObject();
   json["mqtt_server"] = conf.server;
-  json["mqtt_topic"] = conf.topic;
+  json["mqtt_topic_root"] = conf.topicRoot;
   json["mqtt_port"] = conf.port;
 
   Serial << "Saving config: ";
@@ -49,4 +49,10 @@ void ConfigSaver::saveConfiguration(MqttConfiguration &conf) {
 
   json.printTo(configFile);
   configFile.close();
+}
+
+void ConfigSaver::removeSavedConfig() {
+  if(SPIFFS.begin() && SPIFFS.exists(CONF_FILE)) {
+    SPIFFS.remove(CONF_FILE);
+  }
 }
