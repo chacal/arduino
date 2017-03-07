@@ -107,6 +107,7 @@ void connectWiFi() {
 
 void connectMQTT() {
   connectMQTT(mqttClient, mqttConfig, wifiClient, mqttCallback);
+  Serial << "Subscribing to " << String(mqttConfig.topicRoot) + "/reset" << endl;
   mqttClient.subscribe((String(mqttConfig.topicRoot) + "/reset").c_str());
 }
 
