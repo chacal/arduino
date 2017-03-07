@@ -1,10 +1,11 @@
 #include <RCSwitch.h>
 #include <ESP-MQTT-utils.h>
-#include <LoopbackStream.h>
+#include <ArduinoJson.h>
 
 
 void connectWiFi();
 void connectMQTT();
+void handleSwitchMessage();
 
 
 RCSwitch mySwitch = RCSwitch();
@@ -13,7 +14,6 @@ MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/433gw/1");
 WiFiManager wifiManager;
 WiFiClient wifiClient;
 bool shouldSaveMQTTConfig = false;
-LoopbackStream mqttInputBuffer(1024);
 PubSubClient mqttClient;
 
 
@@ -34,30 +34,31 @@ void setup() {
 
 void loop() {
   if(mySwitch.available()) {
-
-    int value = mySwitch.getReceivedValue();
-
-    if(value == 0) {
-      Serial.print("Unknown encoding");
-    } else {
-      Serial.print("Received ");
-      Serial.print(mySwitch.getReceivedValue());
-      Serial.print(" / ");
-      Serial.print(mySwitch.getReceivedBitlength());
-      Serial.print("bit ");
-      Serial.print("Protocol: ");
-      Serial.println(mySwitch.getReceivedProtocol());
-    }
-
+    handleSwitchMessage();
     mySwitch.resetAvailable();
   }
 }
 
+void handleSwitchMessage() {
+  int value = mySwitch.getReceivedValue();
 
-// MQTT message handling
+  if(value == 0) {
+    Serial << "Unknown encoding" << endl;
+  } else {
+    const int BUF_SIZE = 200;
+    StaticJsonBuffer<BUF_SIZE> jsonBuffer;
 
-void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
-  Serial << "Got MQTT message: " << topic << endl;
+    JsonObject &root = jsonBuffer.createObject();
+    root["value"] = mySwitch.getReceivedValue();
+    root["bits"] = mySwitch.getReceivedBitlength();
+    root["protocol"] = mySwitch.getReceivedProtocol();
+
+    char payload[BUF_SIZE];
+    root.printTo(payload, BUF_SIZE);
+
+    String s(mqttConfig.topicRoot);
+    mqttClient.publish((s + "/value").c_str(), payload, true);
+  }
 }
 
 
@@ -68,5 +69,5 @@ void connectWiFi() {
 }
 
 void connectMQTT() {
-  connectMQTT(mqttClient, mqttConfig, wifiClient, mqttInputBuffer, mqttCallback);
+  connectMQTT(mqttClient, mqttConfig, wifiClient);
 }
