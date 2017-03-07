@@ -14,7 +14,7 @@ struct MqttConfiguration {
   }
 };
 
-class ConfigSaver {
+class MQTTConfigSaver {
 public:
   void loadConfiguration(MqttConfiguration &conf);
   void saveConfiguration(MqttConfiguration &conf);

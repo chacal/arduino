@@ -1,7 +1,7 @@
 #pragma once
 
 #include <WiFiManager.h>
-#include "ConfigSaver.h"
+#include "MQTTConfigSaver.h"
 #include <PubSubClient.h>
 #include "StreamPrint.h"
 

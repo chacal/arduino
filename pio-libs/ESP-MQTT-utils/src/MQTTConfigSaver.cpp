@@ -1,11 +1,11 @@
 #include <FS.h>
 #include <ArduinoJson.h>
-#include "ConfigSaver.h"
+#include "MQTTConfigSaver.h"
 #include "StreamPrint.h"
 
 #define CONF_FILE "/config.json"
 
-void ConfigSaver::loadConfiguration(MqttConfiguration &conf) {
+void MQTTConfigSaver::loadConfiguration(MqttConfiguration &conf) {
   if(SPIFFS.begin() && SPIFFS.exists(CONF_FILE)) {
     File configFile = SPIFFS.open(CONF_FILE, "r");
 
@@ -31,7 +31,7 @@ void ConfigSaver::loadConfiguration(MqttConfiguration &conf) {
   }
 }
 
-void ConfigSaver::saveConfiguration(MqttConfiguration &conf) {
+void MQTTConfigSaver::saveConfiguration(MqttConfiguration &conf) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject &json = jsonBuffer.createObject();
   json["mqtt_server"] = conf.server;
@@ -51,7 +51,7 @@ void ConfigSaver::saveConfiguration(MqttConfiguration &conf) {
   configFile.close();
 }
 
-void ConfigSaver::removeSavedConfig() {
+void MQTTConfigSaver::removeSavedConfig() {
   if(SPIFFS.begin() && SPIFFS.exists(CONF_FILE)) {
     SPIFFS.remove(CONF_FILE);
   }
