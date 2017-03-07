@@ -45,6 +45,8 @@ void loop() {
     handleSwitchMessage();
     mySwitch.resetAvailable();
   }
+
+  mqttClient.loop();
 }
 
 
