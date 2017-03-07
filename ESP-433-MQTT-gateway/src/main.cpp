@@ -3,6 +3,8 @@
 #include <ArduinoJson.h>
 #include <StringUtils.h>
 
+#define MESSAGE_THROTTLE_MS 2000    // Don't publish MQTT messages more often than this
+
 
 void connectWiFi();
 void connectMQTT();
@@ -53,11 +55,18 @@ void loop() {
 // Radio message handling
 
 void handleSwitchMessage() {
+  static int previousValue;
+  static unsigned long previousTime;
+
+  if(previousTime > millis()) {
+    previousTime = 0;  // Handle millis() overflow
+  }
+
   int value = mySwitch.getReceivedValue();
 
   if(value == 0) {
     Serial << "Unknown encoding" << endl;
-  } else {
+  } else if(value != previousValue || millis() - previousTime > MESSAGE_THROTTLE_MS) {
     Serial << "Received message " << mySwitch.getReceivedValue() << endl;
 
     const int BUF_SIZE = 200;
@@ -73,6 +82,9 @@ void handleSwitchMessage() {
 
     String s(mqttConfig.topicRoot);
     mqttClient.publish((s + "/value").c_str(), payload, true);
+
+    previousValue = value;
+    previousTime = millis();
   }
 }
 
