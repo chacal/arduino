@@ -58,6 +58,8 @@ void handleSwitchMessage() {
   if(value == 0) {
     Serial << "Unknown encoding" << endl;
   } else {
+    Serial << "Received message " << mySwitch.getReceivedValue() << endl;
+
     const int BUF_SIZE = 200;
     StaticJsonBuffer<BUF_SIZE> jsonBuffer;
 
