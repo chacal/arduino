@@ -1,11 +1,13 @@
 #include <RCSwitch.h>
 #include <ESP-MQTT-utils.h>
 #include <ArduinoJson.h>
+#include <StringUtils.h>
 
 
 void connectWiFi();
 void connectMQTT();
 void handleSwitchMessage();
+void resetConfigAndReboot();
 
 
 RCSwitch mySwitch = RCSwitch();
@@ -62,6 +64,16 @@ void handleSwitchMessage() {
 }
 
 
+// MQTT message handling
+
+void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
+  Serial << "Got MQTT message: " << topic << endl;
+  if(endsWith(topic, "/reset")) {
+    resetConfigAndReboot();
+  }
+}
+
+
 // Helpers
 
 void connectWiFi() {
@@ -69,5 +81,14 @@ void connectWiFi() {
 }
 
 void connectMQTT() {
-  connectMQTT(mqttClient, mqttConfig, wifiClient);
+  connectMQTT(mqttClient, mqttConfig, wifiClient, mqttCallback);
+  mqttClient.subscribe((String(mqttConfig.topicRoot) + "/reset").c_str());
+}
+
+void resetConfigAndReboot() {
+  Serial << "Resetting configuration." << endl;
+  configSaver.removeSavedConfig();
+  wifiManager.resetSettings();
+  Serial << "Rebooting.." << endl;
+  ESP.restart();
 }
