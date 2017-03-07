@@ -1,9 +1,8 @@
-#include <Arduino.h>
-#include <ESP8266WiFi.h>
+#include <ESP-MQTT-utils.h>
 #include <IRremoteESP8266.h>
 #include <LoopbackStream.h>
 #include "prontoConverter.h"
-#include "utils.h"
+#include <StringUtils.h>
 
 
 void connectWiFi();
@@ -12,7 +11,7 @@ void resetConfigAndReboot();
 void handleProntoHexMessage(const char *msg);
 
 
-ConfigSaver configSaver;
+MQTTConfigSaver configSaver;
 WiFiManager wifiManager;
 WiFiClient wifiClient;
 MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/irsender/1");
@@ -84,6 +83,10 @@ void connectWiFi() {
 
 void connectMQTT() {
   connectMQTT(mqttClient, mqttConfig, wifiClient, mqttInputBuffer, mqttCallback);
+  Serial << "Subscribing to " << mqttConfig.topicRoot << "/prontohex and " << mqttConfig.topicRoot << "/reset" <<  endl;
+  String s(mqttConfig.topicRoot);
+  mqttClient.subscribe((s + "/prontohex").c_str());
+  mqttClient.subscribe((s + "/reset").c_str());
 }
 
 void resetConfigAndReboot() {
