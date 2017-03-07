@@ -1,5 +1,4 @@
-#ifndef ESP_IR_SENDER_PRONTOCONVERTER_H
-#define ESP_IR_SENDER_PRONTOCONVERTER_H
+#pragma once
 
 #define MAX_RAW_SAMPLES 200
 
@@ -10,5 +9,3 @@ struct RawSampleData {
 };
 
 bool convertProntoToRaw(const char *prontoHex, RawSampleData *sampleData);
-
-#endif //ESP_IR_SENDER_PRONTOCONVERTER_H
