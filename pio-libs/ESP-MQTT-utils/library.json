@@ -20,6 +20,9 @@
     },
     {
       "name": "PubSubClient"
+    },
+    {
+      "name": "ArduinoHelpers"
     }
   ]
 }
