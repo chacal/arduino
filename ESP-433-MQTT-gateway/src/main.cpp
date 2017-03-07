@@ -19,6 +19,8 @@ bool shouldSaveMQTTConfig = false;
 PubSubClient mqttClient;
 
 
+// Setup & loop
+
 void setup() {
   Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
 
@@ -31,15 +33,22 @@ void setup() {
   }
   connectMQTT();
 
-  mySwitch.enableReceive(digitalPinToInterrupt(3));
+  mySwitch.enableReceive(digitalPinToInterrupt(3));  // GPIO3 is UART0 RX
 }
 
 void loop() {
+  if(!mqttClient.connected()) {
+    connectMQTT();
+  }
+
   if(mySwitch.available()) {
     handleSwitchMessage();
     mySwitch.resetAvailable();
   }
 }
+
+
+// Radio message handling
 
 void handleSwitchMessage() {
   int value = mySwitch.getReceivedValue();
