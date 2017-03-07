@@ -93,6 +93,8 @@ void resetConfigAndReboot() {
   Serial << "Resetting configuration." << endl;
   configSaver.removeSavedConfig();
   wifiManager.resetSettings();
+  delay(1000);
   Serial << "Rebooting.." << endl;
+  delay(2000);
   ESP.restart();
 }
