@@ -14,7 +14,7 @@ void resetConfigAndReboot();
 
 RCSwitch mySwitch = RCSwitch();
 MQTTConfigSaver configSaver;
-MqttConfiguration mqttConfig("mqtt-home.chacal.online", "/test/433gw/1");
+MqttConfiguration mqttConfig("mqtt-home.chacal.fi", "/test/433gw/1");
 WiFiManager wifiManager;
 WiFiClient wifiClient;
 bool shouldSaveMQTTConfig = false;
