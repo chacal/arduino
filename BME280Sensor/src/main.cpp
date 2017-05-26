@@ -22,6 +22,7 @@
 #define AREF 3.33  // Regulated 3V3 used as board's VCC
 
 #define TEMP_CALIBRATION -0.0f  // Calibration value for temperature
+#define PRESSURE_CALIBRATION -1.2f   // Calibration value for pressure
 
 #define INSTANCE 11
 
@@ -49,6 +50,7 @@ struct Config {
   long r1;
   long r2;
   float tempCalibration;
+  float pressureCalibration;
   uint8_t instance;
 } config;
 
@@ -69,7 +71,7 @@ void loop() {
   radio.powerUp();
 
   float temperature, pressure, humidity;
-  measureAndRead(temperature, pressure, humidity, config.tempCalibration);
+  measureAndRead(temperature, pressure, humidity, config.tempCalibration, config.pressureCalibration);
   measurements.vcc = readRawVcc();
   measurements.instance = config.instance;
 
@@ -93,11 +95,12 @@ void loop() {
   measureTimeAndSleep(WAKEUP_DELAY_8_S, WAKEUP_DELAY_8_S);
 }
 
-void measureAndRead(float &temp, float &pressure, float &humidity, float tempCalibration) {
+void measureAndRead(float &temp, float &pressure, float &humidity, float tempCalibration, float pressureCalibration) {
   bme.setMode(0x01);
   measureTimeAndSleep(WAKEUP_DELAY_16_MS);
   bme.read(pressure, temp, humidity, true, 1);  // use metric units & hPa as pressure units
   temp = temp + tempCalibration;
+  pressure = pressure + pressureCalibration;
 }
 
 void measureTimeAndSleep(WatchdogTimerPrescaler delay1, WatchdogTimerPrescaler delay2) {
@@ -118,10 +121,11 @@ int readRawVcc() {
 
 void initializeConfig() {
   EEPROM.get(CONFIG_EEPROM_ADDR, config);
-  if(FORCE_CONFIG_SAVE || (config.r1 == -1 || config.r2 == -1 || config.tempCalibration == -1)) {
+  if(FORCE_CONFIG_SAVE || (config.r1 == -1 || config.r2 == -1 || config.tempCalibration == -1 || config.pressureCalibration == -1)) {
     config.r1 = R1;
     config.r2 = R2;
     config.tempCalibration = TEMP_CALIBRATION;
+    config.pressureCalibration = PRESSURE_CALIBRATION;
     config.instance = INSTANCE;
     Serial.println("Saving defaults to EEPROM...");
     EEPROM.put(CONFIG_EEPROM_ADDR, config);
@@ -131,8 +135,10 @@ void initializeConfig() {
   Serial.println(config.r1);
   Serial.print("R2 = ");
   Serial.println(config.r2);
-  Serial.print("Calibration = ");
+  Serial.print("Temp calibration = ");
   Serial.println(config.tempCalibration);
+  Serial.print("Pressure calibration = ");
+  Serial.println(config.pressureCalibration);
   Serial.print("Instance = ");
   Serial.println(config.instance);
   Serial.flush();
