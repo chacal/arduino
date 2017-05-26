@@ -23,7 +23,7 @@
 
 #define TEMP_CALIBRATION -0.0f  // Calibration value for temperature
 
-#define INSTANCE 5
+#define INSTANCE 12
 
 #define CONFIG_EEPROM_ADDR 0
 #define FORCE_CONFIG_SAVE 0
@@ -85,7 +85,7 @@ void loop() {
 
   measurements.previousSampleTimeMicros = duration + (micros() - start);
 
-  measureTimeAndSleep(WAKEUP_DELAY_4_S, WAKEUP_DELAY_1_S);
+  measureTimeAndSleep(WAKEUP_DELAY_8_S, WAKEUP_DELAY_8_S);
 }
 
 void readTempAndPressure(double &temp, double &pressure, float tempCalibration) {
