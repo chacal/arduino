@@ -23,7 +23,7 @@
 
 #define TEMP_CALIBRATION -0.0f  // Calibration value for temperature
 
-#define INSTANCE 8
+#define INSTANCE 11
 
 #define CONFIG_EEPROM_ADDR 0
 #define FORCE_CONFIG_SAVE 0
