@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <RFM69.h>
 #include <SPI.h>
-#include <power.h>
 #include <limits.h>
 #include <Thermometer.h>
 #include <StreamPrint.h>
+#include "main.h"
 
 #define NETWORKID                      50
 #define RFM_RECEIVER_ID                 1     // Gateway is ID 1
@@ -59,35 +59,53 @@ unsigned long lastCommandTime = millis();
 unsigned long lastTemperatureTime = millis();
 
 void loop() {
-  if (radio.receiveDone()) {
-    uint8_t size = radio.DATALEN;
-    uint8_t buf[size];
-    memcpy(buf, (const void*)radio.DATA, size);
 
-    if (radio.ACKRequested()) {
+  if (radio.receiveDone()) {
+    handleReceivedMessage();
+  } else if(commandTimedOut()) {
+    turnOffMosfet();
+  } else if(temperatureSendPeriodElapsed()) {
+    sendMosfetTemperature();
+  }
+
+}
+
+void handleReceivedMessage() {
+  uint8_t size = radio.DATALEN;
+  uint8_t buf[size];
+  memcpy(buf, (const void*)radio.DATA, size);
+
+  if (radio.ACKRequested()) {
       unsigned long start = micros();
       radio.sendACK();
       unsigned long duration = micros() - start;
       Serial << "ACK sent in " << duration << "us. ";
     }
-    Serial << "RX_RSSI: " << radio.RSSI << endl;
+  Serial << "RX_RSSI: " << radio.RSSI << endl;
 
-    if(size == 2 && buf[0] == LEVEL_CONTROL_TAG) {
+  if(size == 2 && buf[0] == LEVEL_CONTROL_TAG) {
       Serial << "Setting level to " << buf[1] << endl;
       analogWrite(MOSFET_GATE_PIN, buf[1]);
       lastCommandTime = millis();
     }
-  } else if(millis() - lastCommandTime > COMMAND_TIMEOUT_MS && lastCommandTime != ULONG_MAX) {
-    Serial << "No control command received in " << COMMAND_TIMEOUT_MS << "ms. Setting control level to 0." << endl;
-    digitalWrite(MOSFET_GATE_PIN, LOW);
-    lastCommandTime = ULONG_MAX;
-  } else if(millis() - lastTemperatureTime > TEMPERATURE_SEND_PERIOD_MS) {
-    // Read and wait to get the ADC settled
-    analogRead(ThermistorIN);
-    delayMicroseconds(100);
-    measurements.temp = getTemperature(analogRead(ThermistorIN), DIVIDER_RESISTOR, 0);
-    bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &measurements, sizeof(measurements), 3, 20);
-    Serial << "MOSFET temp: " << measurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
-    lastTemperatureTime = millis();
-  }
 }
+
+bool commandTimedOut() { return millis() - lastCommandTime > COMMAND_TIMEOUT_MS && lastCommandTime != ULONG_MAX; }
+
+void turnOffMosfet() {
+  Serial << "No control command received in " << COMMAND_TIMEOUT_MS << "ms. Setting control level to 0." << endl;
+  digitalWrite(MOSFET_GATE_PIN, LOW);
+  lastCommandTime = ULONG_MAX;
+}
+
+bool temperatureSendPeriodElapsed() { return millis() - lastTemperatureTime > TEMPERATURE_SEND_PERIOD_MS; }
+
+void sendMosfetTemperature() {// Read and wait to get the ADC settled
+  analogRead(ThermistorIN);
+  delayMicroseconds(100);
+  measurements.temp = getTemperature(analogRead(ThermistorIN), DIVIDER_RESISTOR, 0);
+  bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &measurements, sizeof(measurements), 3, 20);
+  Serial << "MOSFET temp: " << measurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
+  lastTemperatureTime = millis();
+}
+
