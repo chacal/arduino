@@ -26,11 +26,11 @@
 
 
 struct {
-  char tag;
-  uint8_t instance;
+  char tag = 't';
+  uint8_t instance = NRF_INSTANCE_NUMBER;
   float temp;
-  int vcc;
-  unsigned long previousSampleTimeMicros;
+  int vcc = 3300;
+  unsigned long previousSampleTimeMicros = 0;
 } tempMeasurements;
 
 
@@ -45,11 +45,6 @@ void setup() {
   radio.setHighPower();
   radio.setPowerLevel(20);
   radio.promiscuous(true);
-
-  tempMeasurements.tag = 't';
-  tempMeasurements.instance = NRF_INSTANCE_NUMBER;
-  tempMeasurements.vcc = 3300;
-  tempMeasurements.previousSampleTimeMicros = 0;
 
   Serial << "Node: " << NODEID << endl;
   Serial << "Listening at 433 Mhz..." << endl;
