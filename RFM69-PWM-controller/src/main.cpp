@@ -60,7 +60,7 @@ unsigned long lastTemperatureTime = millis();
 
 void loop() {
 
-  if (radio.receiveDone()) {
+  if(radio.receiveDone()) {
     handleReceivedMessage();
   } else if(commandTimedOut()) {
     turnOffMosfet();
@@ -73,21 +73,21 @@ void loop() {
 void handleReceivedMessage() {
   uint8_t size = radio.DATALEN;
   uint8_t buf[size];
-  memcpy(buf, (const void*)radio.DATA, size);
+  memcpy(buf, (const void *) radio.DATA, size);
 
-  if (radio.ACKRequested()) {
-      unsigned long start = micros();
-      radio.sendACK();
-      unsigned long duration = micros() - start;
-      Serial << "ACK sent in " << duration << "us. ";
-    }
+  if(radio.ACKRequested()) {
+    unsigned long start = micros();
+    radio.sendACK();
+    unsigned long duration = micros() - start;
+    Serial << "ACK sent in " << duration << "us. ";
+  }
   Serial << "RX_RSSI: " << radio.RSSI << endl;
 
   if(size == 2 && buf[0] == LEVEL_CONTROL_TAG) {
-      Serial << "Setting level to " << buf[1] << endl;
-      analogWrite(MOSFET_GATE_PIN, buf[1]);
-      lastCommandTime = millis();
-    }
+    Serial << "Setting level to " << buf[1] << endl;
+    analogWrite(MOSFET_GATE_PIN, buf[1]);
+    lastCommandTime = millis();
+  }
 }
 
 bool commandTimedOut() { return millis() - lastCommandTime > COMMAND_TIMEOUT_MS && lastCommandTime != ULONG_MAX; }
