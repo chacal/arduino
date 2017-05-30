@@ -31,7 +31,7 @@ struct {
   float temp;
   int vcc;
   unsigned long previousSampleTimeMicros;
-} measurements;
+} tempMeasurements;
 
 
 RFM69 radio(RFM69_NSS, RFM69_IRQ_PIN, true, RFM69_IRQ_NUM);
@@ -46,10 +46,10 @@ void setup() {
   radio.setPowerLevel(20);
   radio.promiscuous(true);
 
-  measurements.tag = 't';
-  measurements.instance = NRF_INSTANCE_NUMBER;
-  measurements.vcc = 3300;
-  measurements.previousSampleTimeMicros = 0;
+  tempMeasurements.tag = 't';
+  tempMeasurements.instance = NRF_INSTANCE_NUMBER;
+  tempMeasurements.vcc = 3300;
+  tempMeasurements.previousSampleTimeMicros = 0;
 
   Serial << "Node: " << NODEID << endl;
   Serial << "Listening at 433 Mhz..." << endl;
@@ -103,9 +103,14 @@ bool temperatureSendPeriodElapsed() { return millis() - lastTemperatureTime > TE
 void sendMosfetTemperature() {// Read and wait to get the ADC settled
   analogRead(ThermistorIN);
   delayMicroseconds(100);
-  measurements.temp = getTemperature(analogRead(ThermistorIN), DIVIDER_RESISTOR, 0);
-  bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &measurements, sizeof(measurements), 3, 20);
-  Serial << "MOSFET temp: " << measurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
+  tempMeasurements.temp = getTemperature(analogRead(ThermistorIN), DIVIDER_RESISTOR, 0);
+  bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &tempMeasurements, sizeof(tempMeasurements), 3, 20);
+  Serial << "MOSFET temp: " << tempMeasurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
   lastTemperatureTime = millis();
 }
 
+bool levelSendPeriodElapsed() { return millis() - lastLevelTime > LEVEL_SEND_PERIOD_MS; }
+
+void sendMosfetLevel() {
+
+}
