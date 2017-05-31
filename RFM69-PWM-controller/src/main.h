@@ -7,3 +7,6 @@ void turnOffMosfet();
 
 bool temperatureSendPeriodElapsed();
 void sendMosfetTemperature();
+
+bool levelSendPeriodElapsed();
+void sendMosfetLevel();

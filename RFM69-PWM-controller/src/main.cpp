@@ -23,6 +23,8 @@
 #define SERIAL_BAUD                 57600
 #define COMMAND_TIMEOUT_MS          60000     // If no control commands have arrived within this time, the controlled level is set to 0
 #define LEVEL_CONTROL_TAG             'l'
+#define LEVEL_REPORT_TAG              'r'
+#define LEVEL_SEND_PERIOD_MS        10000     // How often the MOSFET PWM level is reported
 
 
 struct {
@@ -32,6 +34,14 @@ struct {
   int vcc = 3300;
   unsigned long previousSampleTimeMicros = 0;
 } tempMeasurements;
+
+struct {
+  char tag = LEVEL_REPORT_TAG;
+  uint8_t instance = NRF_INSTANCE_NUMBER;
+  uint8_t level;
+  int vcc = 3300;
+  unsigned long previousSampleTimeMicros = 0;
+} levelMeasurements;
 
 
 RFM69 radio(RFM69_NSS, RFM69_IRQ_PIN, true, RFM69_IRQ_NUM);
@@ -52,6 +62,8 @@ void setup() {
 
 unsigned long lastCommandTime = millis();
 unsigned long lastTemperatureTime = millis();
+unsigned long lastLevelTime = millis();
+uint8_t currentPwmValue = 0;
 
 void loop() {
 
@@ -61,6 +73,8 @@ void loop() {
     turnOffMosfet();
   } else if(temperatureSendPeriodElapsed()) {
     sendMosfetTemperature();
+  } else if(levelSendPeriodElapsed()) {
+    sendMosfetLevel();
   }
 
 }
@@ -79,8 +93,9 @@ void handleReceivedMessage() {
   Serial << "RX_RSSI: " << radio.RSSI << endl;
 
   if(size == 2 && buf[0] == LEVEL_CONTROL_TAG) {
-    Serial << "Setting level to " << buf[1] << endl;
-    analogWrite(MOSFET_GATE_PIN, buf[1]);
+    currentPwmValue = buf[1];
+    Serial << "Setting level to " << currentPwmValue << endl;
+    analogWrite(MOSFET_GATE_PIN, currentPwmValue);
     lastCommandTime = millis();
   }
 }
@@ -89,6 +104,7 @@ bool commandTimedOut() { return millis() - lastCommandTime > COMMAND_TIMEOUT_MS 
 
 void turnOffMosfet() {
   Serial << "No control command received in " << COMMAND_TIMEOUT_MS << "ms. Setting control level to 0." << endl;
+  currentPwmValue = 0;
   digitalWrite(MOSFET_GATE_PIN, LOW);
   lastCommandTime = ULONG_MAX;
 }
@@ -107,5 +123,8 @@ void sendMosfetTemperature() {// Read and wait to get the ADC settled
 bool levelSendPeriodElapsed() { return millis() - lastLevelTime > LEVEL_SEND_PERIOD_MS; }
 
 void sendMosfetLevel() {
-
+  levelMeasurements.level = currentPwmValue;
+  bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &levelMeasurements, sizeof(levelMeasurements), 3, 20);
+  Serial << "PWM Level: " << levelMeasurements.level << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
+  lastLevelTime = millis();
 }
