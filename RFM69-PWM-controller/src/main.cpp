@@ -5,6 +5,7 @@
 #include <Thermometer.h>
 #include <StreamPrint.h>
 #include "main.h"
+#include <VCC.h>
 
 #define NETWORKID                      50
 #define RFM_RECEIVER_ID                 1     // Gateway is ID 1
@@ -26,12 +27,17 @@
 #define LEVEL_REPORT_TAG              'r'
 #define LEVEL_SEND_PERIOD_MS        10000     // How often the MOSFET PWM level is reported
 
+// Resistances for the voltage divider resistors (for calculating VCC)
+#define R1        4700000
+#define R2        1000000
+#define RAW_IN         A3
+#define AREF         3.33  // Regulated 3V3 used as board's VCC
 
 struct {
   char tag = 't';
   uint8_t instance = NRF_INSTANCE_NUMBER;
   float temp;
-  int vcc = 3300;
+  int vcc;
   unsigned long previousSampleTimeMicros = 0;
 } tempMeasurements;
 
@@ -39,7 +45,7 @@ struct {
   char tag = LEVEL_REPORT_TAG;
   uint8_t instance = NRF_INSTANCE_NUMBER;
   uint8_t level;
-  int vcc = 3300;
+  int vcc;
   unsigned long previousSampleTimeMicros = 0;
 } levelMeasurements;
 
@@ -115,8 +121,9 @@ void sendMosfetTemperature() {// Read and wait to get the ADC settled
   analogRead(ThermistorIN);
   delayMicroseconds(100);
   tempMeasurements.temp = getTemperature(analogRead(ThermistorIN), DIVIDER_RESISTOR, 0);
+  tempMeasurements.vcc = readRawVccMilliVolts(RAW_IN, AREF, R1, R2);
   bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &tempMeasurements, sizeof(tempMeasurements), 3, 20);
-  Serial << "MOSFET temp: " << tempMeasurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
+  Serial << "MOSFET temp: " << tempMeasurements.temp << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << " VCC: " << tempMeasurements.vcc << endl;
   lastTemperatureTime = millis();
 }
 
@@ -124,7 +131,8 @@ bool levelSendPeriodElapsed() { return millis() - lastLevelTime > LEVEL_SEND_PER
 
 void sendMosfetLevel() {
   levelMeasurements.level = currentPwmValue;
+  levelMeasurements.vcc = readRawVccMilliVolts(RAW_IN, AREF, R1, R2);
   bool acked = radio.sendWithRetry(RFM_RECEIVER_ID, &levelMeasurements, sizeof(levelMeasurements), 3, 20);
-  Serial << "PWM Level: " << levelMeasurements.level << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << endl;
+  Serial << "PWM Level: " << levelMeasurements.level << " Tx acked: " << acked << " TX_RSSI: " << radio.RSSI << " VCC: " << levelMeasurements.vcc << endl;
   lastLevelTime = millis();
 }
