@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include "RF24.h"
 #include <EEPROM.h>
+#include <VCC.h>
 #include "main.h"
 
 /*
@@ -71,7 +72,7 @@ void loop() {
 
   double temperature, pressure;
   readTempAndPressure(temperature, pressure, config.tempCalibration, config.pressureCalibration);
-  measurements.vcc = readRawVcc();
+  measurements.vcc = readRawVccMilliVolts(RAW_IN, AREF, config.r1, config.r2);
   measurements.instance = config.instance;
 
   measurements.tag = 't';
@@ -105,16 +106,6 @@ void measureTimeAndSleep(WatchdogTimerPrescaler delay1, WatchdogTimerPrescaler d
   duration += micros() - start;
   powerDown(delay1, delay2);
   start = micros();
-}
-
-int readRawVcc() {
-  // Read and wait to get the ADC settled
-  analogRead(RAW_IN);
-  delayMicroseconds(100);
-  int sensorValue = analogRead(RAW_IN);
-  float voltageAtPin = sensorValue * (AREF / 1023.0);
-  int externalVoltageInMilliVolts = (config.r1 + config.r2) / (float)config.r2 * voltageAtPin * 1000;
-  return externalVoltageInMilliVolts;
 }
 
 void initializeConfig() {
