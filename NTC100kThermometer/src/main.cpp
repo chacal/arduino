@@ -1,5 +1,6 @@
 #include "RF24.h"
 #include <EEPROM.h>
+#include <VCC.h>
 #include "main.h"
 #include "math.h"
 
@@ -74,7 +75,7 @@ void loop() {
   pinMode(ThermistorOUT, INPUT);
 
   measurements.instance = config.instance;
-  measurements.vcc = readRawVcc();
+  measurements.vcc = readRawVccMilliVolts(RAW_IN, AREF, config.r1, config.r2);
 
   radio.write(&measurements, sizeof(measurements));
   radio.powerDown();
@@ -106,16 +107,6 @@ double calculateTemperature(int rawADC) {
   steinhart = 1.0 / steinhart;                            // Invert
   steinhart -= 273.15;                                    // convert to C
   return steinhart;
-}
-
-int readRawVcc() {
-  // Read and wait to get the ADC settled
-  analogRead(RAW_IN);
-  delayMicroseconds(100);
-  int sensorValue = analogRead(RAW_IN);
-  float voltageAtPin = sensorValue * (AREF / 1023.0);
-  int externalVoltageInMilliVolts = (config.r1 + config.r2) / (float)config.r2 * voltageAtPin * 1000;
-  return externalVoltageInMilliVolts;
 }
 
 void initializeConfig() {
