@@ -93,6 +93,14 @@ void loop() {
     nrf.read(&buf, size);
     interrupts();
 
+    #if DEBUG
+      Serial.print("Got data from nRF: [");
+      for(int i = 0; i < size; ++i) {
+        Serial.print(buf[i]);
+      }
+      Serial.println(']');
+    #endif
+
     if(size > 2 && buf[0] == 'g') {
       uint8_t rfmToAddress = buf[1];
       bool acked = rfm69.sendWithRetry(rfmToAddress, buf+2, size-2, 3, 5);
