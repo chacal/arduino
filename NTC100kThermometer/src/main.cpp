@@ -22,9 +22,10 @@
 #define NRF_CSN 10                      // SPI Chip Select for NFR radio
 
 #define TEMP_CALIBRATION 0              // Calibration value, added to pad resistance
-#define THERMISTOR_RESISTANCE 100000.0  // Both resistors of the thermistor voltage divired are assumed to be the same
-#define THERMISTOR_BETA_COEF 3950       // From thermistor's datasheet
-#define THERMISTOR_NOMINAL_TEMP 25      // From thermistor's datasheet (25°C)
+#define DIVIDER_RESISTOR      100000.0  // Fixed divider resistor value
+#define THERMISTOR_RESISTANCE  10000.0  // Thermistor nominal value
+#define THERMISTOR_BETA_COEF      3950  // From thermistor's datasheet
+#define THERMISTOR_NOMINAL_TEMP     25  // From thermistor's datasheet (25°C)
 
 // Measured resistances for the voltage divider resistors
 #define R1 2000000
@@ -99,7 +100,7 @@ float sampleAdc(uint8_t adcPin, uint8_t sampleCount) {
 
 double calculateTemperature(int rawADC) {
   float steinhart;
-  double R = THERMISTOR_RESISTANCE * (1024.0f / rawADC - 1);
+  double R = DIVIDER_RESISTOR * (1024.0f / rawADC - 1);
   steinhart = R / THERMISTOR_RESISTANCE;                  // (R/Ro)
   steinhart = log(steinhart);                             // ln(R/Ro)
   steinhart /= THERMISTOR_BETA_COEF;                      // 1/B * ln(R/Ro)
