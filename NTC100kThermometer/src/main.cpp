@@ -84,7 +84,7 @@ void loop() {
 
   measurements.previousSampleTimeMicros = micros() - start;
 
-  powerDown(WAKEUP_DELAY_8_S, WAKEUP_DELAY_8_S);
+  powerDown(WAKEUP_DELAY_8_S);
 }
 
 float sampleAdc(uint8_t adcPin, uint8_t sampleCount) {
