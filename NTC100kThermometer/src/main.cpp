@@ -26,6 +26,7 @@
 #define THERMISTOR_RESISTANCE  10000.0  // Thermistor nominal value
 #define THERMISTOR_BETA_COEF      3950  // From thermistor's datasheet
 #define THERMISTOR_NOMINAL_TEMP     25  // From thermistor's datasheet (25°C)
+#define NUM_SAMPLES                 10  // Sample count for ADC averaging
 
 // Measured resistances for the voltage divider resistors
 #define R1 2000000
@@ -70,7 +71,7 @@ void loop() {
   pinMode(ThermistorOUT, OUTPUT);
   digitalWrite(ThermistorOUT, HIGH);
 
-  float adcAverage = sampleAdc(ThermistorIN, 5);
+  float adcAverage = sampleAdc(ThermistorIN, NUM_SAMPLES);
   measurements.temp = calculateTemperature(adcAverage);
 
   pinMode(ThermistorOUT, INPUT);
@@ -92,7 +93,7 @@ float sampleAdc(uint8_t adcPin, uint8_t sampleCount) {
   for (uint8_t i = 0; i < sampleCount; i++) {
     uint16_t sample = analogRead(adcPin);
     average += sample;
-    delayMicroseconds(100);
+    delayMicroseconds(1000);
   }
   average /= sampleCount;
   return average;
