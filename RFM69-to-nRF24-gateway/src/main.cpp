@@ -51,7 +51,7 @@ void setup() {
 }
 
 void loop() {
-  if (rfm69.receiveDone())
+  if (rfm69.receiveDone() && rfm69.DATALEN > 0)
   {
     unsigned long start = micros();
 
