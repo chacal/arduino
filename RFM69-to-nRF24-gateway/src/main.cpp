@@ -103,7 +103,7 @@ void loop() {
 
     if(size > 2 && buf[0] == 'g') {
       uint8_t rfmToAddress = buf[1];
-      bool acked = rfm69.sendWithRetry(rfmToAddress, buf+2, size-2, 3, 5);
+      bool acked = rfm69.sendWithRetry(rfmToAddress, buf+2, size-2, 3, 10);
 
       #if DEBUG
         Serial.print("Sent data to RFM node: "); Serial.print(rfmToAddress);
