@@ -56,6 +56,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_settings.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_transport.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_utils.c \
+  $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -95,6 +96,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/s130/headers/nrf51 \
   $(SDK_ROOT)/components/libraries/queue \
   $(SDK_ROOT)/components/toolchain/gcc \
+  $(SDK_ROOT)/components/drivers_nrf/uart \
 
 # Libraries common to all targets
 LIB_FILES += \
