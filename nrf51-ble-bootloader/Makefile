@@ -1,8 +1,11 @@
 PROJECT_NAME     := nrf51_dfu_ble_s130_bootloader
 TARGETS          := nrf51822_xxaa_s130
 OUTPUT_DIRECTORY := build
+MERGEHEX         := $(HOME)/backupped/dev/nRF5x-Command-Line-Tools_9_5_0_OSX/mergehex/mergehex
+OPENOCD          := /usr/local/bin/openocd
 
 SDK_ROOT := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+SOFTDEVICE_HEX := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
 PROJ_DIR := .
 
 $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.out: \
@@ -161,11 +164,14 @@ include $(TEMPLATE_PATH)/Makefile.common
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
+$(OUTPUT_DIRECTORY)/bootloader_and_s130.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.hex
+	$(MERGEHEX) -m $(SOFTDEVICE_HEX) $< -o $@
+
 # Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.hex
+flash: $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex
 	@echo Flashing: $<
-	nrfjprog --program $< -f nrf51 --sectorerase
-	nrfjprog --reset -f nrf51
+	$(OPENOCD) -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; program $< verify reset; shutdown;"
 
 erase:
-	nrfjprog --eraseall -f nrf52
+	$(OPENOCD) -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; shutdown;"
+
