@@ -1,11 +1,11 @@
-PROJECT_NAME     := secure_dfu_secure_dfu_ble_s130_pca10028_debug
-TARGETS          := nrf51422_xxac_s130
-OUTPUT_DIRECTORY := _build
+PROJECT_NAME     := nrf51_dfu_ble_s130_bootloader
+TARGETS          := nrf51822_xxaa_s130
+OUTPUT_DIRECTORY := build
 
-SDK_ROOT := ../../../../..
-PROJ_DIR := ../..
+SDK_ROOT := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+PROJ_DIR := .
 
-$(OUTPUT_DIRECTORY)/nrf51422_xxac_s130.out: \
+$(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.out: \
   LINKER_SCRIPT  := $(PROJ_DIR)/secure_dfu_gcc_nrf51_debug.ld
 
 # Source files common to all targets
@@ -73,7 +73,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/timer \
   $(SDK_ROOT)/components/drivers_nrf/clock \
   $(SDK_ROOT)/components/softdevice/s130/headers \
-  ../config \
   $(SDK_ROOT)/components/libraries/log/src \
   $(SDK_ROOT)/components/libraries/bootloader/dfu \
   $(SDK_ROOT)/components/drivers_nrf/delay \
@@ -104,7 +103,7 @@ LIB_FILES += \
 # C flags common to all targets
 CFLAGS += -DNRF_DFU_DEBUG_VERSION
 CFLAGS += -DSWI_DISABLE0
-CFLAGS += -DBOARD_PCA10028
+CFLAGS += -DBOARD_CUSTOM
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF51
 CFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
@@ -112,7 +111,7 @@ CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 CFLAGS += -DS130
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
-CFLAGS += -DNRF51422
+CFLAGS += -DNRF51822
 CFLAGS += -DNRF_SD_BLE_API_VERSION=2
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs
@@ -129,7 +128,7 @@ CXXFLAGS += \
 ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DNRF_DFU_DEBUG_VERSION
 ASMFLAGS += -DSWI_DISABLE0
-ASMFLAGS += -DBOARD_PCA10028
+ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF51
 ASMFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
@@ -137,7 +136,7 @@ ASMFLAGS += -D__HEAP_SIZE=0
 ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 ASMFLAGS += -DS130
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DNRF51422
+ASMFLAGS += -DNRF51822
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
 
 # Linker flags
@@ -149,15 +148,10 @@ LDFLAGS += -Wl,--gc-sections
 LDFLAGS += --specs=nano.specs -lc -lnosys
 
 
-.PHONY: $(TARGETS) default all clean help flash 
+.PHONY: $(TARGETS) default all clean flash
 
 # Default target - first one defined
-default: nrf51422_xxac_s130
-
-# Print all targets that can be built
-help:
-	@echo following targets are available:
-	@echo 	nrf51422_xxac_s130
+default: nrf51822_xxaa_s130
 
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
@@ -166,7 +160,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf51422_xxac_s130.hex
+flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.hex
 	@echo Flashing: $<
 	nrfjprog --program $< -f nrf51 --sectorerase
 	nrfjprog --reset -f nrf51
