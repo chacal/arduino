@@ -21,4 +21,3 @@ int main(void) {
     nrf_delay_ms(2000);
   }
 }
-
