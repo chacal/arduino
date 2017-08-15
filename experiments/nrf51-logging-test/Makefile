@@ -4,6 +4,7 @@ OUTPUT_DIRECTORY := build
 
 SDK_ROOT := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
 PROJ_DIR := .
+SRC_DIR = $(PROJ_DIR)/src
 
 $(OUTPUT_DIRECTORY)/nrf51822_xxaa.out: \
   LINKER_SCRIPT  := gcc_nrf51_blank.ld
@@ -25,7 +26,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
-  $(PROJ_DIR)/main.c \
+  $(SRC_DIR)/main.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -47,7 +48,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/ble_services/ble_gls \
   $(SDK_ROOT)/components/libraries/fstorage \
   $(SDK_ROOT)/components/drivers_nrf/i2s \
-  $(PROJ_DIR) \
+  $(SRC_DIR) \
   $(SDK_ROOT)/components/libraries/gpiote \
   $(SDK_ROOT)/components/drivers_nrf/gpiote \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd \
