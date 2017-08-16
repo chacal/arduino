@@ -5,6 +5,7 @@ BMP_DEV          := /dev/cu.usbmodemBEE7BD01
 LINKER_SCRIPT    := gcc_nrf51_s130.ld
 
 SDK_ROOT         := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+S130_HEX         := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
 PROJ_DIR         := .
 SRC_DIR          := $(PROJ_DIR)/src
 TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
@@ -186,6 +187,10 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
 	$(GDB_TARGET) -ex load -ex detach -ex quit $<
+
+flash_s130:
+	@echo Flashing S130 Soft Device..
+	$(GDB_TARGET) -ex load -ex detach -ex quit $(S130_HEX)
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
