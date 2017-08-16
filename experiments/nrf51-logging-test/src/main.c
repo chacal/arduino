@@ -4,20 +4,17 @@
 #include "nrf_gpio.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-
-#define LED_PIN 3
+#include "boards.h"
 
 
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
-
-  nrf_gpio_cfg_output(LED_PIN);
-  nrf_gpio_pin_write(LED_PIN, 0);
+  bsp_board_leds_init();
 
   /* Toggle LEDs. */
   while(true) {
     NRF_LOG_INFO("Blink!\n");
-    nrf_gpio_pin_toggle(LED_PIN);
-    nrf_delay_ms(2000);
+    bsp_board_led_invert(BSP_LED_0);
+    nrf_delay_ms(500);
   }
 }
