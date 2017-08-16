@@ -2,7 +2,7 @@ PROJECT_NAME     := brf51-logging-test
 TARGETS          := nrf51822_xxaa
 OUTPUT_DIRECTORY := build
 BMP_DEV          := /dev/cu.usbmodemBEE7BD01
-LINKER_SCRIPT    := gcc_nrf51_blank.ld
+LINKER_SCRIPT    := gcc_nrf51_s130.ld
 
 SDK_ROOT         := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
 PROJ_DIR         := .
