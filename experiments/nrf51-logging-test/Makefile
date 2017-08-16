@@ -1,13 +1,17 @@
 PROJECT_NAME     := brf51-logging-test
 TARGETS          := nrf51822_xxaa
 OUTPUT_DIRECTORY := build
+BMP_DEV          := /dev/cu.usbmodemBEE7BD01
+LINKER_SCRIPT    := gcc_nrf51_blank.ld
 
-SDK_ROOT := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
-PROJ_DIR := .
-SRC_DIR = $(PROJ_DIR)/src
+SDK_ROOT         := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+PROJ_DIR         := .
+SRC_DIR          := $(PROJ_DIR)/src
+TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
 
-$(OUTPUT_DIRECTORY)/nrf51822_xxaa.out: \
-  LINKER_SCRIPT  := gcc_nrf51_blank.ld
+include $(TEMPLATE_PATH)/Makefile.common
+GDB              := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
+GDB_TARGET       := $(GDB) -ex "target extended-remote $(BMP_DEV)"
 
 # Source files common to all targets
 SRC_FILES += \
@@ -176,16 +180,13 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 # Default target - first one defined
 default: nrf51822_xxaa
 
-TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
-
-include $(TEMPLATE_PATH)/Makefile.common
-
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Flash the program
 flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
-	@openocd -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; program $< verify reset; shutdown;"
+	$(GDB_TARGET) -ex load -ex detach -ex quit $<
 
 erase:
-	openocd -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; shutdown;"
+	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
+
