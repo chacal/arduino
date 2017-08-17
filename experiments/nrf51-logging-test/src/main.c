@@ -6,19 +6,26 @@
 #include "nrf_log_ctrl.h"
 #include "bsp.h"
 #include "ble_nus.h"
+#include "ble_advertising.h"
+#include "ble_advdata.h"
 
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
 
 #define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
+#define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
+
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)             /**< Minimum acceptable connection interval (20 ms), Connection interval uses 1.25 ms units. */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(75, UNIT_1_25_MS)             /**< Maximum acceptable connection interval (75 ms), Connection interval uses 1.25 ms units. */
 #define SLAVE_LATENCY                   0                                           /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)             /**< Connection supervisory timeout (4 seconds), Supervision Timeout uses 10 ms units. */
 
+#define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_TIMEOUT_IN_SECONDS      0                                           /**< The advertising timeout (in units of seconds). */
+
 
 static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
-
+static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
 }
@@ -107,6 +114,45 @@ static void services_init(void)
 }
 
 
+/**@brief Function for handling advertising events.
+ *
+ * @details This function will be called for advertising events which are passed to the application.
+ *
+ * @param[in] ble_adv_evt  Advertising event.
+ */
+static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
+}
+
+
+/**@brief Function for initializing the Advertising functionality.
+ */
+static void advertising_init(void)
+{
+  uint32_t               err_code;
+  ble_advdata_t          advdata;
+  ble_advdata_t          scanrsp;
+  ble_adv_modes_config_t options;
+
+  // Build advertising data struct to pass into @ref ble_advertising_init.
+  memset(&advdata, 0, sizeof(advdata));
+  advdata.name_type          = BLE_ADVDATA_FULL_NAME;
+  advdata.include_appearance = false;
+  advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+
+  memset(&scanrsp, 0, sizeof(scanrsp));
+  scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+  scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
+
+  memset(&options, 0, sizeof(options));
+  options.ble_adv_fast_enabled  = true;
+  options.ble_adv_fast_interval = APP_ADV_INTERVAL;
+  options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
+
+  err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
+  APP_ERROR_CHECK(err_code);
+}
+
+
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
   bsp_board_leds_init();
@@ -114,6 +160,7 @@ int main(void) {
   ble_stack_init();
   gap_params_init();
   services_init();
+  advertising_init();
 
   /* Toggle LEDs. */
   while(true) {

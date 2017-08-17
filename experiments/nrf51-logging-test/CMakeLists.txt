@@ -117,6 +117,7 @@ include_directories("${SDK_ROOT}/components/libraries/log/src")
 include_directories("${SDK_ROOT}/components/softdevice/s130/headers")
 include_directories("${SDK_ROOT}/components/softdevice/s130/headers/nrf51")
 include_directories("${SDK_ROOT}/components/softdevice/common/softdevice_handler")
+include_directories("${SDK_ROOT}/components/ble/common")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
