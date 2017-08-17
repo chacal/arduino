@@ -5,6 +5,7 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "bsp.h"
+#include "ble_nus.h"
 
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
@@ -14,6 +15,9 @@
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(75, UNIT_1_25_MS)             /**< Maximum acceptable connection interval (75 ms), Connection interval uses 1.25 ms units. */
 #define SLAVE_LATENCY                   0                                           /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)             /**< Connection supervisory timeout (4 seconds), Supervision Timeout uses 10 ms units. */
+
+
+static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
@@ -75,12 +79,41 @@ static void gap_params_init(void)
 }
 
 
+/**@brief Function for handling the data from the Nordic UART Service.
+ *
+ * @details This function will process the data received from the Nordic UART BLE Service and send
+ *          it to the UART module.
+ *
+ * @param[in] p_nus    Nordic UART Service structure.
+ * @param[in] p_data   Data to be send to UART module.
+ * @param[in] length   Length of the data.
+ */
+static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length) {
+}
+
+
+/**@brief Function for initializing services that will be used by the application.
+ */
+static void services_init(void)
+{
+  uint32_t       err_code;
+  ble_nus_init_t nus_init;
+
+  memset(&nus_init, 0, sizeof(nus_init));
+  nus_init.data_handler = nus_data_handler;
+
+  err_code = ble_nus_init(&m_nus, &nus_init);
+  APP_ERROR_CHECK(err_code);
+}
+
+
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
   bsp_board_leds_init();
 
   ble_stack_init();
   gap_params_init();
+  services_init();
 
   /* Toggle LEDs. */
   while(true) {
