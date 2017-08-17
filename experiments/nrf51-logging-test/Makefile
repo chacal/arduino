@@ -186,11 +186,11 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 # Flash the program
 flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
-	$(GDB_TARGET) -ex load -ex detach -ex quit $<
+	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
 flash_s130:
 	@echo Flashing S130 Soft Device..
-	$(GDB_TARGET) -ex load -ex detach -ex quit $(S130_HEX)
+	$(GDB_TARGET) -ex load -ex kill -ex quit $(S130_HEX)
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
