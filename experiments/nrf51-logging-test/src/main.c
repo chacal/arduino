@@ -9,6 +9,7 @@
 #include "ble_advertising.h"
 #include "ble_advdata.h"
 #include "ble_hci.h"
+#include "app_timer.h"
 
 
 #define CENTRAL_LINK_COUNT              0
@@ -239,6 +240,31 @@ static void power_manage(void) {
 }
 
 
+static void on_app_timer(void* pContext) {
+  if(m_nus.conn_handle != BLE_CONN_HANDLE_INVALID && m_nus.is_notification_enabled) {
+    char test[] = "Hello world!";
+
+    uint32_t err_code = ble_nus_string_send(&m_nus, (uint8_t *)test, sizeof(test));
+    APP_ERROR_CHECK(err_code);
+
+    NRF_LOG_INFO("Sent data!\n");
+  }
+}
+
+static void nus_transfer_start() {
+  APP_TIMER_INIT(0, 4, NULL);
+
+  APP_TIMER_DEF(timer);
+  uint32_t err_code = app_timer_create(&timer, APP_TIMER_MODE_REPEATED, on_app_timer);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = app_timer_start(timer, APP_TIMER_TICKS(2000, 0), NULL);
+  APP_ERROR_CHECK(err_code);
+
+  NRF_LOG_INFO("App timer started!\n");
+}
+
+
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
   bsp_board_leds_init();
@@ -251,7 +277,8 @@ int main(void) {
   APP_ERROR_CHECK(err_code);
   NRF_LOG_INFO("Advertising started!\n");
 
-  /* Toggle LEDs. */
+  nus_transfer_start();
+
   while(true) {
     power_manage();
   }
