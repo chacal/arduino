@@ -63,8 +63,7 @@ static void ble_stack_init(void) {
  * @details This function will set up all the necessary GAP (Generic Access Profile) parameters of
  *          the device. It also sets the permissions and appearance.
  */
-static void gap_params_init(void)
-{
+static void gap_params_init(void) {
   uint32_t                err_code;
   ble_gap_conn_params_t   gap_conn_params;
   ble_gap_conn_sec_mode_t sec_mode;
@@ -101,8 +100,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 
 /**@brief Function for initializing services that will be used by the application.
  */
-static void services_init(void)
-{
+static void services_init(void) {
   uint32_t       err_code;
   ble_nus_init_t nus_init;
 
@@ -126,8 +124,7 @@ static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
 
 /**@brief Function for initializing the Advertising functionality.
  */
-static void advertising_init(void)
-{
+static void advertising_init(void) {
   uint32_t               err_code;
   ble_advdata_t          advdata;
   ble_advdata_t          scanrsp;
