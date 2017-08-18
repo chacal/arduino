@@ -3126,7 +3126,7 @@
 // <e> FSTORAGE_ENABLED - fstorage - Flash storage module
 //==========================================================
 #ifndef FSTORAGE_ENABLED
-#define FSTORAGE_ENABLED 0
+#define FSTORAGE_ENABLED 1
 #endif
 #if  FSTORAGE_ENABLED
 // <o> FS_QUEUE_SIZE - Configures the size of the internal queue.
