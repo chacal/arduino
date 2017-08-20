@@ -261,7 +261,7 @@ static void nus_transfer_start() {
   uint32_t err_code = app_timer_create(&timer, APP_TIMER_MODE_REPEATED, on_app_timer);
   APP_ERROR_CHECK(err_code);
 
-  err_code = app_timer_start(timer, APP_TIMER_TICKS(2000, 0), NULL);
+  err_code = app_timer_start(timer, APP_TIMER_TICKS(500, 0), NULL);
   APP_ERROR_CHECK(err_code);
 
   NRF_LOG_INFO("App timer started!\n");
