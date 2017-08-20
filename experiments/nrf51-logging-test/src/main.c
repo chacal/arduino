@@ -24,14 +24,14 @@
 #define SLAVE_LATENCY                   0                                           /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)             /**< Connection supervisory timeout (4 seconds), Supervision Timeout uses 10 ms units. */
 
-#define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
-#define APP_ADV_TIMEOUT_IN_SECONDS      0                                           /**< The advertising timeout (in units of seconds). */
+#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_TIMEOUT_IN_SECONDS      60                                          /**< The advertising timeout (in units of seconds). */
+#define APP_ADV_SLOW_INTERVAL           MSEC_TO_UNITS(100, UNIT_0_625_MS)           /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0                                           /**< The advertising timeout (in units of seconds). */
 
 static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
-
-
 
 /**@brief Function for the application's SoftDevice event handler.
  *
@@ -228,6 +228,9 @@ static void advertising_init(void) {
   options.ble_adv_fast_enabled  = true;
   options.ble_adv_fast_interval = APP_ADV_INTERVAL;
   options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
+  options.ble_adv_slow_enabled  = true;
+  options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
+  options.ble_adv_slow_timeout  = APP_ADV_SLOW_TIMEOUT_IN_SECONDS;
 
   err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
   APP_ERROR_CHECK(err_code);
