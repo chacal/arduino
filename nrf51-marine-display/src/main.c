@@ -37,14 +37,11 @@ int main(void) {
   (void) NRF_LOG_INIT(NULL);
   bsp_board_leds_init();
 
-  ble_stack_init(ble_serial_link_on_ble_evt);
-  gap_params_init();
+  ble_support_init(ble_serial_link_on_ble_evt);
   ble_serial_link_init(on_serial_link_rx);
-  advertising_init();
-  uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-  APP_ERROR_CHECK(err_code);
-  NRF_LOG_INFO("Advertising started!\n");
+  ble_support_advertising_init();
 
+  ble_support_advertising_start();
   serial_tx_start();
 
   while(true) {

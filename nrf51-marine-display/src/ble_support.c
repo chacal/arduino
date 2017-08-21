@@ -5,6 +5,7 @@
 #include <bsp.h>
 #include <memory.h>
 #include <ble_nus.h>
+#include <nrf_log.h>
 #include "ble_support.h"
 
 
@@ -42,7 +43,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt);
  * @details This function will set up all the necessary GAP (Generic Access Profile) parameters of
  *          the device. It also sets the permissions and appearance.
  */
-void gap_params_init() {
+static void gap_params_init() {
   uint32_t                err_code;
   ble_gap_conn_params_t   gap_conn_params;
   ble_gap_conn_sec_mode_t sec_mode;
@@ -68,9 +69,7 @@ void gap_params_init() {
  *
  * @details This function initializes the SoftDevice and the BLE event interrupt.
  */
-void ble_stack_init(ble_evt_handler_t ble_evt_handler) {
-  m_ble_evt_handler = ble_evt_handler;
-
+static void ble_stack_init() {
   uint32_t err_code;
   nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
 
@@ -175,11 +174,18 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
 }
 
 
-void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
+static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
 }
 
 
-void advertising_init() {
+void ble_support_init(ble_evt_handler_t ble_evt_handler) {
+  m_ble_evt_handler = ble_evt_handler;
+  ble_stack_init();
+  gap_params_init();
+}
+
+
+void ble_support_advertising_init() {
   uint32_t               err_code;
   ble_advdata_t          advdata;
   ble_advdata_t          scanrsp;
@@ -205,4 +211,11 @@ void advertising_init() {
 
   err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
   APP_ERROR_CHECK(err_code);
+}
+
+
+void ble_support_advertising_start() {
+  uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
+  APP_ERROR_CHECK(err_code);
+  NRF_LOG_INFO("Advertising started!\n");
 }
