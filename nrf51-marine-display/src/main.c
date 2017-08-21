@@ -1,17 +1,11 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "bsp.h"
-#include "ble_nus.h"
-#include "ble_advertising.h"
 #include "app_timer.h"
 #include "ble_support.h"
 #include "ble_serial_link.h"
+#include "power_manager.h"
 
-
-static void power_manage(void) {
-  uint32_t err_code = sd_app_evt_wait();
-  APP_ERROR_CHECK(err_code);
-}
 
 static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Got %d bytes of data\n", length);
