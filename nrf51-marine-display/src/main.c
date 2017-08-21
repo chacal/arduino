@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include <stdint.h>
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "bsp.h"
@@ -9,13 +7,7 @@
 #include "ble_support.h"
 
 
-#define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
-
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(50, UNIT_1_25_MS)             /**< Minimum acceptable connection interval (20 ms), Connection interval uses 1.25 ms units. */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (75 ms), Connection interval uses 1.25 ms units. */
-#define SLAVE_LATENCY                   10                                          /**< Slave latency. */
-#define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)             /**< Connection supervisory timeout (4 seconds), Supervision Timeout uses 10 ms units. */
 
 #define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      60                                          /**< The advertising timeout (in units of seconds). */
@@ -30,33 +22,6 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
   ble_nus_on_ble_evt(&m_nus, p_ble_evt);
   on_ble_evt(p_ble_evt);
   ble_advertising_on_ble_evt(p_ble_evt);
-}
-
-
-/**@brief Function for the GAP initialization.
- *
- * @details This function will set up all the necessary GAP (Generic Access Profile) parameters of
- *          the device. It also sets the permissions and appearance.
- */
-static void gap_params_init(void) {
-  uint32_t                err_code;
-  ble_gap_conn_params_t   gap_conn_params;
-  ble_gap_conn_sec_mode_t sec_mode;
-
-  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
-
-  err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *) DEVICE_NAME, strlen(DEVICE_NAME));
-  APP_ERROR_CHECK(err_code);
-
-  memset(&gap_conn_params, 0, sizeof(gap_conn_params));
-
-  gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
-  gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
-  gap_conn_params.slave_latency     = SLAVE_LATENCY;
-  gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
-
-  err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
-  APP_ERROR_CHECK(err_code);
 }
 
 

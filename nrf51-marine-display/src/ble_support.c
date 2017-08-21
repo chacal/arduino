@@ -3,15 +3,52 @@
 #include <ble_hci.h>
 #include <app_error.h>
 #include <bsp.h>
+#include <memory.h>
 #include "ble_support.h"
 
-#define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)        /**< Reply when unsupported features are requested. */
+
+#define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
+
+#define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
 
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
 #define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
 
+#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(50, UNIT_1_25_MS)
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)
+#define SLAVE_LATENCY                   10
+#define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)
+
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+
+
+/**@brief Function for the GAP initialization.
+ *
+ * @details This function will set up all the necessary GAP (Generic Access Profile) parameters of
+ *          the device. It also sets the permissions and appearance.
+ */
+void gap_params_init() {
+  uint32_t                err_code;
+  ble_gap_conn_params_t   gap_conn_params;
+  ble_gap_conn_sec_mode_t sec_mode;
+
+  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+
+  err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *) DEVICE_NAME, strlen(DEVICE_NAME));
+  APP_ERROR_CHECK(err_code);
+
+  memset(&gap_conn_params, 0, sizeof(gap_conn_params));
+
+  gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
+  gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
+  gap_conn_params.slave_latency     = SLAVE_LATENCY;
+  gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
+
+  err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
+  APP_ERROR_CHECK(err_code);
+}
+
 
 
 /**@brief Function for the SoftDevice initialization.
