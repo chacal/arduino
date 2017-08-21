@@ -30,6 +30,11 @@
 
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+static ble_evt_handler_t                m_ble_evt_handler = NULL;
+
+
+static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
+static void on_ble_evt(ble_evt_t * p_ble_evt);
 
 
 /**@brief Function for the GAP initialization.
@@ -64,6 +69,8 @@ void gap_params_init() {
  * @details This function initializes the SoftDevice and the BLE event interrupt.
  */
 void ble_stack_init(ble_evt_handler_t ble_evt_handler) {
+  m_ble_evt_handler = ble_evt_handler;
+
   uint32_t err_code;
   nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
 
@@ -81,7 +88,7 @@ void ble_stack_init(ble_evt_handler_t ble_evt_handler) {
   APP_ERROR_CHECK(err_code);
 
   // Subscribe for BLE events.
-  err_code = softdevice_ble_evt_handler_set(ble_evt_handler);
+  err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
   APP_ERROR_CHECK(err_code);
 
   err_code = sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
@@ -89,11 +96,16 @@ void ble_stack_init(ble_evt_handler_t ble_evt_handler) {
 }
 
 
-/**@brief Function for the application's SoftDevice event handler.
- *
- * @param[in] p_ble_evt SoftDevice event.
- */
-void on_ble_evt(ble_evt_t * p_ble_evt) {
+static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
+  on_ble_evt(p_ble_evt);
+  ble_advertising_on_ble_evt(p_ble_evt);
+  if(m_ble_evt_handler != NULL) {
+    m_ble_evt_handler(p_ble_evt);
+  }
+}
+
+
+static void on_ble_evt(ble_evt_t * p_ble_evt) {
   uint32_t err_code;
 
   switch (p_ble_evt->header.evt_id) {

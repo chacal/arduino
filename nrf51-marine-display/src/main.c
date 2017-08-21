@@ -7,14 +7,11 @@
 #include "ble_support.h"
 
 
-
 static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
 
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
   ble_nus_on_ble_evt(&m_nus, p_ble_evt);
-  on_ble_evt(p_ble_evt);
-  ble_advertising_on_ble_evt(p_ble_evt);
 }
 
 
