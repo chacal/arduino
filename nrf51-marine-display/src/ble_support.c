@@ -4,12 +4,14 @@
 #include <app_error.h>
 #include <bsp.h>
 #include <memory.h>
+#include <ble_nus.h>
 #include "ble_support.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
 
 #define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
+#define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
@@ -20,7 +22,14 @@
 #define SLAVE_LATENCY                   10
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)
 
+#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_TIMEOUT_IN_SECONDS      60                                          /**< The advertising timeout (in units of seconds). */
+#define APP_ADV_SLOW_INTERVAL           MSEC_TO_UNITS(100, UNIT_0_625_MS)           /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0                                           /**< The advertising timeout (in units of seconds). */
+
+
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
 
 
 /**@brief Function for the GAP initialization.
@@ -48,7 +57,6 @@ void gap_params_init() {
   err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
   APP_ERROR_CHECK(err_code);
 }
-
 
 
 /**@brief Function for the SoftDevice initialization.
@@ -152,4 +160,37 @@ void on_ble_evt(ble_evt_t * p_ble_evt) {
     default:
       break;
   }
+}
+
+
+void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
+}
+
+
+void advertising_init() {
+  uint32_t               err_code;
+  ble_advdata_t          advdata;
+  ble_advdata_t          scanrsp;
+  ble_adv_modes_config_t options;
+
+  // Build advertising data struct to pass into @ref ble_advertising_init.
+  memset(&advdata, 0, sizeof(advdata));
+  advdata.name_type          = BLE_ADVDATA_FULL_NAME;
+  advdata.include_appearance = false;
+  advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+
+  memset(&scanrsp, 0, sizeof(scanrsp));
+  scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+  scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
+
+  memset(&options, 0, sizeof(options));
+  options.ble_adv_fast_enabled  = true;
+  options.ble_adv_fast_interval = APP_ADV_INTERVAL;
+  options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
+  options.ble_adv_slow_enabled  = true;
+  options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
+  options.ble_adv_slow_timeout  = APP_ADV_SLOW_TIMEOUT_IN_SECONDS;
+
+  err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
+  APP_ERROR_CHECK(err_code);
 }
