@@ -1,6 +1,5 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-#include "bsp.h"
 #include "app_timer.h"
 #include "ble_support.h"
 #include "ble_serial_link.h"
@@ -35,7 +34,6 @@ static void serial_tx_start() {
 
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
-  bsp_board_leds_init();
 
   ble_support_init(ble_serial_link_on_ble_evt);
   ble_serial_link_init(on_serial_link_rx);
