@@ -5,43 +5,7 @@
 #include "ble_advertising.h"
 #include "app_timer.h"
 #include "ble_support.h"
-
-
-static ble_nus_t                        m_nus;                                      /**< Structure to identify the Nordic UART Service. */
-
-
-static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
-  ble_nus_on_ble_evt(&m_nus, p_ble_evt);
-}
-
-
-/**@brief Function for handling the data from the Nordic UART Service.
- *
- * @details This function will process the data received from the Nordic UART BLE Service and send
- *          it to the UART module.
- *
- * @param[in] p_nus    Nordic UART Service structure.
- * @param[in] p_data   Data to be send to UART module.
- * @param[in] length   Length of the data.
- */
-static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length) {
-  NRF_LOG_INFO("Got %d bytes of data\n", length);
-}
-
-
-/**@brief Function for initializing services that will be used by the application.
- */
-static void services_init(void) {
-  uint32_t       err_code;
-  ble_nus_init_t nus_init;
-
-  memset(&nus_init, 0, sizeof(nus_init));
-  nus_init.data_handler = nus_data_handler;
-
-  err_code = ble_nus_init(&m_nus, &nus_init);
-  APP_ERROR_CHECK(err_code);
-}
-
+#include "ble_serial_link.h"
 
 
 static void power_manage(void) {
@@ -49,19 +13,19 @@ static void power_manage(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
+  NRF_LOG_INFO("Got %d bytes of data\n", length);
+}
 
 static void on_app_timer(void* pContext) {
-  if(m_nus.conn_handle != BLE_CONN_HANDLE_INVALID && m_nus.is_notification_enabled) {
-    char test[] = "Hello world!";
-
-    uint32_t err_code = ble_nus_string_send(&m_nus, (uint8_t *)test, sizeof(test));
-    APP_ERROR_CHECK(err_code);
-
+  char test[] = "Hello world!";
+  uint32_t error = ble_serial_link_string_send((uint8_t *)test, sizeof(test));
+  if(error == NRF_SUCCESS) {
     NRF_LOG_INFO("Sent data!\n");
   }
 }
 
-static void nus_transfer_start() {
+static void serial_tx_start() {
   APP_TIMER_INIT(0, 4, NULL);
 
   APP_TIMER_DEF(timer);
@@ -79,15 +43,15 @@ int main(void) {
   (void) NRF_LOG_INIT(NULL);
   bsp_board_leds_init();
 
-  ble_stack_init(ble_evt_dispatch);
+  ble_stack_init(ble_serial_link_on_ble_evt);
   gap_params_init();
-  services_init();
+  ble_serial_link_init(on_serial_link_rx);
   advertising_init();
   uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
   APP_ERROR_CHECK(err_code);
   NRF_LOG_INFO("Advertising started!\n");
 
-  nus_transfer_start();
+  serial_tx_start();
 
   while(true) {
     power_manage();
