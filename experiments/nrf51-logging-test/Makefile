@@ -37,9 +37,19 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf51.S \
   $(SDK_ROOT)/components/toolchain/system_nrf51.c \
+  $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
+  $(SDK_ROOT)/components/ble/ble_services/ble_nus/ble_nus.c \
+  $(SDK_ROOT)/components/ble/ble_advertising/ble_advertising.c \
+  $(SDK_ROOT)/components/ble/common/ble_advdata.c \
+  $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
+  $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
+
 
 # Include folders common to all targets
 INC_FOLDERS += \
+  $(SRC_DIR) \
+  $(SDK_ROOT)/components/softdevice/s130/headers \
+  $(SDK_ROOT)/components/softdevice/s130/headers/nrf51 \
   $(SDK_ROOT)/components/drivers_nrf/comp \
   $(SDK_ROOT)/components/drivers_nrf/twi_master \
   $(SDK_ROOT)/components/ble/ble_services/ble_ancs_c \
@@ -53,7 +63,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/ble_services/ble_gls \
   $(SDK_ROOT)/components/libraries/fstorage \
   $(SDK_ROOT)/components/drivers_nrf/i2s \
-  $(SRC_DIR) \
   $(SDK_ROOT)/components/libraries/gpiote \
   $(SDK_ROOT)/components/drivers_nrf/gpiote \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd \
@@ -138,6 +147,9 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/drivers_nrf/swi \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs \
   $(SDK_ROOT)/components/libraries/log/src \
+  $(SDK_ROOT)/components/softdevice/common/softdevice_handler \
+  $(SDK_ROOT)/components/ble/common \
+  $(SDK_ROOT)/components/ble/ble_services/ble_nus \
 
 # Libraries common to all targets
 LIB_FILES += \
@@ -147,10 +159,13 @@ CFLAGS += -DNRF51
 CFLAGS += -DNRF51822
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -DBOARD_CUSTOM
-CFLAGS += -DBSP_DEFINES_ONLY
+CFLAGS += -DBLE_STACK_SUPPORT_REQD
+CFLAGS += -DSOFTDEVICE_PRESENT
+CFLAGS += -DS130
+CFLAGS += -DNRF_SD_BLE_API_VERSION=2
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs
-CFLAGS +=  -Wall -Werror -O3 -g3 -Os
+CFLAGS += -Wall -Werror -O3 -g3
 CFLAGS += -mfloat-abi=soft
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
@@ -166,6 +181,10 @@ ASMFLAGS += -DNRF51822
 ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DBSP_DEFINES_ONLY
+ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
+ASMFLAGS += -DSOFTDEVICE_PRESENT
+ASMFLAGS += -DS130
+ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
 
 # Linker flags
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)
@@ -186,11 +205,11 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 # Flash the program
 flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
-	$(GDB_TARGET) -ex load -ex detach -ex quit $<
+	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
 flash_s130:
 	@echo Flashing S130 Soft Device..
-	$(GDB_TARGET) -ex load -ex detach -ex quit $(S130_HEX)
+	$(GDB_TARGET) -ex load -ex kill -ex quit $(S130_HEX)
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit

@@ -10,6 +10,10 @@ add_definitions(-DNRF51)
 add_definitions(-DNRF51822)
 add_definitions(-DBOARD_CUSTOM)
 add_definitions(-DUSE_LFXO)
+add_definitions(-DBLE_STACK_SUPPORT_REQD)
+add_definitions(-DSOFTDEVICE_PRESENT)
+add_definitions(-DS130)
+add_definitions(-DNRF_SD_BLE_API_VERSION=2)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${SDK_ROOT}/components/libraries/log")
@@ -110,6 +114,11 @@ include_directories("${SDK_ROOT}/components/ble/ble_services/ble_rscs")
 include_directories("${SDK_ROOT}/components/drivers_nrf/swi")
 include_directories("${SDK_ROOT}/components/ble/ble_services/ble_hrs")
 include_directories("${SDK_ROOT}/components/libraries/log/src")
+include_directories("${SDK_ROOT}/components/softdevice/s130/headers")
+include_directories("${SDK_ROOT}/components/softdevice/s130/headers/nrf51")
+include_directories("${SDK_ROOT}/components/softdevice/common/softdevice_handler")
+include_directories("${SDK_ROOT}/components/ble/common")
+
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
 
