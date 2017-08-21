@@ -15,6 +15,7 @@
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
 #define APP_FEATURE_NOT_SUPPORTED       BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2        /**< Reply when unsupported features are requested. */
+#define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
 
 #define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
@@ -137,6 +138,9 @@ static void ble_stack_init(void) {
 
   // Subscribe for BLE events.
   err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
   APP_ERROR_CHECK(err_code);
 }
 
