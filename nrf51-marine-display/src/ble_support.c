@@ -2,11 +2,46 @@
 #include <ble.h>
 #include <ble_hci.h>
 #include <app_error.h>
+#include <bsp.h>
 #include "ble_support.h"
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)        /**< Reply when unsupported features are requested. */
 
+#define CENTRAL_LINK_COUNT              0
+#define PERIPHERAL_LINK_COUNT           1
+#define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
+
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+
+
+/**@brief Function for the SoftDevice initialization.
+ *
+ * @details This function initializes the SoftDevice and the BLE event interrupt.
+ */
+void ble_stack_init(ble_evt_handler_t ble_evt_handler) {
+  uint32_t err_code;
+  nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
+
+  // Initialize SoftDevice.
+  SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
+
+  ble_enable_params_t ble_enable_params;
+  err_code = softdevice_enable_get_default_config(CENTRAL_LINK_COUNT, PERIPHERAL_LINK_COUNT, &ble_enable_params);
+  APP_ERROR_CHECK(err_code);
+
+  //Check the ram settings against the used number of links
+  CHECK_RAM_START_ADDR(CENTRAL_LINK_COUNT,PERIPHERAL_LINK_COUNT);
+
+  err_code = softdevice_enable(&ble_enable_params);
+  APP_ERROR_CHECK(err_code);
+
+  // Subscribe for BLE events.
+  err_code = softdevice_ble_evt_handler_set(ble_evt_handler);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
+  APP_ERROR_CHECK(err_code);
+}
 
 
 /**@brief Function for the application's SoftDevice event handler.
