@@ -5,9 +5,14 @@
 #include "ble_serial_link.h"
 #include "power_manager.h"
 
+#define WAKEUP_BUTTON_PIN      18
+
 
 static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Got %d bytes of data\n", length);
+  if(length == 1 && p_data[0] == 's') {
+    power_manager_shutdown();
+  }
 }
 
 static void on_app_timer(void* pContext) {
@@ -19,8 +24,6 @@ static void on_app_timer(void* pContext) {
 }
 
 static void serial_tx_start() {
-  APP_TIMER_INIT(0, 4, NULL);
-
   APP_TIMER_DEF(timer);
   uint32_t err_code = app_timer_create(&timer, APP_TIMER_MODE_REPEATED, on_app_timer);
   APP_ERROR_CHECK(err_code);
@@ -34,7 +37,9 @@ static void serial_tx_start() {
 
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
+  APP_TIMER_INIT(0, 8, NULL);
 
+  power_manager_init(WAKEUP_BUTTON_PIN);
   ble_support_init(ble_serial_link_on_ble_evt);
   ble_serial_link_init(on_serial_link_rx);
   ble_support_advertising_init();
