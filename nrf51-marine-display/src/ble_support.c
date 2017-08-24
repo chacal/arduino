@@ -20,7 +20,7 @@
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(50, UNIT_1_25_MS)
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)
-#define SLAVE_LATENCY                   10
+#define SLAVE_LATENCY                   5
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)
 
 #define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
