@@ -4,6 +4,7 @@
 #include "ble_support.h"
 #include "ble_serial_link.h"
 #include "power_manager.h"
+#include "display.h"
 
 #define WAKEUP_BUTTON_PIN      18
 
@@ -12,6 +13,11 @@ static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Got %d bytes of data\n", length);
   if(length == 1 && p_data[0] == 's') {
     power_manager_shutdown();
+  } else if(length <= 3) {
+    char temp[length + 1];
+    strncpy(temp, p_data, length);
+    temp[length] = '\0';
+    display_render_str(temp);
   }
 }
 
@@ -43,9 +49,10 @@ int main(void) {
   ble_support_init(ble_serial_link_on_ble_evt);
   ble_serial_link_init(on_serial_link_rx);
   ble_support_advertising_init();
+  display_init();
 
   ble_support_advertising_start();
-  serial_tx_start();
+//  serial_tx_start();
 
   while(true) {
     power_manage();

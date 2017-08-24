@@ -34,10 +34,12 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
+  $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
   $(SRC_DIR)/main.c \
   $(SRC_DIR)/ble_support.c \
   $(SRC_DIR)/ble_serial_link.c \
   $(SRC_DIR)/power_manager.c \
+  $(SRC_DIR)/display.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
