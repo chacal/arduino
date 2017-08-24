@@ -4,6 +4,7 @@ project(nrf51-marine-display)
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_12.3.0")
+set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
 
 add_definitions(-DNRF5)
 add_definitions(-DNRF51)
@@ -119,6 +120,7 @@ include_directories("${SDK_ROOT}/components/softdevice/s130/headers/nrf51")
 include_directories("${SDK_ROOT}/components/softdevice/common/softdevice_handler")
 include_directories("${SDK_ROOT}/components/ble/common")
 include_directories("${SDK_ROOT}/components/libraries/pwr_mgmt")
+include_directories("${U8G2_ROOT}/csrc")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")

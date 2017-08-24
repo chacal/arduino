@@ -10,6 +10,9 @@ PROJ_DIR         := .
 SRC_DIR          := $(PROJ_DIR)/src
 TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
 
+U8G2_PATH        := $(HOME)/arduino/u8g2
+U8G2_SOURCES     := $(wildcard $(U8G2_PATH)/csrc/*.c)
+
 include $(TEMPLATE_PATH)/Makefile.common
 GDB              := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
 GDB_TARGET       := $(GDB) -ex "target extended-remote $(BMP_DEV)"
@@ -47,6 +50,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
   $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
+  $(U8G2_SOURCES)
 
 
 # Include folders common to all targets
@@ -155,6 +159,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
   $(SDK_ROOT)/components/libraries/pwr_mgmt \
+  $(U8G2_PATH)/csrc
 
 # Libraries common to all targets
 LIB_FILES += \
