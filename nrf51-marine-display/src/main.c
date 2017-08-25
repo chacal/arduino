@@ -21,6 +21,20 @@ static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
   }
 }
 
+static void on_ble_event(ble_evt_t *p_ble_evt) {
+  ble_serial_link_on_ble_evt(p_ble_evt);
+  switch (p_ble_evt->header.evt_id) {
+    case BLE_GAP_EVT_CONNECTED:
+      display_on();
+      break;
+    case BLE_GAP_EVT_DISCONNECTED:
+      display_off();
+      break;
+    default:
+      break;
+  }
+}
+
 static void on_app_timer(void* pContext) {
   char test[] = "Hello world!";
   uint32_t error = ble_serial_link_string_send((uint8_t *)test, sizeof(test));
@@ -46,7 +60,7 @@ int main(void) {
   APP_TIMER_INIT(0, 8, NULL);
 
   power_manager_init(WAKEUP_BUTTON_PIN);
-  ble_support_init(ble_serial_link_on_ble_evt);
+  ble_support_init(on_ble_event);
   ble_serial_link_init(on_serial_link_rx);
   ble_support_advertising_init();
   display_init();

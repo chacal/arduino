@@ -94,10 +94,18 @@ static uint8_t u8x8_byte_nrf51_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int
 void display_init() {
   u8g2_Setup_st7565_nhd_c12864_f(&u8g2, U8G2_R0, u8x8_byte_nrf51_hw_spi, u8x8_gpio_and_delay_nrf51);
   u8g2_InitDisplay(&u8g2);
-  u8g2_ClearDisplay(&u8g2);
-  u8g2_SetPowerSave(&u8g2, 0);
   u8g2_SetContrast(&u8g2, CONTRAST);
   u8g2_SetFont(&u8g2, u8g2_font_fub42_tr);
+  u8g2_ClearDisplay(&u8g2);
+}
+
+void display_on() {
+  u8g2_ClearBuffer(&u8g2);
+  u8g2_SetPowerSave(&u8g2, 0);
+}
+
+void display_off() {
+  u8g2_SetPowerSave(&u8g2, 1);
 }
 
 void display_render_str(char *str) {
