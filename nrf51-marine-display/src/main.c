@@ -15,7 +15,7 @@ static void on_serial_link_rx(uint8_t *p_data, uint16_t length) {
     power_manager_shutdown();
   } else if(length <= 3) {
     char temp[length + 1];
-    strncpy(temp, p_data, length);
+    strncpy(temp, (char*)p_data, length);
     temp[length] = '\0';
     display_render_str(temp);
   }
