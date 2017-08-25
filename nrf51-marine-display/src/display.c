@@ -101,6 +101,7 @@ void display_init() {
 
 void display_on() {
   u8g2_ClearBuffer(&u8g2);
+  u8g2_SendBuffer(&u8g2);
   u8g2_SetPowerSave(&u8g2, 0);
 }
 
