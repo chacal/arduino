@@ -20,8 +20,8 @@
 #define PERIPHERAL_LINK_COUNT           1
 #define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
 
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(50, UNIT_1_25_MS)
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)
+#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(150, UNIT_1_25_MS)
 #define SLAVE_LATENCY                   5
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)
 
