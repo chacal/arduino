@@ -6,6 +6,8 @@
 #include <memory.h>
 #include <ble_nus.h>
 #include <nrf_log.h>
+#include <ble_conn_params.h>
+#include <app_timer.h>
 #include "ble_support.h"
 
 
@@ -22,6 +24,10 @@
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)
 #define SLAVE_LATENCY                   5
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)
+
+#define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1000, 0)                    /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000, 0)                    /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
 
 #define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      60                                          /**< The advertising timeout (in units of seconds). */
@@ -65,6 +71,30 @@ static void gap_params_init() {
 }
 
 
+static void conn_params_error_handler(uint32_t nrf_error) {
+  APP_ERROR_HANDLER(nrf_error);
+}
+
+
+static void conn_params_init(void) {
+  uint32_t err_code;
+  ble_conn_params_init_t cp_init;
+
+  memset(&cp_init, 0, sizeof(cp_init));
+
+  cp_init.p_conn_params = NULL;
+  cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;
+  cp_init.next_conn_params_update_delay = NEXT_CONN_PARAMS_UPDATE_DELAY;
+  cp_init.max_conn_params_update_count = MAX_CONN_PARAMS_UPDATE_COUNT;
+  cp_init.start_on_notify_cccd_handle = BLE_GATT_HANDLE_INVALID;
+  cp_init.disconnect_on_fail = true;
+  cp_init.error_handler = conn_params_error_handler;
+
+  err_code = ble_conn_params_init(&cp_init);
+  APP_ERROR_CHECK(err_code);
+}
+
+
 /**@brief Function for the SoftDevice initialization.
  *
  * @details This function initializes the SoftDevice and the BLE event interrupt.
@@ -98,6 +128,7 @@ static void ble_stack_init() {
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
   on_ble_evt(p_ble_evt);
   ble_advertising_on_ble_evt(p_ble_evt);
+  ble_conn_params_on_ble_evt(p_ble_evt);
   if(m_ble_evt_handler != NULL) {
     m_ble_evt_handler(p_ble_evt);
   }
@@ -182,6 +213,7 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   m_ble_evt_handler = ble_evt_handler;
   ble_stack_init();
   gap_params_init();
+  conn_params_init();
 }
 
 
