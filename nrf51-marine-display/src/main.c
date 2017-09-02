@@ -9,7 +9,7 @@
 #define WAKEUP_BUTTON_PIN      18
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
-  NRF_LOG_INFO("Received %d bytes: %s\n", length, (uint32_t)p_data);
+  NRF_LOG_INFO("Received %d bytes\n", length);
   if(length == 1 && p_data[0] == 's') {
     power_manager_shutdown();
   } else if(length <= 3) {
