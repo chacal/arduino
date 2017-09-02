@@ -34,7 +34,7 @@
 
 
 #ifndef NRF_BLE_QWR_ENABLED
-#define NRF_BLE_QWR_ENABLED 0
+#define NRF_BLE_QWR_ENABLED 1
 #endif
 
 // <q> PEER_MANAGER_ENABLED  - peer_manager - Peer Manager

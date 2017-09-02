@@ -9,12 +9,12 @@
 #include <ble_conn_params.h>
 #include <app_timer.h>
 #include "ble_support.h"
+#include "ble_data_service.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
 
-#define DEVICE_NAME                     "Nordic_UART"                               /**< Name of device. Will be included in the advertising data. */
-#define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
+#define DEVICE_NAME                     "MarineDisplay"                             /**< Name of device. Will be included in the advertising data. */
 
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
@@ -35,9 +35,9 @@
 #define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0                                           /**< The advertising timeout (in units of seconds). */
 
 
-static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
-static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
-static ble_evt_handler_t                m_ble_evt_handler = NULL;
+static uint16_t          m_conn_handle     = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static ble_uuid_t        m_adv_uuids[]     = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+static ble_evt_handler_t m_ble_evt_handler = NULL;
 
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
@@ -170,11 +170,6 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
       APP_ERROR_CHECK(err_code);
       break; // BLE_GATTS_EVT_TIMEOUT
-
-    case BLE_EVT_USER_MEM_REQUEST:
-      err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gattc_evt.conn_handle, NULL);
-      APP_ERROR_CHECK(err_code);
-      break; // BLE_EVT_USER_MEM_REQUEST
 
     case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST: {
       ble_gatts_evt_rw_authorize_request_t  req;
