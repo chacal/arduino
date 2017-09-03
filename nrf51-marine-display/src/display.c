@@ -95,13 +95,12 @@ void display_init() {
   u8g2_Setup_st7565_nhd_c12864_f(&u8g2, U8G2_R0, u8x8_byte_nrf51_hw_spi, u8x8_gpio_and_delay_nrf51);
   u8g2_InitDisplay(&u8g2);
   u8g2_SetContrast(&u8g2, CONTRAST);
-  u8g2_SetFont(&u8g2, u8g2_font_fub42_tr);
+  u8g2_SetFont(&u8g2, u8g2_font_fub20_tr);
   u8g2_ClearDisplay(&u8g2);
 }
 
 void display_on() {
-  u8g2_ClearBuffer(&u8g2);
-  u8g2_SendBuffer(&u8g2);
+  display_clear();
   u8g2_SetPowerSave(&u8g2, 0);
 }
 
@@ -109,8 +108,17 @@ void display_off() {
   u8g2_SetPowerSave(&u8g2, 1);
 }
 
-void display_render_str(char *str) {
+void display_render_str(uint32_t idx, uint32_t x, uint32_t y, uint32_t font_size, char *str) {
+  u8g2_DrawStr(&u8g2, x, y, str);
+  u8g2_SendBuffer(&u8g2);
+}
+
+void display_clear() {
   u8g2_ClearBuffer(&u8g2);
-  u8g2_DrawStr(&u8g2, 10, 50, str);
+  u8g2_SendBuffer(&u8g2);
+}
+
+void display_render_line(uint32_t idx, uint32_t start_x, uint32_t start_y, uint32_t end_x, uint32_t end_y, uint32_t width) {
+  u8g2_DrawLine(&u8g2, start_x, start_y, end_x, end_y);
   u8g2_SendBuffer(&u8g2);
 }
