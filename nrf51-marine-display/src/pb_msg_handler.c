@@ -15,7 +15,7 @@ void pb_msg_handle(uint8_t *p_data, uint16_t length) {
   } else {
     switch (cmd.which_command) {
       case DisplayCommand_string_tag:
-        NRF_LOG_INFO("String cmd font size: %d\n", cmd.command.string.font_size);
+        NRF_LOG_INFO("String cmd: %s\n", cmd.command.string.str);
         break;
       case DisplayCommand_line_tag:
         NRF_LOG_INFO("Line cmd: (%d,%d) -> (%d,%d)\n", cmd.command.line.start_x, cmd.command.line.start_y, cmd.command.line.end_x, cmd.command.line.end_y);
