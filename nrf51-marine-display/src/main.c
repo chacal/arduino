@@ -5,19 +5,13 @@
 #include "ble_data_service.h"
 #include "power_manager.h"
 #include "display.h"
+#include "pb_msg_handler.h"
 
 #define WAKEUP_BUTTON_PIN      18
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Received %d bytes\n", length);
-  if(length == 1 && p_data[0] == 's') {
-    power_manager_shutdown();
-  } else if(length <= 3) {
-    char temp[length + 1];
-    strncpy(temp, (char*)p_data, length);
-    temp[length] = '\0';
-    display_render_str(temp);
-  }
+  pb_msg_handle(p_data, length);
 }
 
 static void on_ble_event(ble_evt_t *p_ble_evt) {
