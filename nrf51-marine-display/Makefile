@@ -13,6 +13,10 @@ TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
 U8G2_PATH        := $(HOME)/arduino/u8g2
 U8G2_SOURCES     := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
+NANOPB_PATH      := $(HOME)/backupped/dev/nanopb-0.3.8-macosx-x86
+NANOPB_GEN       := $(NANOPB_PATH)/generator-bin/nanopb_generator
+NANOPB_SOURCES   := $(wildcard $(NANOPB_PATH)/pb_*.c)
+
 include $(TEMPLATE_PATH)/Makefile.common
 GDB              := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
 GDB_TARGET       := $(GDB) -ex "target extended-remote $(BMP_DEV)"
@@ -54,7 +58,8 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/common/ble_conn_params.c \
   $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
-  $(U8G2_SOURCES)
+  $(U8G2_SOURCES) \
+  $(NANOPB_SOURCES)
 
 
 # Include folders common to all targets
@@ -163,7 +168,8 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
   $(SDK_ROOT)/components/libraries/pwr_mgmt \
-  $(U8G2_PATH)/csrc
+  $(U8G2_PATH)/csrc \
+  $(NANOPB_PATH)
 
 # Libraries common to all targets
 LIB_FILES += \

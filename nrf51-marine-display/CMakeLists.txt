@@ -5,6 +5,7 @@ set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_12.3.0")
 set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
+set(NANOPB_ROOT "$ENV{HOME}/backupped/dev/nanopb")
 
 add_definitions(-DNRF5)
 add_definitions(-DNRF51)
@@ -121,6 +122,7 @@ include_directories("${SDK_ROOT}/components/softdevice/common/softdevice_handler
 include_directories("${SDK_ROOT}/components/ble/common")
 include_directories("${SDK_ROOT}/components/libraries/pwr_mgmt")
 include_directories("${U8G2_ROOT}/csrc")
+include_directories("${NANOPB_ROOT}")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
