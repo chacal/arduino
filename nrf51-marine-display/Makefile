@@ -14,6 +14,9 @@ U8G2_PATH        := $(HOME)/arduino/u8g2
 U8G2_SOURCES     := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
 NANOPB_PATH      := $(HOME)/backupped/dev/nanopb-0.3.8-macosx-x86
+PB_PROTOCOL_DIR  := $(HOME)/backupped/dev/marine-display-simulator/public
+PROTOC           := $(NANOPB_PATH)/generator-bin/protoc
+PROTOC_OPTS      := -I $(PB_PROTOCOL_DIR)
 NANOPB_GEN       := $(NANOPB_PATH)/generator-bin/nanopb_generator
 NANOPB_SOURCES   := $(wildcard $(NANOPB_PATH)/pb_*.c)
 
@@ -44,6 +47,7 @@ SRC_FILES += \
   $(SRC_DIR)/power_manager.c \
   $(SRC_DIR)/display.c \
   $(SRC_DIR)/ble_data_service.c \
+  $(SRC_DIR)/marinedisplay.pb.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -234,3 +238,8 @@ flash_s130:
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
 
+%.pb: $(PB_PROTOCOL_DIR)/%.proto
+	$(PROTOC) $(PROTOC_OPTS) -o$@ $<
+
+$(SRC_DIR)/%.pb.c $(SRC_DIR)/%.pb.h: %.pb
+	$(NANOPB_GEN) -D$(SRC_DIR) $<

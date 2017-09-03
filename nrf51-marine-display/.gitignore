@@ -1,3 +1,5 @@
 cmake-build-debug/
 build/
 .idea/
+*.pb.h
+*.pb.c
