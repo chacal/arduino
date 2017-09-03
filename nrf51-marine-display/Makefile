@@ -1,29 +1,29 @@
-PROJECT_NAME     := nrf51-marine-display
-TARGETS          := nrf51822_xxaa
-OUTPUT_DIRECTORY := build
-BMP_DEV          := /dev/cu.usbmodemBEE7BD01
-LINKER_SCRIPT    := gcc_nrf51_s130.ld
+PROJECT_NAME       := nrf51-marine-display
+TARGETS            := nrf51822_xxaa
+OUTPUT_DIRECTORY   := build
+BMP_DEV            := /dev/cu.usbmodemBEE7BD01
+LINKER_SCRIPT      := gcc_nrf51_s130.ld
 
-SDK_ROOT         := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
-S130_HEX         := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
-PROJ_DIR         := .
-SRC_DIR          := $(PROJ_DIR)/src
-TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
+SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+S130_HEX           := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
+PROJ_DIR           := .
+SRC_DIR            := $(PROJ_DIR)/src
+TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
 
-U8G2_PATH        := $(HOME)/arduino/u8g2
-U8G2_SOURCES     := $(wildcard $(U8G2_PATH)/csrc/*.c)
+U8G2_PATH          := $(HOME)/arduino/u8g2
+U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
-NANOPB_PATH      := $(HOME)/backupped/dev/nanopb-0.3.8-macosx-x86
-PB_PROTOCOL_DIR  := $(HOME)/backupped/dev/marine-display-simulator/public
-PROTOC           := $(NANOPB_PATH)/generator-bin/protoc
-PROTOC_OPTS      := -I $(PB_PROTOCOL_DIR)
-NANOPB_GEN       := $(NANOPB_PATH)/generator-bin/nanopb_generator
-NANOPB_SOURCES   := $(wildcard $(NANOPB_PATH)/pb_*.c)
-NANOPB_STR_LENGTH:= 50
+NANOPB_PATH        := $(HOME)/backupped/dev/nanopb-0.3.8-macosx-x86
+PB_PROTOCOL_DIR    := $(HOME)/backupped/dev/marine-display-simulator/public
+PROTOC             := $(NANOPB_PATH)/generator-bin/protoc
+PROTOC_OPTS        := -I $(PB_PROTOCOL_DIR)
+NANOPB_GEN         := $(NANOPB_PATH)/generator-bin/nanopb_generator
+NANOPB_SOURCES     := $(wildcard $(NANOPB_PATH)/pb_*.c)
+NANOPB_STR_LENGTH  := 50
 
 include $(TEMPLATE_PATH)/Makefile.common
-GDB              := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
-GDB_TARGET       := $(GDB) -ex "target extended-remote $(BMP_DEV)"
+GDB                := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
+GDB_TARGET         := $(GDB) -ex "target extended-remote $(BMP_DEV)"
 
 # Source files common to all targets
 SRC_FILES += \
