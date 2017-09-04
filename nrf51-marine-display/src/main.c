@@ -8,6 +8,7 @@
 #include "pb_msg_handler.h"
 #include <app_scheduler.h>
 #include "config.h"
+#include "internal_command.h"
 
 #define WAKEUP_BUTTON_PIN          18
 #define APP_SCHED_QUEUE_SIZE       2
@@ -24,10 +25,10 @@ static void on_ble_event(ble_evt_t *p_ble_evt) {
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
-      display_on();
+      SCHED_INT_CMD(DISPLAY_ON);
       break;
     case BLE_GAP_EVT_DISCONNECTED:
-      display_off();
+      SCHED_INT_CMD(DISPLAY_OFF);
       break;
     default:
       break;

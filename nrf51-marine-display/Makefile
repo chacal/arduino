@@ -52,6 +52,7 @@ SRC_FILES += \
   $(SRC_DIR)/ble_data_service.c \
   $(SRC_DIR)/marinedisplay.pb.c \
   $(SRC_DIR)/pb_msg_handler.c \
+  $(SRC_DIR)/internal_command.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
