@@ -19,7 +19,7 @@ PROTOC             := $(NANOPB_PATH)/generator-bin/protoc
 PROTOC_OPTS        := -I $(PB_PROTOCOL_DIR)
 NANOPB_GEN         := $(NANOPB_PATH)/generator-bin/nanopb_generator
 NANOPB_SOURCES     := $(wildcard $(NANOPB_PATH)/pb_*.c)
-NANOPB_STR_LENGTH  := 50
+NANOPB_STR_LENGTH  := 20
 NANOPB_INT_SIZE    := 8
 
 include $(TEMPLATE_PATH)/Makefile.common
