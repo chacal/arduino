@@ -20,6 +20,7 @@ PROTOC_OPTS        := -I $(PB_PROTOCOL_DIR)
 NANOPB_GEN         := $(NANOPB_PATH)/generator-bin/nanopb_generator
 NANOPB_SOURCES     := $(wildcard $(NANOPB_PATH)/pb_*.c)
 NANOPB_STR_LENGTH  := 50
+NANOPB_INT_SIZE    := 8
 
 include $(TEMPLATE_PATH)/Makefile.common
 GDB                := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
@@ -244,4 +245,4 @@ erase:
 	$(PROTOC) $(PROTOC_OPTS) -o$@ $<
 
 $(SRC_DIR)/%.pb.c $(SRC_DIR)/%.pb.h: %.pb
-	$(NANOPB_GEN) -s max_size:$(NANOPB_STR_LENGTH) -D$(SRC_DIR) $<
+	$(NANOPB_GEN) -s max_size:$(NANOPB_STR_LENGTH) -s int_size:$(NANOPB_INT_SIZE) -D$(SRC_DIR) $<
