@@ -2098,7 +2098,7 @@
 // <3=> 3
 
 #ifndef SPI_DEFAULT_CONFIG_IRQ_PRIORITY
-#define SPI_DEFAULT_CONFIG_IRQ_PRIORITY 3
+#define SPI_DEFAULT_CONFIG_IRQ_PRIORITY 1
 #endif
 
 // <e> SPI0_ENABLED - Enable SPI0 instance
@@ -2111,7 +2111,7 @@
 
 
 #ifndef SPI0_USE_EASY_DMA
-#define SPI0_USE_EASY_DMA 0
+#define SPI0_USE_EASY_DMA 1
 #endif
 
 // <o> SPI0_DEFAULT_FREQUENCY  - SPI frequency

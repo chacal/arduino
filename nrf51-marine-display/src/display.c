@@ -1,4 +1,5 @@
 #include "display.h"
+#include "power_manager.h"
 #include <u8g2.h>
 #include <nrf_gpio.h>
 #include <nrf_delay.h>
@@ -17,6 +18,7 @@
 static u8g2_t u8g2;
 
 static const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);
+static volatile bool       spi_xfer_done;
 
 
 static uint8_t u8x8_gpio_and_delay_nrf51(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
@@ -60,13 +62,26 @@ static uint8_t u8x8_gpio_and_delay_nrf51(u8x8_t *u8x8, uint8_t msg, uint8_t arg_
   return 1;
 }
 
+
+static void spi_evt_handler(nrf_drv_spi_evt_t const * p_event) {
+  spi_xfer_done = true;
+}
+
 static void spi_init() {
   nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
   spi_config.ss_pin   = CS_PIN;
   spi_config.miso_pin = NRF_DRV_SPI_PIN_NOT_USED;
   spi_config.mosi_pin = MOSI_PIN;
   spi_config.sck_pin  = SCK_PIN;
-  APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, NULL));
+  APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_evt_handler));
+}
+
+static void spi_send(uint8_t *data, uint8_t length) {
+  spi_xfer_done = false;
+  APP_ERROR_CHECK(nrf_drv_spi_transfer(&spi, data, length, NULL, 0));
+  while(! spi_xfer_done) {
+    power_manage();
+  }
 }
 
 static uint8_t u8x8_byte_nrf51_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
@@ -80,7 +95,7 @@ static uint8_t u8x8_byte_nrf51_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int
     case U8X8_MSG_BYTE_START_TRANSFER:
       break;
     case U8X8_MSG_BYTE_SEND:
-      APP_ERROR_CHECK(nrf_drv_spi_transfer(&spi, (uint8_t *)arg_ptr, arg_int, NULL, 0));
+      spi_send((uint8_t*)arg_ptr, arg_int);
       break;
     case U8X8_MSG_BYTE_END_TRANSFER:
       break;
