@@ -41,7 +41,7 @@ static void scheduler_init() {
 
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
-  APP_TIMER_INIT(0, 8, NULL);
+  APP_TIMER_INIT(0, 4, NULL);
 
   scheduler_init();
   power_manager_init(WAKEUP_BUTTON_PIN);
