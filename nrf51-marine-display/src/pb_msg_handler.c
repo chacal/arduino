@@ -2,7 +2,7 @@
 #include <pb_decode.h>
 #include <nrf_log.h>
 #include "marinedisplay.pb.h"
-#include "display.h"
+#include "display_list.h"
 
 void pb_msg_handle(void *p_data, uint16_t length) {
   DisplayCommand cmd = DisplayCommand_init_zero;
@@ -17,28 +17,20 @@ void pb_msg_handle(void *p_data, uint16_t length) {
     switch (cmd.which_command) {
       case DisplayCommand_string_tag:
         NRF_LOG_INFO("String cmd: %s\n", (uint32_t)cmd.command.string.str);
-        display_render_str(1,
-                           cmd.command.string.x,
-                           cmd.command.string.y,
-                           cmd.command.string.font_size,
-                           cmd.command.string.str);
+        display_list_add(cmd.command.string.index, &cmd);
         break;
       case DisplayCommand_line_tag:
         NRF_LOG_INFO("Line cmd: (%d,%d) -> (%d,%d)\n", cmd.command.line.start_x, cmd.command.line.start_y, cmd.command.line.end_x, cmd.command.line.end_y);
-        display_render_line(1,
-                            cmd.command.line.start_x,
-                            cmd.command.line.start_y,
-                            cmd.command.line.end_x,
-                            cmd.command.line.end_y,
-                            cmd.command.line.width);
+        display_list_add(cmd.command.line.index, &cmd);
         break;
       case DisplayCommand_clear_tag:
         NRF_LOG_INFO("Clear cmd\n");
-        display_clear();
+        display_list_clear();
         break;
       default:
         NRF_LOG_WARNING("Unknown command tag: %d\n", cmd.which_command);
-        break;
+        return;
     }
+    display_list_render();
   }
 }

@@ -116,6 +116,7 @@ void display_init() {
 
 void display_on() {
   display_clear();
+  display_render();
   u8g2_SetPowerSave(&u8g2, 0);
 }
 
@@ -123,17 +124,18 @@ void display_off() {
   u8g2_SetPowerSave(&u8g2, 1);
 }
 
-void display_render_str(uint32_t idx, uint32_t x, uint32_t y, uint32_t font_size, char *str) {
+void display_draw_str(uint32_t x, uint32_t y, uint32_t font_size, char *str) {
   u8g2_DrawStr(&u8g2, x, y, str);
-  u8g2_SendBuffer(&u8g2);
 }
 
 void display_clear() {
   u8g2_ClearBuffer(&u8g2);
-  u8g2_SendBuffer(&u8g2);
 }
 
-void display_render_line(uint32_t idx, uint32_t start_x, uint32_t start_y, uint32_t end_x, uint32_t end_y, uint32_t width) {
+void display_draw_line(uint32_t start_x, uint32_t start_y, uint32_t end_x, uint32_t end_y, uint32_t width) {
   u8g2_DrawLine(&u8g2, start_x, start_y, end_x, end_y);
+}
+
+void display_render() {
   u8g2_SendBuffer(&u8g2);
 }
