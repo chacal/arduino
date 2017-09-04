@@ -6,12 +6,17 @@
 #include "power_manager.h"
 #include "display.h"
 #include "pb_msg_handler.h"
+#include <app_scheduler.h>
+#include "config.h"
 
-#define WAKEUP_BUTTON_PIN      18
+#define WAKEUP_BUTTON_PIN          18
+#define APP_SCHED_QUEUE_SIZE       2
+#define APP_SCHED_MAX_EVENT_SIZE   MAX_BLE_COMMAND_LENGTH
+
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Received %d bytes\n", length);
-  pb_msg_handle(p_data, length);
+  APP_ERROR_CHECK(app_sched_event_put(p_data, length, pb_msg_handle));
 }
 
 static void on_ble_event(ble_evt_t *p_ble_evt) {
@@ -29,11 +34,16 @@ static void on_ble_event(ble_evt_t *p_ble_evt) {
   }
 }
 
+static void scheduler_init() {
+  APP_SCHED_INIT(APP_SCHED_MAX_EVENT_SIZE, APP_SCHED_QUEUE_SIZE);
+  NRF_LOG_INFO("App scheduler initialized. RAM usage %d bytes.\n", APP_SCHED_BUF_SIZE(APP_SCHED_MAX_EVENT_SIZE, APP_SCHED_QUEUE_SIZE));
+}
 
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
   APP_TIMER_INIT(0, 8, NULL);
 
+  scheduler_init();
   power_manager_init(WAKEUP_BUTTON_PIN);
   ble_support_init(on_ble_event);
   ble_data_service_init(on_data_service_rx);
@@ -44,5 +54,6 @@ int main(void) {
 
   while(true) {
     power_manage();
+    app_sched_execute();
   }
 }
