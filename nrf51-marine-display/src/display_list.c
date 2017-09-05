@@ -6,12 +6,14 @@
 
 static DisplayCommand m_display_list[DISPLAY_LIST_LENGTH];
 static bool           m_display_list_set[DISPLAY_LIST_LENGTH];
+static bool           m_dirty;
 
 
 static void add_to_list(uint8_t idx, DisplayCommand *p_cmd) {
   if(idx < DISPLAY_LIST_LENGTH) {
     memcpy(&m_display_list[idx], p_cmd, sizeof(DisplayCommand));
     m_display_list_set[idx] = true;
+    m_dirty = true;
   } else {
     NRF_LOG_ERROR("Display list index out of bounds! Got idx: %d List length: %d\n", idx, DISPLAY_LIST_LENGTH);
   }
@@ -28,6 +30,7 @@ void display_list_add(uint8_t idx, DisplayCommand *p_cmd) {
 
 void display_list_clear() {
   memset(m_display_list_set, false, DISPLAY_LIST_LENGTH);
+  m_dirty = true;
 }
 
 static void render_cmd(DisplayCommand *cmd) {
@@ -44,6 +47,10 @@ static void render_cmd(DisplayCommand *cmd) {
 }
 
 void display_list_render() {
+  if(!m_dirty) {
+    return;
+  }
+
   display_clear();
   for(int i = 0; i < DISPLAY_LIST_LENGTH; ++i) {
     if(m_display_list_set[i]) {
@@ -51,4 +58,5 @@ void display_list_render() {
     }
   }
   display_render();
+  m_dirty = false;
 }
