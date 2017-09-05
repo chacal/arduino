@@ -36,7 +36,7 @@ static void render_cmd(DisplayCommand *cmd) {
       display_draw_str(cmd->command.string.x, cmd->command.string.y, cmd->command.string.font_size, cmd->command.string.str);
       break;
     case DisplayCommand_line_tag:
-      display_draw_line(cmd->command.line.start_x, cmd->command.line.start_y, cmd->command.line.end_x, cmd->command.line.end_y, cmd->command.line.width);
+      display_draw_line(cmd->command.line.start_x, cmd->command.line.start_y, cmd->command.line.end_x, cmd->command.line.end_y);
       break;
     default:
       break;

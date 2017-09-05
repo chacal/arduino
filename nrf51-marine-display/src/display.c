@@ -132,7 +132,7 @@ void display_clear() {
   u8g2_ClearBuffer(&u8g2);
 }
 
-void display_draw_line(uint32_t start_x, uint32_t start_y, uint32_t end_x, uint32_t end_y, uint32_t width) {
+void display_draw_line(uint32_t start_x, uint32_t start_y, uint32_t end_x, uint32_t end_y) {
   u8g2_DrawLine(&u8g2, start_x, start_y, end_x, end_y);
 }
 
