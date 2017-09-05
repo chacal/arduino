@@ -29,10 +29,10 @@
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000, 0)                    /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
 
-#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)            /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
-#define APP_ADV_TIMEOUT_IN_SECONDS      60                                          /**< The advertising timeout (in units of seconds). */
-#define APP_ADV_SLOW_INTERVAL           MSEC_TO_UNITS(100, UNIT_0_625_MS)           /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
-#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0                                           /**< The advertising timeout (in units of seconds). */
+#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)
+#define APP_ADV_TIMEOUT_IN_SECONDS      600
+#define APP_ADV_SLOW_INTERVAL           MSEC_TO_UNITS(1000, UNIT_0_625_MS)
+#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0
 
 
 static uint16_t          m_conn_handle     = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
