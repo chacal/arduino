@@ -16,7 +16,7 @@
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Received %d bytes\n", length);
-  APP_ERROR_CHECK(app_sched_event_put(p_data, length, pb_msg_handle));
+  pb_msg_decode(p_data, length);
 }
 
 static void on_ble_event(ble_evt_t *p_ble_evt) {
