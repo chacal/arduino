@@ -43,6 +43,7 @@ static void qwr_init() {
 
 
 static void ble_service_init() {
+  NRF_LOG_INFO("BLE data service. Using %d byte RX buffer.\n", sizeof(m_rx_buffer));
   ret_code_t    err_code;
   ble_uuid128_t base_uuid = DATA_SERVICE_BASE_UUID;
 
