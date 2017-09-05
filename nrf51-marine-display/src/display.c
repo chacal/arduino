@@ -139,13 +139,13 @@ void display_draw_str(uint32_t x, uint32_t y, uint32_t font_size, char *str) {
   } else if(font_size <= 24) {
     font = u8g2_font_helvB24_tr;
   } else if(font_size <= 25) {
-    font = u8g2_font_fub25_tr;
+    font = u8g2_font_fub25_tn;
   } else if(font_size <= 30) {
-    font = u8g2_font_fub30_tr;
+    font = u8g2_font_fub30_tn;
   } else if(font_size <= 35) {
-    font = u8g2_font_fub35_tr;
+    font = u8g2_font_fub35_tn;
   } else {
-    font = u8g2_font_fub42_tr;
+    font = u8g2_font_fub42_tn;
   }
   u8g2_SetFont(&u8g2, font);
   u8g2_DrawStr(&u8g2, x, y, str);
