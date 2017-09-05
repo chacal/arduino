@@ -3,6 +3,7 @@
 #include <nrf_log.h>
 #include "marinedisplay.pb.h"
 #include "display_list.h"
+#include "power_manager.h"
 
 void pb_msg_handle(void *p_data, uint16_t length) {
   DisplayCommand cmd = DisplayCommand_init_zero;
@@ -27,6 +28,9 @@ void pb_msg_handle(void *p_data, uint16_t length) {
         NRF_LOG_INFO("Clear cmd\n");
         display_list_clear();
         break;
+      case DisplayCommand_shutdown_tag:
+        NRF_LOG_INFO("Shutdown cmd\n");
+        power_manager_shutdown();
       default:
         NRF_LOG_WARNING("Unknown command tag: %d\n", cmd.which_command);
         return;
