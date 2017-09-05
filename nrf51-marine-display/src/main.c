@@ -9,10 +9,9 @@
 #include <app_scheduler.h>
 #include "config.h"
 #include "internal_command.h"
+#include "marinedisplay.pb.h"
 
 #define WAKEUP_BUTTON_PIN          18
-#define APP_SCHED_QUEUE_SIZE       2
-#define APP_SCHED_MAX_EVENT_SIZE   MAX_BLE_COMMAND_LENGTH
 
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
@@ -36,8 +35,8 @@ static void on_ble_event(ble_evt_t *p_ble_evt) {
 }
 
 static void scheduler_init() {
-  APP_SCHED_INIT(APP_SCHED_MAX_EVENT_SIZE, APP_SCHED_QUEUE_SIZE);
-  NRF_LOG_INFO("App scheduler initialized. RAM usage %d bytes.\n", APP_SCHED_BUF_SIZE(APP_SCHED_MAX_EVENT_SIZE, APP_SCHED_QUEUE_SIZE));
+  APP_SCHED_INIT(APP_SCHEDULER_EVENT_SIZE, APP_SCHEDULER_QUEUE_SIZE);
+  NRF_LOG_INFO("App scheduler initialized. RAM usage %d bytes.\n", APP_SCHED_BUF_SIZE(APP_SCHEDULER_EVENT_SIZE, APP_SCHEDULER_QUEUE_SIZE));
 }
 
 int main(void) {
