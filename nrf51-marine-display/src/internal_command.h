@@ -2,7 +2,8 @@
 
 typedef enum {
   DISPLAY_ON,
-  DISPLAY_OFF
+  DISPLAY_OFF,
+  RENDER
 } internal_cmd_t;
 
 
