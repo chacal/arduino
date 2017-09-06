@@ -1,4 +1,7 @@
 PROJECT_NAME       := nrf51-marine-display
+DFU_APP_VERSION    := 1
+DFU_APP_VERSION_STR:= 1.0.0
+
 TARGETS            := nrf51822_xxaa
 OUTPUT_DIRECTORY   := build
 BMP_DEV            := /dev/cu.usbmodemBEE7BD01
@@ -233,14 +236,23 @@ default: nrf51822_xxaa
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
+$(OUTPUT_DIRECTORY)/bootloader_settings.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
+	nrfutil settings generate --family NRF51 --application $< --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+
 # Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
+flash_app: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
 	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
 flash_s130:
 	@echo Flashing S130 Soft Device..
 	$(GDB_TARGET) -ex load -ex kill -ex quit $(S130_HEX)
+
+flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+	@echo Flashing bootloader settings..
+	$(GDB_TARGET) -ex load -ex kill -ex quit $<
+
+flash: flash_app flash_dfu_settings
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
