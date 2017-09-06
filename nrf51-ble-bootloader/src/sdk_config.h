@@ -546,7 +546,11 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logging
 //==========================================================
 #ifndef NRF_LOG_ENABLED
+#ifdef NRF_DFU_DEBUG_VERSION
 #define NRF_LOG_ENABLED 1
+#else
+#define NRF_LOG_ENABLED 0
+#endif
 #endif
 #if  NRF_LOG_ENABLED
 // <e> NRF_LOG_USES_COLORS - If enabled then ANSI escape code for colors is prefixed to every string

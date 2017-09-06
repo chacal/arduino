@@ -1,8 +1,15 @@
+# Comment this line away if production build is to be built
+DEBUG_VERSION    := yes
+
 PROJECT_NAME     := nrf51_dfu_ble_s130_bootloader
 TARGETS          := nrf51822_xxaa_s130
 OUTPUT_DIRECTORY := build
 BMP_DEV          := /dev/cu.usbmodemBEE7BD01
+ifdef DEBUG_VERSION
 LINKER_SCRIPT    := secure_dfu_gcc_nrf51_debug.ld
+else
+LINKER_SCRIPT    := secure_dfu_gcc_nrf51.ld
+endif
 
 MERGEHEX         := $(HOME)/backupped/dev/nRF5x-Command-Line-Tools_9_5_0_OSX/mergehex/mergehex
 
@@ -111,7 +118,9 @@ LIB_FILES += \
   $(SDK_ROOT)/external/micro-ecc/nrf51_armgcc/armgcc/micro_ecc_lib_nrf51.a \
 
 # C flags common to all targets
+ifdef DEBUG_VERSION
 CFLAGS += -DNRF_DFU_DEBUG_VERSION
+endif
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -DBOARD_CUSTOM
 CFLAGS += -DSOFTDEVICE_PRESENT
@@ -135,8 +144,10 @@ CFLAGS += -fno-builtin --short-enums -flto
 CXXFLAGS += \
 
 # Assembler flags common to all targets
-ASMFLAGS += -x assembler-with-cpp
+ifdef DEBUG_VERSION
 ASMFLAGS += -DNRF_DFU_DEBUG_VERSION
+endif
+ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DSOFTDEVICE_PRESENT
