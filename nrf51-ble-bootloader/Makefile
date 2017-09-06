@@ -1,15 +1,20 @@
 PROJECT_NAME     := nrf51_dfu_ble_s130_bootloader
 TARGETS          := nrf51822_xxaa_s130
 OUTPUT_DIRECTORY := build
+BMP_DEV          := /dev/cu.usbmodemBEE7BD01
+LINKER_SCRIPT    := secure_dfu_gcc_nrf51_debug.ld
+
 MERGEHEX         := $(HOME)/backupped/dev/nRF5x-Command-Line-Tools_9_5_0_OSX/mergehex/mergehex
-OPENOCD          := /usr/local/bin/openocd
 
-SDK_ROOT := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
-SOFTDEVICE_HEX := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
-PROJ_DIR := .
+SDK_ROOT         := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
+SOFTDEVICE_HEX   := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
+PROJ_DIR         := .
+SRC_DIR          := $(PROJ_DIR)/src
+TEMPLATE_PATH    := $(SDK_ROOT)/components/toolchain/gcc
 
-$(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.out: \
-  LINKER_SCRIPT  := $(PROJ_DIR)/secure_dfu_gcc_nrf51_debug.ld
+include $(TEMPLATE_PATH)/Makefile.common
+GDB              := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
+GDB_TARGET       := $(GDB) -ex "target extended-remote $(BMP_DEV)"
 
 # Source files common to all targets
 SRC_FILES += \
@@ -36,10 +41,10 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/rng/nrf_drv_rng.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_nvmc.c \
   $(SDK_ROOT)/components/libraries/bootloader/ble_dfu/nrf_ble_dfu.c \
-  $(PROJ_DIR)/dfu-cc.pb.c \
-  $(PROJ_DIR)/dfu_public_key.c \
-  $(PROJ_DIR)/dfu_req_handling.c \
-  $(PROJ_DIR)/main.c \
+  $(SRC_DIR)/dfu-cc.pb.c \
+  $(SRC_DIR)/dfu_public_key.c \
+  $(SRC_DIR)/dfu_req_handling.c \
+  $(SRC_DIR)/main.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -69,7 +74,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/sha256 \
   $(SDK_ROOT)/components/libraries/crc32 \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
-  $(PROJ_DIR) \
+  $(SRC_DIR) \
   $(SDK_ROOT)/components/libraries/fstorage \
   $(SDK_ROOT)/components/libraries/util \
   $(SDK_ROOT)/components \
@@ -158,10 +163,6 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 # Default target - first one defined
 default: nrf51822_xxaa_s130
 
-TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
-
-include $(TEMPLATE_PATH)/Makefile.common
-
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.hex
@@ -170,8 +171,8 @@ $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s
 # Flash the program
 flash: $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex
 	@echo Flashing: $<
-	$(OPENOCD) -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; program $< verify reset; shutdown;"
+	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
 erase:
-	$(OPENOCD) -f interface/stlink-v2.cfg -f target/nrf51.cfg -c "init; halt; nrf51 mass_erase; shutdown;"
+	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
 
