@@ -2,7 +2,7 @@
 DEBUG_VERSION    := yes
 
 PROJECT_NAME     := nrf51_dfu_ble_s130_bootloader
-TARGETS          := nrf51822_xxaa_s130
+TARGETS          := nrf51822_xxaa
 OUTPUT_DIRECTORY := build
 BMP_DEV          := /dev/cu.usbmodemBEE7BD01
 ifdef DEBUG_VERSION
@@ -172,15 +172,18 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 .PHONY: $(TARGETS) default all clean flash
 
 # Default target - first one defined
-default: nrf51822_xxaa_s130
+default: nrf51822_xxaa
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-$(OUTPUT_DIRECTORY)/bootloader_and_s130.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa_s130.hex
+$(OUTPUT_DIRECTORY)/bootloader_and_s130.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	$(MERGEHEX) -m $(SOFTDEVICE_HEX) $< -o $@
 
-# Flash the program
-flash: $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex
+flash_with_s130: $(OUTPUT_DIRECTORY)/bootloader_and_s130.hex
+	@echo Flashing: $<
+	$(GDB_TARGET) -ex load -ex kill -ex quit $<
+
+flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
 	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
