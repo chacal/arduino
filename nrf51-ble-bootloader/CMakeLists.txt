@@ -121,6 +121,9 @@ include_directories("${SDK_ROOT}/components/ble/common")
 include_directories("${SDK_ROOT}/components/libraries/pwr_mgmt")
 include_directories("${SDK_ROOT}/components/libraries/bootloader")
 include_directories("${SDK_ROOT}/components/libraries/bootloader/dfu")
+include_directories("${SDK_ROOT}/components/libraries/bootloader/ble_dfu")
+include_directories("${SDK_ROOT}/components/libraries/crypto")
+include_directories("${SDK_ROOT}/external/nano-pb")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
