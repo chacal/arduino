@@ -2,6 +2,7 @@
 #include <pb_decode.h>
 #include <nrf_log.h>
 #include <app_scheduler.h>
+#include <softdevice/s130/headers/nrf_soc.h>
 #include "marinedisplay.pb.h"
 #include "display_list.h"
 #include "power_manager.h"
@@ -36,6 +37,13 @@ void pb_msg_decode(void *p_data, uint16_t length) {
   SCHED_INT_CMD(RENDER);
 }
 
+static void enter_bootloader() {
+  NRF_LOG_INFO("Entering bootloader..\n");
+  sd_power_gpregret_clr(0xFFFFFFFF);
+  sd_power_gpregret_set(1);
+  NVIC_SystemReset();
+}
+
 void pb_msg_handle(void *p_data, uint16_t length) {
   DisplayCommand *cmd = p_data;
 
@@ -55,6 +63,10 @@ void pb_msg_handle(void *p_data, uint16_t length) {
     case DisplayCommand_shutdown_tag:
       NRF_LOG_INFO("Shutdown cmd\n");
       power_manager_shutdown();
+      break;
+    case DisplayCommand_bootloader_tag:
+      enter_bootloader();
+      break;
     default:
       NRF_LOG_WARNING("Unknown command tag: %d\n", cmd->which_command);
       return;
