@@ -72,6 +72,16 @@ void app_error_handler_bare(uint32_t error_code)
     NVIC_SystemReset();
 }
 
+bool nrf_dfu_enter_check(void) {
+    NRF_LOG_INFO("bootloader enter check. gpregret=%d\n", NRF_POWER->GPREGRET);
+
+    if(NRF_POWER->GPREGRET == 1) {
+        NRF_POWER->GPREGRET = 0;
+        return true;
+    }
+
+    return false;
+}
 
 /**@brief Function for initialization of LEDs.
  */
