@@ -8,3 +8,5 @@
 #define APP_SCHEDULER_EVENT_SIZE    sizeof(DisplayCommand)
 
 #define DISPLAY_LIST_LENGTH        10
+
+#define GATT_ATTR_TABLE_SIZE      420  // Minimum needed - found by trial & error

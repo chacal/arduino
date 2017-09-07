@@ -108,6 +108,7 @@ static void ble_stack_init() {
 
   ble_enable_params_t ble_enable_params;
   err_code = softdevice_enable_get_default_config(CENTRAL_LINK_COUNT, PERIPHERAL_LINK_COUNT, &ble_enable_params);
+  ble_enable_params.gatts_enable_params.attr_tab_size = GATT_ATTR_TABLE_SIZE;
   APP_ERROR_CHECK(err_code);
 
   //Check the ram settings against the used number of links
