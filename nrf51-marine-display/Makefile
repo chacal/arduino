@@ -26,9 +26,8 @@ NANOPB_SOURCES     := $(wildcard $(NANOPB_PATH)/pb_*.c)
 NANOPB_STR_LENGTH  := 21
 NANOPB_INT_SIZE    := 8
 
-include $(TEMPLATE_PATH)/Makefile.common
-GDB                := "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
-GDB_TARGET         := $(GDB) -ex "target extended-remote $(BMP_DEV)"
+GDB                 = "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gdb"
+GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)"
 
 # Source files common to all targets
 SRC_FILES += \
@@ -231,18 +230,20 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 
 .PHONY: $(TARGETS) default all clean flash erase
 
-# Default target - first one defined
-default: nrf51822_xxaa
+# Make default (=first) target -> needs to be before including Makefile.common
+default: clean_linked_binaries
+	@$(MAKE) -j8 nrf51822_xxaa
 
+include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-$(OUTPUT_DIRECTORY)/bootloader_settings.hex: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
-	nrfutil settings generate --family NRF51 --application $< --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+$(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
+	nrfutil settings generate --family NRF51 --application $(OUTPUT_FILE).hex --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
-flash_app: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
-	@echo Flashing: $<
-	$(GDB_TARGET) -ex load -ex kill -ex quit $<
+flash_app: default
+	@echo Flashing: $(OUTPUT_FILE).hex
+	$(GDB_TARGET) -ex load -ex kill -ex quit $(OUTPUT_FILE).hex
 
 flash_s130:
 	@echo Flashing S130 Soft Device..
@@ -262,3 +263,12 @@ erase:
 
 $(SRC_DIR)/%.pb.c $(SRC_DIR)/%.pb.h: %.pb
 	$(NANOPB_GEN) -s max_size:$(NANOPB_STR_LENGTH) -s int_size:$(NANOPB_INT_SIZE) -D$(SRC_DIR) $<
+
+$(OUTPUT_DIRECTORY)/.clean_linked_binaries: $(PROJ_DIR)/$(LINKER_SCRIPT)
+	@echo Cleaning linked binaries..
+	@rm -f $(OUTPUT_DIRECTORY)/*.hex
+	@rm -f $(OUTPUT_DIRECTORY)/*.bin
+	@rm -f $(OUTPUT_DIRECTORY)/*.out
+	@touch $@
+
+clean_linked_binaries: $(OUTPUT_DIRECTORY)/.clean_linked_binaries
