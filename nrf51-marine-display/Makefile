@@ -200,6 +200,7 @@ CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -O3 -g3
 CFLAGS += -mfloat-abi=soft
+CFLAGS += -D__HEAP_SIZE=0
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
@@ -218,6 +219,7 @@ ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DS130
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
+ASMFLAGS += -D__HEAP_SIZE=0
 
 # Linker flags
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)
