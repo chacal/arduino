@@ -57,21 +57,31 @@ static void ble_service_init() {
 
 
 static void ble_characteristic_init() {
-  ble_add_char_params_t add_char_params;
-  ret_code_t            err_code;
-  memset(&add_char_params, 0, sizeof(add_char_params));
+  ret_code_t err_code;
 
-  add_char_params.uuid                     = DATA_SERVICE_RX_CHARACTERISTIC_UUID;
-  add_char_params.uuid_type                = m_data_service_ble_uuid.type;
-  add_char_params.max_len                  = DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN;
-  add_char_params.init_len                 = 0;
-  add_char_params.is_var_len               = true;
-  add_char_params.char_props.read          = true;
-  add_char_params.char_props.write         = true;
-  add_char_params.char_props.write_wo_resp = true;
-  add_char_params.write_access             = SEC_OPEN;
+  ble_gatts_char_md_t char_md = {0};
+  char_md.char_props.read          = true;
+  char_md.char_props.write         = true;
+  char_md.char_props.write_wo_resp = true;
 
-  err_code = characteristic_add(m_data_service_service_handle, &add_char_params, &m_data_service_rx_char_handles);
+
+  ble_uuid_t char_uuid;
+  char_uuid.uuid = DATA_SERVICE_RX_CHARACTERISTIC_UUID;
+  char_uuid.type = m_data_service_ble_uuid.type;
+
+  ble_gatts_attr_md_t attr_md = {0};
+  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
+  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
+  attr_md.vlen = 1;
+  attr_md.vloc = BLE_GATTS_VLOC_STACK;
+
+  ble_gatts_attr_t attr_char_value = {0};
+  attr_char_value.p_uuid    = &char_uuid;
+  attr_char_value.p_attr_md = &attr_md;
+  attr_char_value.max_len   = DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN;
+
+
+  err_code = sd_ble_gatts_characteristic_add(m_data_service_service_handle, &char_md, &attr_char_value, &m_data_service_rx_char_handles);
   APP_ERROR_CHECK(err_code);
 
   err_code = nrf_ble_qwr_attr_register(&m_qwr, m_data_service_rx_char_handles.value_handle);
