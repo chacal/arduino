@@ -1644,7 +1644,7 @@
 // <e> RNG_ENABLED - nrf_drv_rng - RNG peripheral driver
 //==========================================================
 #ifndef RNG_ENABLED
-#define RNG_ENABLED 0
+#define RNG_ENABLED 1
 #endif
 #if  RNG_ENABLED
 // <q> RNG_CONFIG_ERROR_CORRECTION  - Error correction
@@ -3416,7 +3416,7 @@
 
 
 #ifndef NRF_QUEUE_ENABLED
-#define NRF_QUEUE_ENABLED 0
+#define NRF_QUEUE_ENABLED 1
 #endif
 
 // <q> SLIP_ENABLED  - slip - SLIP encoding decoding

@@ -42,6 +42,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/util/sdk_errors.c \
   $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto.c \
+  $(SDK_ROOT)/components/libraries/ecc/ecc.c \
+  $(SDK_ROOT)/components/libraries/sha256/sha256.c \
   $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/components/drivers_nrf/clock/nrf_drv_clock.c \
   $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
@@ -49,6 +52,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
+  $(SDK_ROOT)/components/drivers_nrf/rng/nrf_drv_rng.c \
   $(SRC_DIR)/main.c \
   $(SRC_DIR)/ble_support.c \
   $(SRC_DIR)/power_manager.c \
@@ -85,6 +89,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/peer_manager/id_manager.c \
   $(SDK_ROOT)/components/ble/peer_manager/pm_buffer.c \
   $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c \
+  $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
   $(U8G2_SOURCES) \
   $(NANOPB_SOURCES)
 
@@ -195,11 +200,17 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
   $(SDK_ROOT)/components/libraries/pwr_mgmt \
+  $(SDK_ROOT)/components/libraries/crypto \
+  $(SDK_ROOT)/components/libraries/ecc \
+  $(SDK_ROOT)/components/libraries/sha256 \
+  $(SDK_ROOT)/components/libraries/svc \
+  $(SDK_ROOT)/external/micro-ecc/micro-ecc \
   $(U8G2_PATH)/csrc \
   $(NANOPB_PATH)
 
 # Libraries common to all targets
 LIB_FILES += \
+  $(SDK_ROOT)/external/micro-ecc/nrf51_armgcc/armgcc/micro_ecc_lib_nrf51.a \
 
 # C flags common to all targets
 CFLAGS += -DNRF51
@@ -218,6 +229,7 @@ CFLAGS += -D__HEAP_SIZE=0
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
+CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 
 # C++ flags common to all targets
 CXXFLAGS += \
@@ -234,6 +246,7 @@ ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DS130
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
 ASMFLAGS += -D__HEAP_SIZE=0
+ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 
 # Linker flags
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)

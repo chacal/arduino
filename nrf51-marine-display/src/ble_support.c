@@ -11,6 +11,8 @@
 #include <fstorage.h>
 #include "ble_support.h"
 #include "ble_data_service.h"
+#include <peer_manager.h>
+#include "ecc.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
@@ -39,6 +41,10 @@
 static uint16_t          m_conn_handle     = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_uuid_t        m_adv_uuids[]     = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
 static ble_evt_handler_t m_ble_evt_handler = NULL;
+
+__ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
+__ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
+__ALIGN(4) static ble_gap_lesc_dhkey_t   m_lesc_dhkey; /* LESC DH Key */
 
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
@@ -99,6 +105,41 @@ static void sys_evt_dispatch(uint32_t sys_evt) {
   NRF_LOG_INFO("Got system event: %d\n", sys_evt)
   fs_sys_event_handler(sys_evt);
   ble_advertising_on_sys_evt(sys_evt);
+}
+
+
+static void pm_evt_handler(pm_evt_t const * p_evt) {
+  NRF_LOG_INFO("Peer Manager event: %d\n", p_evt->evt_id);
+}
+
+
+static void pairing_init(bool erase_bonds) {
+  ecc_init(true);
+
+  APP_ERROR_CHECK(pm_init());
+  if(erase_bonds) {
+    APP_ERROR_CHECK(pm_peers_delete());
+  }
+  APP_ERROR_CHECK(ecc_p256_keypair_gen(m_lesc_sk.sk, m_lesc_pk.pk));
+  APP_ERROR_CHECK(pm_lesc_public_key_set(&m_lesc_pk));
+
+  ble_gap_sec_params_t sec_param;
+  memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+  // Security parameters to be used for all security procedures.
+  sec_param.bond              = 1;
+  sec_param.mitm              = 1;
+  sec_param.lesc              = 1;
+  sec_param.io_caps           = BLE_GAP_IO_CAPS_DISPLAY_ONLY;
+  sec_param.min_key_size      = 7;
+  sec_param.max_key_size      = 16;
+  sec_param.kdist_own.enc     = 1;
+  sec_param.kdist_own.id      = 1;
+  sec_param.kdist_peer.enc    = 1;
+  sec_param.kdist_peer.id     = 1;
+
+  APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
+  APP_ERROR_CHECK(pm_register(pm_evt_handler));
 }
 
 
@@ -178,6 +219,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       break; // BLE_GATTS_EVT_TIMEOUT
 
     case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST: {
+      NRF_LOG_INFO("Ei tänne!\n");
       ble_gatts_evt_rw_authorize_request_t  req;
       ble_gatts_rw_authorize_reply_params_t auth_reply;
 
@@ -200,6 +242,19 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       }
     } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
 
+    case BLE_GAP_EVT_PASSKEY_DISPLAY:
+      NRF_LOG_INFO("Passkey: %s\n", (uint32_t)p_ble_evt->evt.gap_evt.params.passkey_display.passkey);
+      break;
+
+    case BLE_GAP_EVT_LESC_DHKEY_REQUEST:
+      APP_ERROR_CHECK(ecc_p256_shared_secret_compute(&m_lesc_sk.sk[0], &p_ble_evt->evt.gap_evt.params.lesc_dhkey_request.p_pk_peer->pk[0], &m_lesc_dhkey.key[0]));
+      APP_ERROR_CHECK(sd_ble_gap_lesc_dhkey_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_lesc_dhkey));
+      break;
+
+    case BLE_GAP_EVT_AUTH_STATUS:
+      NRF_LOG_INFO("Auth status: %d %d\n", p_ble_evt->evt.gap_evt.params.auth_status.auth_status, p_ble_evt->evt.gap_evt.params.auth_status.error_src);
+      break;
+
     default:
       break;
   }
@@ -215,6 +270,7 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   ble_stack_init();
   gap_params_init();
   conn_params_init();
+  pairing_init(true);
 }
 
 

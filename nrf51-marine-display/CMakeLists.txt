@@ -121,6 +121,8 @@ include_directories("${SDK_ROOT}/components/softdevice/s130/headers/nrf51")
 include_directories("${SDK_ROOT}/components/softdevice/common/softdevice_handler")
 include_directories("${SDK_ROOT}/components/ble/common")
 include_directories("${SDK_ROOT}/components/libraries/pwr_mgmt")
+include_directories("${SDK_ROOT}/components/libraries/crypto")
+include_directories("${SDK_ROOT}/components/libraries/ecc")
 include_directories("${U8G2_ROOT}/csrc")
 include_directories("${NANOPB_ROOT}")
 
