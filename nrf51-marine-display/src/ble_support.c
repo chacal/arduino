@@ -8,6 +8,7 @@
 #include <nrf_log.h>
 #include <ble_conn_params.h>
 #include <app_timer.h>
+#include <fstorage.h>
 #include "ble_support.h"
 #include "ble_data_service.h"
 
@@ -94,6 +95,12 @@ static void conn_params_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+static void sys_evt_dispatch(uint32_t sys_evt) {
+  NRF_LOG_INFO("Got system event: %d\n", sys_evt)
+  fs_sys_event_handler(sys_evt);
+  ble_advertising_on_sys_evt(sys_evt);
+}
+
 
 /**@brief Function for the SoftDevice initialization.
  *
@@ -119,6 +126,10 @@ static void ble_stack_init() {
 
   // Subscribe for BLE events.
   err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+  APP_ERROR_CHECK(err_code);
+
+  // Subscribe for system events.
+  err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
   APP_ERROR_CHECK(err_code);
 
   err_code = sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
@@ -147,12 +158,6 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
     case BLE_GAP_EVT_DISCONNECTED:
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
       break; // BLE_GAP_EVT_DISCONNECTED
-
-    case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
-      // Pairing not supported
-      err_code = sd_ble_gap_sec_params_reply(m_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
-      APP_ERROR_CHECK(err_code);
-      break; // BLE_GAP_EVT_SEC_PARAMS_REQUEST
 
     case BLE_GATTS_EVT_SYS_ATTR_MISSING:
       // No system attributes have been stored.
