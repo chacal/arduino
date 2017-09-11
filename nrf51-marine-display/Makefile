@@ -300,4 +300,4 @@ $(OUTPUT_DIRECTORY)/.clean_linked_binaries: $(PROJ_DIR)/$(LINKER_SCRIPT)
 	@rm -f $(OUTPUT_DIRECTORY)/*.out
 	@touch $@
 
-clean_linked_binaries: $(OUTPUT_DIRECTORY)/.clean_linked_binaries
+clean_linked_binaries: $(OUTPUT_DIRECTORY) $(OUTPUT_DIRECTORY)/.clean_linked_binaries
