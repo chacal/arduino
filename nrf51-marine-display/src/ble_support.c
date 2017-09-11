@@ -197,6 +197,14 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
 }
 
 
+static void log_connection_security(uint16_t conn_handle) {
+  ble_gap_conn_sec_t conn_sec;
+  if(sd_ble_gap_conn_sec_get(conn_handle, &conn_sec) == NRF_SUCCESS) {
+    NRF_LOG_INFO("Conn security: Mode: %d, Level: %d, Key size: %d \n", conn_sec.sec_mode.sm, conn_sec.sec_mode.lv, conn_sec.encr_key_size);
+  }
+}
+
+
 static void try_secure_connection() {
   pm_peer_id_t peer_id;
   if(pm_peer_id_get(m_conn_handle, &peer_id) == NRF_SUCCESS && peer_id != PM_PEER_ID_INVALID) {
@@ -212,6 +220,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+      log_connection_security(m_conn_handle);
       try_secure_connection();
       break; // BLE_GAP_EVT_CONNECTED
 
@@ -271,6 +280,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
 
     case BLE_GAP_EVT_AUTH_STATUS:
       NRF_LOG_INFO("Auth status: %d %d\n", p_ble_evt->evt.gap_evt.params.auth_status.auth_status, p_ble_evt->evt.gap_evt.params.auth_status.error_src);
+      break;
+
+    case BLE_GAP_EVT_CONN_SEC_UPDATE:
+      log_connection_security(m_conn_handle);
       break;
 
     default:
