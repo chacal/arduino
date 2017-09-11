@@ -103,14 +103,14 @@ static void conn_params_init(void) {
 }
 
 static void sys_evt_dispatch(uint32_t sys_evt) {
-  NRF_LOG_INFO("Got system event: %d\n", sys_evt)
+  NRF_LOG_DEBUG("Got system event: %d\n", sys_evt)
   fs_sys_event_handler(sys_evt);
   ble_advertising_on_sys_evt(sys_evt);
 }
 
 
 static void pm_evt_handler(pm_evt_t const * p_evt) {
-  NRF_LOG_INFO("Peer Manager event: %d\n", p_evt->evt_id);
+  NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
   switch(p_evt->evt_id) {
     case PM_EVT_STORAGE_FULL:
       NRF_LOG_INFO("Running GC for flash..");
@@ -222,10 +222,12 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       log_connection_security(m_conn_handle);
       try_secure_connection();
+      NRF_LOG_INFO("Connected\n");
       break; // BLE_GAP_EVT_CONNECTED
 
     case BLE_GAP_EVT_DISCONNECTED:
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
+      NRF_LOG_INFO("Disconnected\n");
       break; // BLE_GAP_EVT_DISCONNECTED
 
     case BLE_GATTS_EVT_SYS_ATTR_MISSING:
@@ -279,7 +281,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       break;
 
     case BLE_GAP_EVT_AUTH_STATUS:
-      NRF_LOG_INFO("Auth status: %d %d\n", p_ble_evt->evt.gap_evt.params.auth_status.auth_status, p_ble_evt->evt.gap_evt.params.auth_status.error_src);
+      NRF_LOG_DEBUG("Auth status: %d %d\n", p_ble_evt->evt.gap_evt.params.auth_status.auth_status, p_ble_evt->evt.gap_evt.params.auth_status.error_src);
       break;
 
     case BLE_GAP_EVT_CONN_SEC_UPDATE:
