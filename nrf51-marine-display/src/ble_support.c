@@ -219,7 +219,6 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       break; // BLE_GATTS_EVT_TIMEOUT
 
     case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST: {
-      NRF_LOG_INFO("Ei tänne!\n");
       ble_gatts_evt_rw_authorize_request_t  req;
       ble_gatts_rw_authorize_reply_params_t auth_reply;
 

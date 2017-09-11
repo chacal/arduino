@@ -61,8 +61,6 @@ static void ble_characteristic_init() {
 
   ble_gatts_char_md_t char_md = {0};
   char_md.char_props.write         = true;
-  //char_md.char_props.write_wo_resp = true;
-
 
   ble_uuid_t char_uuid;
   char_uuid.uuid = DATA_SERVICE_RX_CHARACTERISTIC_UUID;

@@ -23,7 +23,6 @@ static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
 }
 
 static void on_ble_event(ble_evt_t *p_ble_evt) {
-  NRF_LOG_INFO("BLE event: %d\n", p_ble_evt->header.evt_id);
   ble_data_service_on_ble_evt(p_ble_evt);
   ble_conn_state_on_ble_evt(p_ble_evt);
   pm_on_ble_evt(p_ble_evt);
