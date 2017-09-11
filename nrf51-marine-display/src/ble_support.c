@@ -12,6 +12,7 @@
 #include "ble_support.h"
 #include "ble_data_service.h"
 #include <peer_manager.h>
+#include <fds.h>
 #include "ecc.h"
 
 
@@ -110,6 +111,14 @@ static void sys_evt_dispatch(uint32_t sys_evt) {
 
 static void pm_evt_handler(pm_evt_t const * p_evt) {
   NRF_LOG_INFO("Peer Manager event: %d\n", p_evt->evt_id);
+  switch(p_evt->evt_id) {
+    case PM_EVT_STORAGE_FULL:
+      NRF_LOG_INFO("Running GC for flash..");
+      APP_ERROR_CHECK(fds_gc());
+      break;
+    default:
+      break;
+  }
 }
 
 
