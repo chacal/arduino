@@ -197,12 +197,22 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
 }
 
 
+static void try_secure_connection() {
+  pm_peer_id_t peer_id;
+  if(pm_peer_id_get(m_conn_handle, &peer_id) == NRF_SUCCESS && peer_id != PM_PEER_ID_INVALID) {
+    NRF_LOG_INFO("Known peer connected. Requesting connection security..\n");
+    pm_conn_secure(m_conn_handle, false);
+  }
+}
+
+
 static void on_ble_evt(ble_evt_t * p_ble_evt) {
   uint32_t err_code;
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+      try_secure_connection();
       break; // BLE_GAP_EVT_CONNECTED
 
     case BLE_GAP_EVT_DISCONNECTED:
