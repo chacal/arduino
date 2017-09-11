@@ -42,7 +42,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/util/sdk_errors.c \
   $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
-  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto.c \
   $(SDK_ROOT)/components/libraries/ecc/ecc.c \
   $(SDK_ROOT)/components/libraries/sha256/sha256.c \
   $(SDK_ROOT)/components/boards/boards.c \
@@ -200,7 +199,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
   $(SDK_ROOT)/components/libraries/pwr_mgmt \
-  $(SDK_ROOT)/components/libraries/crypto \
   $(SDK_ROOT)/components/libraries/ecc \
   $(SDK_ROOT)/components/libraries/sha256 \
   $(SDK_ROOT)/components/libraries/svc \
