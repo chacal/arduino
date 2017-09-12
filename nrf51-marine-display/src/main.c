@@ -14,7 +14,6 @@
 #include "internal_command.h"
 #include "marinedisplay.pb.h"
 
-#define WAKEUP_BUTTON_PIN          18
 
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
@@ -49,7 +48,7 @@ int main(void) {
   APP_TIMER_INIT(0, 4, NULL);
 
   scheduler_init();
-  power_manager_init(WAKEUP_BUTTON_PIN);
+  power_manager_init();
   ble_support_init(on_ble_event);
   ble_data_service_init(on_data_service_rx);
   ble_support_advertising_init();
