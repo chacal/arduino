@@ -303,7 +303,7 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   ble_stack_init();
   gap_params_init();
   conn_params_init();
-  pairing_init(true);
+  pairing_init(false);
 }
 
 
