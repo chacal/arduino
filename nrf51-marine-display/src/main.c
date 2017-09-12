@@ -10,10 +10,14 @@
 #include <peer_manager.h>
 #include <ble_conn_state.h>
 #include <softdevice/s130/headers/ble_gap.h>
+#include <app_gpiote.h>
 #include "config.h"
 #include "internal_command.h"
 #include "marinedisplay.pb.h"
+#include "button_handler.h"
+#include <app_button.h>
 
+#define APP_GPIOTE_MAX_USERS        1
 
 
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
@@ -46,6 +50,7 @@ static void scheduler_init() {
 int main(void) {
   (void) NRF_LOG_INIT(NULL);
   APP_TIMER_INIT(0, 4, NULL);
+  APP_GPIOTE_INIT(APP_GPIOTE_MAX_USERS);
 
   scheduler_init();
   power_manager_init();
@@ -53,6 +58,7 @@ int main(void) {
   ble_data_service_init(on_data_service_rx);
   ble_support_advertising_init();
   display_init();
+  btn_handler_init();
 
   ble_support_advertising_start();
 
