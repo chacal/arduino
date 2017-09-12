@@ -7,6 +7,9 @@
 #include "display.h"
 #include "pb_msg_handler.h"
 #include <app_scheduler.h>
+#include <peer_manager.h>
+#include <ble_conn_state.h>
+#include <softdevice/s130/headers/ble_gap.h>
 #include "config.h"
 #include "internal_command.h"
 #include "marinedisplay.pb.h"
@@ -21,6 +24,8 @@ static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
 
 static void on_ble_event(ble_evt_t *p_ble_evt) {
   ble_data_service_on_ble_evt(p_ble_evt);
+  ble_conn_state_on_ble_evt(p_ble_evt);
+  pm_on_ble_evt(p_ble_evt);
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:

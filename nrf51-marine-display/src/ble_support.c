@@ -8,8 +8,12 @@
 #include <nrf_log.h>
 #include <ble_conn_params.h>
 #include <app_timer.h>
+#include <fstorage.h>
 #include "ble_support.h"
 #include "ble_data_service.h"
+#include <peer_manager.h>
+#include <fds.h>
+#include "ecc.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
@@ -38,6 +42,10 @@
 static uint16_t          m_conn_handle     = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 static ble_uuid_t        m_adv_uuids[]     = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
 static ble_evt_handler_t m_ble_evt_handler = NULL;
+
+__ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
+__ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
+__ALIGN(4) static ble_gap_lesc_dhkey_t   m_lesc_dhkey; /* LESC DH Key */
 
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
@@ -94,6 +102,55 @@ static void conn_params_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+static void sys_evt_dispatch(uint32_t sys_evt) {
+  NRF_LOG_DEBUG("Got system event: %d\n", sys_evt)
+  fs_sys_event_handler(sys_evt);
+  ble_advertising_on_sys_evt(sys_evt);
+}
+
+
+static void pm_evt_handler(pm_evt_t const * p_evt) {
+  NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
+  switch(p_evt->evt_id) {
+    case PM_EVT_STORAGE_FULL:
+      NRF_LOG_INFO("Running GC for flash..");
+      APP_ERROR_CHECK(fds_gc());
+      break;
+    default:
+      break;
+  }
+}
+
+
+static void pairing_init(bool erase_bonds) {
+  ecc_init(true);
+
+  APP_ERROR_CHECK(pm_init());
+  if(erase_bonds) {
+    APP_ERROR_CHECK(pm_peers_delete());
+  }
+  APP_ERROR_CHECK(ecc_p256_keypair_gen(m_lesc_sk.sk, m_lesc_pk.pk));
+  APP_ERROR_CHECK(pm_lesc_public_key_set(&m_lesc_pk));
+
+  ble_gap_sec_params_t sec_param;
+  memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+  // Security parameters to be used for all security procedures.
+  sec_param.bond              = 1;
+  sec_param.mitm              = 1;
+  sec_param.lesc              = 1;
+  sec_param.io_caps           = BLE_GAP_IO_CAPS_DISPLAY_ONLY;
+  sec_param.min_key_size      = 7;
+  sec_param.max_key_size      = 16;
+  sec_param.kdist_own.enc     = 1;
+  sec_param.kdist_own.id      = 1;
+  sec_param.kdist_peer.enc    = 1;
+  sec_param.kdist_peer.id     = 1;
+
+  APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
+  APP_ERROR_CHECK(pm_register(pm_evt_handler));
+}
+
 
 /**@brief Function for the SoftDevice initialization.
  *
@@ -121,6 +178,10 @@ static void ble_stack_init() {
   err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
   APP_ERROR_CHECK(err_code);
 
+  // Subscribe for system events.
+  err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
+  APP_ERROR_CHECK(err_code);
+
   err_code = sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
   APP_ERROR_CHECK(err_code);
 }
@@ -136,23 +197,38 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
 }
 
 
+static void log_connection_security(uint16_t conn_handle) {
+  ble_gap_conn_sec_t conn_sec;
+  if(sd_ble_gap_conn_sec_get(conn_handle, &conn_sec) == NRF_SUCCESS) {
+    NRF_LOG_INFO("Conn security: Mode: %d, Level: %d, Key size: %d \n", conn_sec.sec_mode.sm, conn_sec.sec_mode.lv, conn_sec.encr_key_size);
+  }
+}
+
+
+static void try_secure_connection() {
+  pm_peer_id_t peer_id;
+  if(pm_peer_id_get(m_conn_handle, &peer_id) == NRF_SUCCESS && peer_id != PM_PEER_ID_INVALID) {
+    NRF_LOG_INFO("Known peer connected. Requesting connection security..\n");
+    pm_conn_secure(m_conn_handle, false);
+  }
+}
+
+
 static void on_ble_evt(ble_evt_t * p_ble_evt) {
   uint32_t err_code;
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+      log_connection_security(m_conn_handle);
+      try_secure_connection();
+      NRF_LOG_INFO("Connected\n");
       break; // BLE_GAP_EVT_CONNECTED
 
     case BLE_GAP_EVT_DISCONNECTED:
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
+      NRF_LOG_INFO("Disconnected\n");
       break; // BLE_GAP_EVT_DISCONNECTED
-
-    case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
-      // Pairing not supported
-      err_code = sd_ble_gap_sec_params_reply(m_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
-      APP_ERROR_CHECK(err_code);
-      break; // BLE_GAP_EVT_SEC_PARAMS_REQUEST
 
     case BLE_GATTS_EVT_SYS_ATTR_MISSING:
       // No system attributes have been stored.
@@ -195,6 +271,23 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       }
     } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
 
+    case BLE_GAP_EVT_PASSKEY_DISPLAY:
+      NRF_LOG_INFO("Passkey: %s\n", (uint32_t)p_ble_evt->evt.gap_evt.params.passkey_display.passkey);
+      break;
+
+    case BLE_GAP_EVT_LESC_DHKEY_REQUEST:
+      APP_ERROR_CHECK(ecc_p256_shared_secret_compute(&m_lesc_sk.sk[0], &p_ble_evt->evt.gap_evt.params.lesc_dhkey_request.p_pk_peer->pk[0], &m_lesc_dhkey.key[0]));
+      APP_ERROR_CHECK(sd_ble_gap_lesc_dhkey_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_lesc_dhkey));
+      break;
+
+    case BLE_GAP_EVT_AUTH_STATUS:
+      NRF_LOG_DEBUG("Auth status: %d %d\n", p_ble_evt->evt.gap_evt.params.auth_status.auth_status, p_ble_evt->evt.gap_evt.params.auth_status.error_src);
+      break;
+
+    case BLE_GAP_EVT_CONN_SEC_UPDATE:
+      log_connection_security(m_conn_handle);
+      break;
+
     default:
       break;
   }
@@ -210,6 +303,7 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   ble_stack_init();
   gap_params_init();
   conn_params_init();
+  pairing_init(false);
 }
 
 

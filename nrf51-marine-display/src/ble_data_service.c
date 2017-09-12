@@ -60,18 +60,15 @@ static void ble_characteristic_init() {
   ret_code_t err_code;
 
   ble_gatts_char_md_t char_md = {0};
-  char_md.char_props.read          = true;
   char_md.char_props.write         = true;
-  char_md.char_props.write_wo_resp = true;
-
 
   ble_uuid_t char_uuid;
   char_uuid.uuid = DATA_SERVICE_RX_CHARACTERISTIC_UUID;
   char_uuid.type = m_data_service_ble_uuid.type;
 
   ble_gatts_attr_md_t attr_md = {0};
-  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-  BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
+  BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&attr_md.read_perm);
+  BLE_GAP_CONN_SEC_MODE_SET_LESC_ENC_WITH_MITM(&attr_md.write_perm);
   attr_md.vlen = 1;
   attr_md.vloc = BLE_GATTS_VLOC_STACK;
 
