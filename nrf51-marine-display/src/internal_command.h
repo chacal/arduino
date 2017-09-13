@@ -3,7 +3,10 @@
 typedef enum {
   DISPLAY_ON,
   DISPLAY_OFF,
-  RENDER
+  RENDER,
+  DISCOVERABLE,
+  SETTINGS_RESET,
+  NOOP
 } internal_cmd_t;
 
 

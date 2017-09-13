@@ -17,6 +17,12 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
     case RENDER:
       display_list_render();
       break;
+    case DISCOVERABLE:
+      break;
+    case SETTINGS_RESET:
+      break;
+    case NOOP:
+      break;
     default:
       NRF_LOG_WARNING("Got unknown internal command! %d", cmd);
   }
