@@ -353,3 +353,12 @@ void ble_support_disconnect(ble_support_callback_t callback) {
     callback();
   }
 }
+
+
+void ble_support_factory_reset() {
+  APP_ERROR_CHECK(pm_peers_delete());
+  ble_support_disconnect(NULL);
+  APP_ERROR_CHECK(sd_ble_gap_adv_stop());
+  ble_support_advertising_init();
+  ble_support_advertising_start();
+}

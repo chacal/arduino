@@ -28,8 +28,7 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
       break;
     case FACTORY_RESET:
       NRF_LOG_INFO("Factory reset\n")
-      APP_ERROR_CHECK(pm_peers_delete());
-      ble_support_disconnect(NULL);
+      ble_support_factory_reset();
       break;
     case NOOP:
       break;

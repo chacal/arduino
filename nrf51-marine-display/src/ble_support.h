@@ -14,3 +14,4 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler);
 void ble_support_advertising_init();
 void ble_support_advertising_start();
 void ble_support_disconnect(ble_support_callback_t callback);
+void ble_support_factory_reset();
