@@ -111,12 +111,31 @@ static void sys_evt_dispatch(uint32_t sys_evt) {
 }
 
 
+static void update_whitelist_from_saved_peers() {
+  // Fetch a list of peer IDs from Peer Manager and whitelist them.
+  pm_peer_id_t peer_ids[REMEMBERED_PEER_COUNT] = {PM_PEER_ID_INVALID};
+  uint32_t     n_peer_ids                      = 0;
+  pm_peer_id_t peer_id                         = pm_next_peer_id_get(PM_PEER_ID_INVALID);
+
+  while((peer_id != PM_PEER_ID_INVALID) && (n_peer_ids < REMEMBERED_PEER_COUNT)) {
+        peer_ids[n_peer_ids++] = peer_id;
+        peer_id = pm_next_peer_id_get(peer_id);
+      }
+
+  // Whitelist peers.
+  APP_ERROR_CHECK(pm_whitelist_set(peer_ids, n_peer_ids));
+}
+
+
 static void pm_evt_handler(pm_evt_t const * p_evt) {
   NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
   switch(p_evt->evt_id) {
     case PM_EVT_STORAGE_FULL:
       NRF_LOG_INFO("Running GC for flash..");
       APP_ERROR_CHECK(fds_gc());
+      break;
+    case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
+      update_whitelist_from_saved_peers();
       break;
     default:
       break;
@@ -366,18 +385,7 @@ void ble_support_advertising_init() {
   err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
   APP_ERROR_CHECK(err_code);
 
-  // Fetch a list of peer IDs from Peer Manager and whitelist them.
-  pm_peer_id_t peer_ids[REMEMBERED_PEER_COUNT] = {PM_PEER_ID_INVALID};
-  uint32_t     n_peer_ids                      = 0;
-  pm_peer_id_t peer_id                         = pm_next_peer_id_get(PM_PEER_ID_INVALID);
-
-  while((peer_id != PM_PEER_ID_INVALID) && (n_peer_ids < REMEMBERED_PEER_COUNT)) {
-    peer_ids[n_peer_ids++] = peer_id;
-    peer_id = pm_next_peer_id_get(peer_id);
-  }
-
-  // Whitelist peers.
-  APP_ERROR_CHECK(pm_whitelist_set(peer_ids, n_peer_ids));
+  update_whitelist_from_saved_peers();
 }
 
 
