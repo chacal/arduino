@@ -4,6 +4,7 @@
 #include <nrf_pwr_mgmt.h>
 #include <app_timer.h>
 #include <nrf_gpio.h>
+#include <nrf_log.h>
 
 
 void power_manager_init() {
@@ -16,5 +17,6 @@ void power_manage() {
 }
 
 void power_manager_shutdown() {
+  NRF_LOG_DEBUG("Shutdown\n");
   nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
 }

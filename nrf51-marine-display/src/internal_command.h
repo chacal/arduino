@@ -4,6 +4,7 @@ typedef enum {
   DISPLAY_ON,
   DISPLAY_OFF,
   RENDER,
+  POWER_OFF,
   DISCOVERABLE,
   FACTORY_RESET,
   NOOP

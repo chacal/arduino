@@ -2,6 +2,8 @@
 #include "internal_command.h"
 #include "display.h"
 #include "display_list.h"
+#include "power_manager.h"
+#include "ble_support.h"
 
 
 void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
@@ -16,6 +18,9 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
       break;
     case RENDER:
       display_list_render();
+      break;
+    case POWER_OFF:
+      ble_support_disconnect(power_manager_shutdown);
       break;
     case DISCOVERABLE:
       break;
