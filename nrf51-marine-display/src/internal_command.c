@@ -20,6 +20,7 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
       display_list_render();
       break;
     case POWER_OFF:
+      display_off();
       ble_support_disconnect(power_manager_shutdown);
       break;
     case DISCOVERABLE:
