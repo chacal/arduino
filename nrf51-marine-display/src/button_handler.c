@@ -28,8 +28,8 @@ static button_cmd_t m_button_commands[] = {
     {APP_TIMER_TICKS(9000, 0), FACTORY_RESET, "Factory Reset"},
     {APP_TIMER_TICKS(0, 0),    NOOP,          "Cancel"}
 };
-static uint8_t      m_cmd_count         = sizeof(m_button_commands) / sizeof(m_button_commands[0]);
-static uint32_t     m_btn_press_time;
+static uint8_t  m_cmd_count      = sizeof(m_button_commands) / sizeof(m_button_commands[0]);
+static uint32_t m_btn_press_time = 0;
 APP_TIMER_DEF(m_second_timer);
 
 
@@ -85,7 +85,6 @@ static void render_menu(void *p_context) {
 
 
 static void start_selecting_command() {
-  m_btn_press_time = app_timer_cnt_get();
   app_timer_start(m_second_timer, TICKS_IN_SEC, NULL);
   SCHED_INT_CMD(DISPLAY_ON);
   render_menu(NULL);
@@ -104,9 +103,11 @@ static void execute_selected_command() {
 
 static void button_handler(uint8_t pin_no, uint8_t button_action) {
   if(button_action == APP_BUTTON_PUSH) {
+    m_btn_press_time = app_timer_cnt_get();
     start_selecting_command();
-  } else {
+  } else if(m_btn_press_time > 0) {     // Execute command only if command selection has been started (this prevents command execution on power on)
     execute_selected_command();
+    m_btn_press_time = 0;
   }
 }
 
