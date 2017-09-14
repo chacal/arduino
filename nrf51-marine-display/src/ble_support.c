@@ -23,6 +23,7 @@
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
 #define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
+#define REMEMBERED_PEER_COUNT           8
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)
@@ -213,6 +214,8 @@ static void try_secure_connection() {
 
 
 static void on_ble_evt(ble_evt_t * p_ble_evt) {
+  NRF_LOG_DEBUG("BLE event: %d\n", p_ble_evt->header.evt_id);
+
   uint32_t err_code;
 
   switch (p_ble_evt->header.evt_id) {
@@ -297,6 +300,32 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
 
 
 static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
+  NRF_LOG_DEBUG("Advertising event: %d\n", ble_adv_evt);
+  switch(ble_adv_evt) {
+    case BLE_ADV_EVT_WHITELIST_REQUEST: {
+      ble_gap_irk_t  irks[REMEMBERED_PEER_COUNT];
+      ble_gap_addr_t addrs[REMEMBERED_PEER_COUNT];
+      uint32_t       irk_cnt  = REMEMBERED_PEER_COUNT;
+      uint32_t       addr_cnt = REMEMBERED_PEER_COUNT;
+      APP_ERROR_CHECK(pm_whitelist_get(addrs, &addr_cnt, irks, &irk_cnt));
+      APP_ERROR_CHECK(ble_advertising_whitelist_reply(addrs, addr_cnt, irks, irk_cnt));
+      NRF_LOG_INFO("Whitelisted %d peers\n", addr_cnt, irk_cnt);
+      break;
+    }
+    case BLE_ADV_EVT_FAST:
+    case BLE_ADV_EVT_FAST_WHITELIST:
+      NRF_LOG_INFO("Advertising fast%s\n", ble_adv_evt == BLE_ADV_EVT_FAST_WHITELIST ? " with whitelist" : "");
+      break;
+    case BLE_ADV_EVT_SLOW:
+    case BLE_ADV_EVT_SLOW_WHITELIST:
+      NRF_LOG_INFO("Advertising slow%s\n", ble_adv_evt == BLE_ADV_EVT_SLOW_WHITELIST ? " with whitelist" : "");
+      break;
+    case BLE_ADV_EVT_IDLE:
+      NRF_LOG_INFO("Advertising idle\n");
+      break;
+    default:
+      break;
+  }
 }
 
 
@@ -326,22 +355,35 @@ void ble_support_advertising_init() {
   scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
 
   memset(&options, 0, sizeof(options));
-  options.ble_adv_fast_enabled  = true;
-  options.ble_adv_fast_interval = APP_ADV_INTERVAL;
-  options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
-  options.ble_adv_slow_enabled  = true;
-  options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
-  options.ble_adv_slow_timeout  = APP_ADV_SLOW_TIMEOUT_IN_SECONDS;
+  options.ble_adv_whitelist_enabled = true;
+  options.ble_adv_fast_enabled      = true;
+  options.ble_adv_fast_interval     = APP_ADV_INTERVAL;
+  options.ble_adv_fast_timeout      = APP_ADV_TIMEOUT_IN_SECONDS;
+  options.ble_adv_slow_enabled      = true;
+  options.ble_adv_slow_interval     = APP_ADV_SLOW_INTERVAL;
+  options.ble_adv_slow_timeout      = APP_ADV_SLOW_TIMEOUT_IN_SECONDS;
 
   err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
   APP_ERROR_CHECK(err_code);
+
+  // Fetch a list of peer IDs from Peer Manager and whitelist them.
+  pm_peer_id_t peer_ids[REMEMBERED_PEER_COUNT] = {PM_PEER_ID_INVALID};
+  uint32_t     n_peer_ids                      = 0;
+  pm_peer_id_t peer_id                         = pm_next_peer_id_get(PM_PEER_ID_INVALID);
+
+  while((peer_id != PM_PEER_ID_INVALID) && (n_peer_ids < REMEMBERED_PEER_COUNT)) {
+    peer_ids[n_peer_ids++] = peer_id;
+    peer_id = pm_next_peer_id_get(peer_id);
+  }
+
+  // Whitelist peers.
+  APP_ERROR_CHECK(pm_whitelist_set(peer_ids, n_peer_ids));
 }
 
 
 void ble_support_advertising_start() {
   uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
   APP_ERROR_CHECK(err_code);
-  NRF_LOG_INFO("Advertising started!\n");
 }
 
 
