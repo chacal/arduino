@@ -39,9 +39,10 @@
 #define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0
 
 
-static uint16_t          m_conn_handle     = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
-static ble_uuid_t        m_adv_uuids[]     = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
-static ble_evt_handler_t m_ble_evt_handler = NULL;
+static uint16_t               m_conn_handle         = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static ble_uuid_t             m_adv_uuids[]         = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+static ble_evt_handler_t      m_ble_evt_handler     = NULL;
+static ble_support_callback_t m_disconnect_callback = NULL;
 
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
@@ -228,6 +229,10 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
     case BLE_GAP_EVT_DISCONNECTED:
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
       NRF_LOG_INFO("Disconnected\n");
+      if(m_disconnect_callback != NULL) {
+        m_disconnect_callback();
+        m_disconnect_callback = NULL;
+      }
       break; // BLE_GAP_EVT_DISCONNECTED
 
     case BLE_GATTS_EVT_SYS_ATTR_MISSING:
@@ -340,4 +345,14 @@ void ble_support_advertising_start() {
   uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
   APP_ERROR_CHECK(err_code);
   NRF_LOG_INFO("Advertising started!\n");
+}
+
+
+void ble_support_disconnect(ble_support_callback_t callback) {
+  if(m_conn_handle != BLE_CONN_HANDLE_INVALID) {
+    m_disconnect_callback = callback;
+    sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+  } else if(callback != NULL) {
+    callback();
+  }
 }
