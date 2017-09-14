@@ -123,13 +123,10 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
 }
 
 
-static void pairing_init(bool erase_bonds) {
+static void pairing_init() {
   ecc_init(true);
 
   APP_ERROR_CHECK(pm_init());
-  if(erase_bonds) {
-    APP_ERROR_CHECK(pm_peers_delete());
-  }
   APP_ERROR_CHECK(ecc_p256_keypair_gen(m_lesc_sk.sk, m_lesc_pk.pk));
   APP_ERROR_CHECK(pm_lesc_public_key_set(&m_lesc_pk));
 
@@ -308,7 +305,7 @@ void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   ble_stack_init();
   gap_params_init();
   conn_params_init();
-  pairing_init(false);
+  pairing_init();
 }
 
 
