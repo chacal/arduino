@@ -20,6 +20,12 @@
 #define APP_GPIOTE_MAX_USERS        1
 
 
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info) {
+  error_info_t *error_info = (error_info_t*)info;
+  NRF_LOG_ERROR("FATAL Code: %d, %s:%d\n", error_info->err_code, (uint32_t)error_info->p_file_name, error_info->line_num);
+  NVIC_SystemReset();
+}
+
 static void on_data_service_rx(uint8_t *p_data, uint16_t length) {
   NRF_LOG_INFO("Received %d bytes\n", length);
   pb_msg_decode(p_data, length);
