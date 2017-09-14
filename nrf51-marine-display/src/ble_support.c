@@ -409,6 +409,12 @@ void ble_support_disconnect(ble_support_callback_t callback) {
 }
 
 
+void ble_support_start_discoverable() {
+  ble_advertising_restart_without_whitelist();
+  APP_ERROR_CHECK(ble_advertising_start(BLE_ADV_MODE_FAST));
+}
+
+
 void ble_support_factory_reset() {
   APP_ERROR_CHECK(pm_peers_delete());
   ble_support_disconnect(NULL);
