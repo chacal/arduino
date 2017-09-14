@@ -314,11 +314,11 @@ static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
     }
     case BLE_ADV_EVT_FAST:
     case BLE_ADV_EVT_FAST_WHITELIST:
-      NRF_LOG_INFO("Advertising fast%s\n", ble_adv_evt == BLE_ADV_EVT_FAST_WHITELIST ? " with whitelist" : "");
+      NRF_LOG_INFO("Advertising fast%s\n", (uint32_t)(ble_adv_evt == BLE_ADV_EVT_FAST_WHITELIST ? " with whitelist" : ""));
       break;
     case BLE_ADV_EVT_SLOW:
     case BLE_ADV_EVT_SLOW_WHITELIST:
-      NRF_LOG_INFO("Advertising slow%s\n", ble_adv_evt == BLE_ADV_EVT_SLOW_WHITELIST ? " with whitelist" : "");
+      NRF_LOG_INFO("Advertising slow%s\n", (uint32_t)(ble_adv_evt == BLE_ADV_EVT_SLOW_WHITELIST ? " with whitelist" : ""));
       break;
     case BLE_ADV_EVT_IDLE:
       NRF_LOG_INFO("Advertising idle\n");
@@ -382,6 +382,10 @@ void ble_support_advertising_init() {
 
 
 void ble_support_advertising_start() {
+  if(pm_peer_count() == 0) {
+    NRF_LOG_INFO("No saved peers. Not starting advertising.\n")
+    return;
+  }
   uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
   APP_ERROR_CHECK(err_code);
 }
