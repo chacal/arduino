@@ -24,8 +24,8 @@ typedef struct {
 
 static button_cmd_t m_button_commands[] = {
     {APP_TIMER_TICKS(3000, 0), DISCOVERABLE,   "Discoverable"},
-    {APP_TIMER_TICKS(6000, 0), SETTINGS_RESET, "Factory Reset"},
     {APP_TIMER_TICKS(0, 0),    NOOP,           "Cancel"}
+    {APP_TIMER_TICKS(9000, 0), FACTORY_RESET, "Factory Reset"},
 };
 static uint8_t      m_cmd_count         = sizeof(m_button_commands) / sizeof(m_button_commands[0]);
 static uint32_t     m_btn_press_time;

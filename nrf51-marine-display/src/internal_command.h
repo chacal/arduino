@@ -5,7 +5,7 @@ typedef enum {
   DISPLAY_OFF,
   RENDER,
   DISCOVERABLE,
-  SETTINGS_RESET,
+  FACTORY_RESET,
   NOOP
 } internal_cmd_t;
 

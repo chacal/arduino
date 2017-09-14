@@ -19,7 +19,7 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
       break;
     case DISCOVERABLE:
       break;
-    case SETTINGS_RESET:
+    case FACTORY_RESET:
       break;
     case NOOP:
       break;
