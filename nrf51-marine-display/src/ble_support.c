@@ -13,8 +13,13 @@
 #include "ble_data_service.h"
 #include <peer_manager.h>
 #include <fds.h>
+#include <app_scheduler.h>
 #include "ecc.h"
 #include "ble_adv_support.h"
+#include "display_list.h"
+#include "internal_command.h"
+#include "marinedisplay.pb.h"
+#include "display.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
@@ -122,6 +127,33 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
 }
 
 
+static void render_discoverable_state(uint32_t secs_till_discoverable_timeout) {
+  display_list_clear();
+
+  DisplayCommand name_cmd = {
+        .which_command = DisplayCommand_string_tag,
+        .command.string = {0, 0, 25, 10}
+    };
+  strcpy(name_cmd.command.string.str, DEVICE_NAME);
+  name_cmd.command.string.x = display_centered_x(name_cmd.command.string.str, name_cmd.command.string.font_size);
+  display_list_add(0, &name_cmd);
+
+  DisplayCommand cmd = {
+        .which_command = DisplayCommand_string_tag,
+        .command.string = {1, 0, 50, 8}
+    };
+  sprintf(cmd.command.string.str, "Discoverable %us", (unsigned int) secs_till_discoverable_timeout);
+  cmd.command.string.x = display_centered_x(cmd.command.string.str, cmd.command.string.font_size);
+  display_list_add(1, &cmd);
+  SCHED_INT_CMD(RENDER);
+}
+
+static void on_discoverable_stop() {
+  app_timer_stop(m_discoverable_timer);
+  display_list_clear();
+  SCHED_INT_CMD(RENDER);
+}
+
 void on_discover_timer_tick(void *ctx) {
   uint32_t ticks_in_sec = APP_TIMER_TICKS(1000, 0);
   uint32_t duration     = 0;
@@ -129,14 +161,15 @@ void on_discover_timer_tick(void *ctx) {
   app_timer_cnt_diff_compute(app_timer_cnt_get(), m_discoverable_start_time, &duration);
 
   uint32_t ticks_till_discoverable_timeout = APP_TIMER_TICKS(1000 * DISCOVERABLE_TIMEOUT_SECONDS, 0) - duration;
-  uint32_t secs_till_discoverable_timeout  = (ticks_till_discoverable_timeout + ticks_in_sec - 1) / ticks_in_sec;  // Round up
+  uint32_t secs_till_discoverable_timeout  = (ticks_till_discoverable_timeout + (ticks_in_sec / 2)) / ticks_in_sec;  // Round up
 
   if(secs_till_discoverable_timeout <= 0) {
     NRF_LOG_INFO("Discoverable timeout\n");
-    app_timer_stop(m_discoverable_timer);
     ble_adv_start();
+    on_discoverable_stop();
+    SCHED_INT_CMD(DISPLAY_OFF);
   } else {
-    NRF_LOG_INFO("Discoverable for %d seconds\n", secs_till_discoverable_timeout);
+    render_discoverable_state(secs_till_discoverable_timeout);
   }
 }
 
@@ -239,11 +272,11 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+      NRF_LOG_INFO("Connected\n");
       log_connection_security(m_conn_handle);
       try_secure_connection();
-      app_timer_stop(m_discoverable_timer);
+      on_discoverable_stop();
       ble_adv_stop();
-      NRF_LOG_INFO("Connected\n");
       break; // BLE_GAP_EVT_CONNECTED
 
     case BLE_GAP_EVT_DISCONNECTED:
@@ -354,6 +387,7 @@ void ble_support_start_discoverable() {
   app_timer_start(m_discoverable_timer, DISCOVERABLE_TIMER_PERIOD, NULL);
   m_discoverable_start_time = app_timer_cnt_get();
   NRF_LOG_INFO("Discoverable\n")
+  render_discoverable_state(DISCOVERABLE_TIMEOUT_SECONDS);
 }
 
 

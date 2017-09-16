@@ -14,6 +14,7 @@
 #define CONTRAST       230
 
 #define SPI_INSTANCE     0
+#define SCREEN_WIDTH   128
 
 static u8g2_t u8g2;
 
@@ -124,29 +125,32 @@ void display_off() {
   u8g2_SetPowerSave(&u8g2, 1);
 }
 
-void display_draw_str(uint32_t x, uint32_t y, uint32_t font_size, char *str) {
-  const uint8_t *font;
+static const uint8_t *font_for_size(uint8_t font_size) {
   if(font_size <= 8) {
-    font = u8g2_font_helvB08_tr;
+    return u8g2_font_helvB08_tr;
   } else if(font_size <= 10) {
-    font = u8g2_font_helvB10_tr;
+    return u8g2_font_helvB10_tr;
   } else if(font_size <= 12) {
-    font = u8g2_font_helvB12_tr;
+    return u8g2_font_helvB12_tr;
   } else if(font_size <= 14) {
-    font = u8g2_font_helvB14_tr;
+    return u8g2_font_helvB14_tr;
   } else if(font_size <= 18) {
-    font = u8g2_font_helvB18_tr;
+    return u8g2_font_helvB18_tr;
   } else if(font_size <= 24) {
-    font = u8g2_font_helvB24_tr;
+    return u8g2_font_helvB24_tr;
   } else if(font_size <= 25) {
-    font = u8g2_font_fub25_tn;
+    return u8g2_font_fub25_tn;
   } else if(font_size <= 30) {
-    font = u8g2_font_fub30_tn;
+    return u8g2_font_fub30_tn;
   } else if(font_size <= 35) {
-    font = u8g2_font_fub35_tn;
+    return u8g2_font_fub35_tn;
   } else {
-    font = u8g2_font_fub42_tn;
+    return u8g2_font_fub42_tn;
   }
+}
+
+void display_draw_str(uint32_t x, uint32_t y, uint32_t font_size, char *str) {
+  const uint8_t *font = font_for_size(font_size);
   u8g2_SetFont(&u8g2, font);
   u8g2_DrawStr(&u8g2, x, y, str);
 }
@@ -161,4 +165,10 @@ void display_draw_line(uint32_t start_x, uint32_t start_y, uint32_t end_x, uint3
 
 void display_render() {
   u8g2_SendBuffer(&u8g2);
+}
+
+uint8_t display_centered_x(const char *str, uint8_t font_size) {
+  u8g2_SetFont(&u8g2, font_for_size(font_size));
+  int x = SCREEN_WIDTH / 2 - u8g2_GetStrWidth(&u8g2, str) / 2;
+  return x >= 0 ? x : 0;
 }
