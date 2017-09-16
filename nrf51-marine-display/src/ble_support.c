@@ -14,6 +14,7 @@
 #include <peer_manager.h>
 #include <fds.h>
 #include "ecc.h"
+#include "ble_adv_support.h"
 
 
 #define APP_FEATURE_NOT_SUPPORTED       (BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2)      /**< Reply when unsupported features are requested. */
@@ -23,7 +24,6 @@
 #define CENTRAL_LINK_COUNT              0
 #define PERIPHERAL_LINK_COUNT           1
 #define TX_POWER_LEVEL                  4                                           /**< Tx power in dBm */
-#define REMEMBERED_PEER_COUNT           8
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(20, UNIT_1_25_MS)
@@ -34,16 +34,15 @@
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000, 0)                    /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
 
-#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)
-#define APP_ADV_TIMEOUT_IN_SECONDS      600
-#define APP_ADV_SLOW_INTERVAL           MSEC_TO_UNITS(1000, UNIT_0_625_MS)
-#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS 0
+#define DISCOVERABLE_TIMEOUT_SECONDS    60
+#define DISCOVERABLE_TIMER_PERIOD       APP_TIMER_TICKS(1000, 0)
 
 
-static uint16_t               m_conn_handle         = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
-static ble_uuid_t             m_adv_uuids[]         = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
-static ble_evt_handler_t      m_ble_evt_handler     = NULL;
-static ble_support_callback_t m_disconnect_callback = NULL;
+static uint16_t               m_conn_handle             = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static ble_evt_handler_t      m_ble_evt_handler         = NULL;
+static ble_support_callback_t m_disconnect_callback     = NULL;
+static uint32_t               m_discoverable_start_time = 0;
+APP_TIMER_DEF(m_discoverable_timer);
 
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
@@ -107,23 +106,6 @@ static void conn_params_init(void) {
 static void sys_evt_dispatch(uint32_t sys_evt) {
   NRF_LOG_DEBUG("Got system event: %d\n", sys_evt)
   fs_sys_event_handler(sys_evt);
-  ble_advertising_on_sys_evt(sys_evt);
-}
-
-
-static void update_whitelist_from_saved_peers() {
-  // Fetch a list of peer IDs from Peer Manager and whitelist them.
-  pm_peer_id_t peer_ids[REMEMBERED_PEER_COUNT] = {PM_PEER_ID_INVALID};
-  uint32_t     n_peer_ids                      = 0;
-  pm_peer_id_t peer_id                         = pm_next_peer_id_get(PM_PEER_ID_INVALID);
-
-  while((peer_id != PM_PEER_ID_INVALID) && (n_peer_ids < REMEMBERED_PEER_COUNT)) {
-        peer_ids[n_peer_ids++] = peer_id;
-        peer_id = pm_next_peer_id_get(peer_id);
-      }
-
-  // Whitelist peers.
-  APP_ERROR_CHECK(pm_whitelist_set(peer_ids, n_peer_ids));
 }
 
 
@@ -131,14 +113,30 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
   NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
   switch(p_evt->evt_id) {
     case PM_EVT_STORAGE_FULL:
-      NRF_LOG_INFO("Running GC for flash..");
+      NRF_LOG_INFO("Running GC for flash..\n");
       APP_ERROR_CHECK(fds_gc());
-      break;
-    case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
-      update_whitelist_from_saved_peers();
       break;
     default:
       break;
+  }
+}
+
+
+void on_discover_timer_tick(void *ctx) {
+  uint32_t ticks_in_sec = APP_TIMER_TICKS(1000, 0);
+  uint32_t duration     = 0;
+
+  app_timer_cnt_diff_compute(app_timer_cnt_get(), m_discoverable_start_time, &duration);
+
+  uint32_t ticks_till_discoverable_timeout = APP_TIMER_TICKS(1000 * DISCOVERABLE_TIMEOUT_SECONDS, 0) - duration;
+  uint32_t secs_till_discoverable_timeout  = (ticks_till_discoverable_timeout + ticks_in_sec - 1) / ticks_in_sec;  // Round up
+
+  if(secs_till_discoverable_timeout <= 0) {
+    NRF_LOG_INFO("Discoverable timeout\n");
+    app_timer_stop(m_discoverable_timer);
+    ble_adv_start();
+  } else {
+    NRF_LOG_INFO("Discoverable for %d seconds\n", secs_till_discoverable_timeout);
   }
 }
 
@@ -167,6 +165,8 @@ static void pairing_init() {
 
   APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
   APP_ERROR_CHECK(pm_register(pm_evt_handler));
+
+  app_timer_create(&m_discoverable_timer, APP_TIMER_MODE_REPEATED, on_discover_timer_tick);
 }
 
 
@@ -207,7 +207,6 @@ static void ble_stack_init() {
 
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt) {
   on_ble_evt(p_ble_evt);
-  ble_advertising_on_ble_evt(p_ble_evt);
   ble_conn_params_on_ble_evt(p_ble_evt);
   if(m_ble_evt_handler != NULL) {
     m_ble_evt_handler(p_ble_evt);
@@ -242,12 +241,15 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       log_connection_security(m_conn_handle);
       try_secure_connection();
+      app_timer_stop(m_discoverable_timer);
+      ble_adv_stop();
       NRF_LOG_INFO("Connected\n");
       break; // BLE_GAP_EVT_CONNECTED
 
     case BLE_GAP_EVT_DISCONNECTED:
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
       NRF_LOG_INFO("Disconnected\n");
+      ble_adv_start();
       if(m_disconnect_callback != NULL) {
         m_disconnect_callback();
         m_disconnect_callback = NULL;
@@ -318,84 +320,22 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
 }
 
 
-static void on_adv_evt(const ble_adv_evt_t ble_adv_evt) {
-  NRF_LOG_DEBUG("Advertising event: %d\n", ble_adv_evt);
-  switch(ble_adv_evt) {
-    case BLE_ADV_EVT_WHITELIST_REQUEST: {
-      ble_gap_irk_t  irks[REMEMBERED_PEER_COUNT];
-      ble_gap_addr_t addrs[REMEMBERED_PEER_COUNT];
-      uint32_t       irk_cnt  = REMEMBERED_PEER_COUNT;
-      uint32_t       addr_cnt = REMEMBERED_PEER_COUNT;
-      APP_ERROR_CHECK(pm_whitelist_get(addrs, &addr_cnt, irks, &irk_cnt));
-      APP_ERROR_CHECK(ble_advertising_whitelist_reply(addrs, addr_cnt, irks, irk_cnt));
-      NRF_LOG_INFO("Whitelisted %d peers\n", addr_cnt, irk_cnt);
-      break;
-    }
-    case BLE_ADV_EVT_FAST:
-    case BLE_ADV_EVT_FAST_WHITELIST:
-      NRF_LOG_INFO("Advertising fast%s\n", (uint32_t)(ble_adv_evt == BLE_ADV_EVT_FAST_WHITELIST ? " with whitelist" : ""));
-      break;
-    case BLE_ADV_EVT_SLOW:
-    case BLE_ADV_EVT_SLOW_WHITELIST:
-      NRF_LOG_INFO("Advertising slow%s\n", (uint32_t)(ble_adv_evt == BLE_ADV_EVT_SLOW_WHITELIST ? " with whitelist" : ""));
-      break;
-    case BLE_ADV_EVT_IDLE:
-      NRF_LOG_INFO("Advertising idle\n");
-      break;
-    default:
-      break;
-  }
-}
-
-
 void ble_support_init(ble_evt_handler_t ble_evt_handler) {
   m_ble_evt_handler = ble_evt_handler;
   ble_stack_init();
   gap_params_init();
   conn_params_init();
-  pairing_init();
 }
 
 
 void ble_support_advertising_init() {
-  uint32_t               err_code;
-  ble_advdata_t          advdata;
-  ble_advdata_t          scanrsp;
-  ble_adv_modes_config_t options;
-
-  // Build advertising data struct to pass into @ref ble_advertising_init.
-  memset(&advdata, 0, sizeof(advdata));
-  advdata.name_type          = BLE_ADVDATA_FULL_NAME;
-  advdata.include_appearance = false;
-  advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-
-  memset(&scanrsp, 0, sizeof(scanrsp));
-  scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-  scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
-
-  memset(&options, 0, sizeof(options));
-  options.ble_adv_whitelist_enabled = true;
-  options.ble_adv_fast_enabled      = true;
-  options.ble_adv_fast_interval     = APP_ADV_INTERVAL;
-  options.ble_adv_fast_timeout      = APP_ADV_TIMEOUT_IN_SECONDS;
-  options.ble_adv_slow_enabled      = true;
-  options.ble_adv_slow_interval     = APP_ADV_SLOW_INTERVAL;
-  options.ble_adv_slow_timeout      = APP_ADV_SLOW_TIMEOUT_IN_SECONDS;
-
-  err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
-  APP_ERROR_CHECK(err_code);
-
-  update_whitelist_from_saved_peers();
+  pairing_init();
+  ble_adv_init();
 }
 
 
 void ble_support_advertising_start() {
-  if(pm_peer_count() == 0) {
-    NRF_LOG_INFO("No saved peers. Not starting advertising.\n")
-    return;
-  }
-  uint32_t err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
-  APP_ERROR_CHECK(err_code);
+  ble_adv_start();
 }
 
 
@@ -410,15 +350,15 @@ void ble_support_disconnect(ble_support_callback_t callback) {
 
 
 void ble_support_start_discoverable() {
-  ble_advertising_restart_without_whitelist();
-  APP_ERROR_CHECK(ble_advertising_start(BLE_ADV_MODE_FAST));
+  ble_adv_discoverable_start();
+  app_timer_start(m_discoverable_timer, DISCOVERABLE_TIMER_PERIOD, NULL);
+  m_discoverable_start_time = app_timer_cnt_get();
+  NRF_LOG_INFO("Discoverable\n")
 }
 
 
 void ble_support_factory_reset() {
   APP_ERROR_CHECK(pm_peers_delete());
   ble_support_disconnect(NULL);
-  APP_ERROR_CHECK(sd_ble_gap_adv_stop());
-  ble_support_advertising_init();
-  ble_support_advertising_start();
+  ble_adv_start();
 }

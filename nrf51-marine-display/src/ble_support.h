@@ -1,5 +1,4 @@
 #pragma once
-#include <ble_advertising.h>
 #include <softdevice_handler.h>
 
 #define BLE_GAP_LESC_P256_SK_LEN 32

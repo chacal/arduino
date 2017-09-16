@@ -25,8 +25,7 @@ void on_internal_cmd(internal_cmd_t const *p_cmd, uint16_t length) {
       ble_support_disconnect(power_manager_shutdown);
       break;
     case DISCOVERABLE:
-      NRF_LOG_INFO("Discoverable\n")
-      ble_support_start_discoverable();
+      ble_support_disconnect(ble_support_start_discoverable);
       break;
     case FACTORY_RESET:
       NRF_LOG_INFO("Factory reset\n")

@@ -17,6 +17,6 @@ void power_manage() {
 }
 
 void power_manager_shutdown() {
-  NRF_LOG_DEBUG("Shutdown\n");
+  NRF_LOG_INFO("Shutdown\n");
   nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
 }

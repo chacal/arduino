@@ -62,6 +62,7 @@ SRC_FILES += \
   $(SRC_DIR)/internal_command.c \
   $(SRC_DIR)/display_list.c \
   $(SRC_DIR)/button_handler.c \
+  $(SRC_DIR)/ble_adv_support.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -69,7 +70,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/system_nrf51.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus/ble_nus.c \
-  $(SDK_ROOT)/components/ble/ble_advertising/ble_advertising.c \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
@@ -120,7 +120,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd \
   $(SDK_ROOT)/components/boards \
   $(SDK_ROOT)/components/drivers_nrf/common \
-  $(SDK_ROOT)/components/ble/ble_advertising \
   $(SDK_ROOT)/components/drivers_nrf/adc \
   $(SDK_ROOT)/components/ble/ble_services/ble_bas_c \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs_c \
