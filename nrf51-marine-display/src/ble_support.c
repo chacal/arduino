@@ -154,6 +154,26 @@ static void render_discoverable_state(uint32_t secs_till_discoverable_timeout) {
   SCHED_INT_CMD(RENDER);
 }
 
+static void render_pairing_passkey(char *passkey) {
+  display_list_clear();
+  DisplayCommand cmd = {
+      .which_command = DisplayCommand_string_tag,
+      .command.string = {0, 0, 15, 10}
+  };
+  strcpy(cmd.command.string.str, "Pairing PIN");
+  cmd.command.string.x = display_centered_x(cmd.command.string.str, cmd.command.string.font_size);
+  display_list_add(0, &cmd);
+
+  DisplayCommand passkey_cmd = {
+      .which_command = DisplayCommand_string_tag,
+      .command.string = {1, 0, 50, 20}
+  };
+  strcpy(passkey_cmd.command.string.str, passkey);
+  passkey_cmd.command.string.x = display_centered_x(passkey_cmd.command.string.str, passkey_cmd.command.string.font_size);
+  display_list_add(1, &passkey_cmd);
+  SCHED_INT_CMD(RENDER);
+}
+
 static void on_discoverable_stop() {
   app_timer_stop(m_discoverable_timer);
   display_list_clear();
@@ -338,6 +358,9 @@ static void on_ble_evt(ble_evt_t * p_ble_evt) {
 
     case BLE_GAP_EVT_PASSKEY_DISPLAY:
       NRF_LOG_INFO("Passkey: %s\n", (uint32_t)p_ble_evt->evt.gap_evt.params.passkey_display.passkey);
+      char buf[BLE_GAP_PASSKEY_LEN + 1];
+      memcpy(buf, p_ble_evt->evt.gap_evt.params.passkey_display.passkey, BLE_GAP_PASSKEY_LEN);
+      render_pairing_passkey(buf);
       break;
 
     case BLE_GAP_EVT_LESC_DHKEY_REQUEST:
