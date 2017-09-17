@@ -127,6 +127,10 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
       pm_conn_sec_config_reply(p_evt->conn_handle, &reply);
       break;
     }
+    case PM_EVT_CONN_SEC_SUCCEEDED:
+      display_list_clear();
+      SCHED_INT_CMD(RENDER);
+      break;
     default:
       break;
   }
