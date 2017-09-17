@@ -6,7 +6,7 @@
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
-// <h> nRF_BLE 
+// <h> nRF_BLE
 
 //==========================================================
 // <q> BLE_ADVERTISING_ENABLED  - ble_advertising - Advertising module
@@ -44,10 +44,10 @@
 #define PEER_MANAGER_ENABLED 1
 #endif
 
-// </h> 
+// </h>
 //==========================================================
 
-// <h> nRF_BLE_Services 
+// <h> nRF_BLE_Services
 
 //==========================================================
 // <q> BLE_ANCS_C_ENABLED  - ble_ancs_c - Apple Notification Service Client
@@ -119,7 +119,7 @@
 #define BLE_HRS_C_ENABLED 0
 #endif
 #if  BLE_HRS_C_ENABLED
-// <o> BLE_HRS_C_RR_INTERVALS_MAX_CNT - Maximum number of RR_INTERVALS per notification to be decoded 
+// <o> BLE_HRS_C_RR_INTERVALS_MAX_CNT - Maximum number of RR_INTERVALS per notification to be decoded
 #ifndef BLE_HRS_C_RR_INTERVALS_MAX_CNT
 #define BLE_HRS_C_RR_INTERVALS_MAX_CNT 30
 #endif
@@ -211,10 +211,10 @@
 #define BLE_TPS_ENABLED 0
 #endif
 
-// </h> 
+// </h>
 //==========================================================
 
-// <h> nRF_Drivers 
+// <h> nRF_Drivers
 
 //==========================================================
 // <e> ADC_ENABLED - nrf_drv_adc - Driver for ADC peripheral (nRF51)
@@ -224,13 +224,13 @@
 #endif
 #if  ADC_ENABLED
 // <o> ADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
+
 
 // <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
 
 #ifndef ADC_CONFIG_IRQ_PRIORITY
 #define ADC_CONFIG_IRQ_PRIORITY 3
@@ -243,44 +243,44 @@
 #endif
 #if  ADC_CONFIG_LOG_ENABLED
 // <o> ADC_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
 
 #ifndef ADC_CONFIG_LOG_LEVEL
 #define ADC_CONFIG_LOG_LEVEL 3
 #endif
 
 // <o> ADC_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef ADC_CONFIG_INFO_COLOR
 #define ADC_CONFIG_INFO_COLOR 0
 #endif
 
 // <o> ADC_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef ADC_CONFIG_DEBUG_COLOR
 #define ADC_CONFIG_DEBUG_COLOR 0
@@ -298,7 +298,7 @@
 #define APP_USBD_ENABLED 0
 #endif
 #if  APP_USBD_ENABLED
-// <o> APP_USBD_VID - Vendor ID  <0x0000-0xFFFF> 
+// <o> APP_USBD_VID - Vendor ID  <0x0000-0xFFFF>
 
 
 // <i> Vendor ID ordered from USB IF: http://www.usb.org/developers/vendor/
@@ -307,7 +307,7 @@
 #define APP_USBD_VID 0
 #endif
 
-// <o> APP_USBD_PID - Product ID  <0x0000-0xFFFF> 
+// <o> APP_USBD_PID - Product ID  <0x0000-0xFFFF>
 
 
 // <i> Selected Product ID
@@ -316,7 +316,7 @@
 #define APP_USBD_PID 0
 #endif
 
-// <o> APP_USBD_DEVICE_VER_MAJOR - Device version, major part  <0-99> 
+// <o> APP_USBD_DEVICE_VER_MAJOR - Device version, major part  <0-99>
 
 
 // <i> Device version, will be converted automatically to BCD notation. Use just decimal values.
@@ -325,7 +325,7 @@
 #define APP_USBD_DEVICE_VER_MAJOR 1
 #endif
 
-// <o> APP_USBD_DEVICE_VER_MINOR - Device version, minor part  <0-99> 
+// <o> APP_USBD_DEVICE_VER_MINOR - Device version, minor part  <0-99>
 
 
 // <i> Device version, will be converted automatically to BCD notation. Use just decimal values.
@@ -345,9 +345,9 @@
 #if  CLOCK_ENABLED
 // <o> CLOCK_CONFIG_XTAL_FREQ  - HF XTAL Frequency
 
-// <0=> Default (64 MHz) 
-// <255=> Default (16 MHz) 
-// <0=> 32 MHz 
+// <0=> Default (64 MHz)
+// <255=> Default (16 MHz)
+// <0=> 32 MHz
 
 #ifndef CLOCK_CONFIG_XTAL_FREQ
 #define CLOCK_CONFIG_XTAL_FREQ 255
@@ -355,9 +355,9 @@
 
 // <o> CLOCK_CONFIG_LF_SRC  - LF Clock Source
 
-// <0=> RC 
-// <1=> XTAL 
-// <2=> Synth 
+// <0=> RC
+// <1=> XTAL
+// <2=> Synth
 
 #ifndef CLOCK_CONFIG_LF_SRC
 #define CLOCK_CONFIG_LF_SRC 1
@@ -367,10 +367,10 @@
 
 
 // <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
 
 #ifndef CLOCK_CONFIG_IRQ_PRIORITY
 #define CLOCK_CONFIG_IRQ_PRIORITY 3
@@ -383,44 +383,44 @@
 #endif
 #if  CLOCK_CONFIG_LOG_ENABLED
 // <o> CLOCK_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
 
 #ifndef CLOCK_CONFIG_LOG_LEVEL
 #define CLOCK_CONFIG_LOG_LEVEL 3
 #endif
 
 // <o> CLOCK_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef CLOCK_CONFIG_INFO_COLOR
 #define CLOCK_CONFIG_INFO_COLOR 0
 #endif
 
 // <o> CLOCK_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef CLOCK_CONFIG_DEBUG_COLOR
 #define CLOCK_CONFIG_DEBUG_COLOR 0
@@ -439,79 +439,79 @@
 #endif
 #if  COMP_ENABLED
 // <o> COMP_CONFIG_REF  - Reference voltage
- 
-// <0=> Internal 1.2V 
-// <1=> Internal 1.8V 
-// <2=> Internal 2.4V 
-// <4=> VDD 
-// <7=> ARef 
+
+// <0=> Internal 1.2V
+// <1=> Internal 1.8V
+// <2=> Internal 2.4V
+// <4=> VDD
+// <7=> ARef
 
 #ifndef COMP_CONFIG_REF
 #define COMP_CONFIG_REF 1
 #endif
 
 // <o> COMP_CONFIG_MAIN_MODE  - Main mode
- 
-// <0=> Single ended 
-// <1=> Differential 
+
+// <0=> Single ended
+// <1=> Differential
 
 #ifndef COMP_CONFIG_MAIN_MODE
 #define COMP_CONFIG_MAIN_MODE 0
 #endif
 
 // <o> COMP_CONFIG_SPEED_MODE  - Speed mode
- 
-// <0=> Low power 
-// <1=> Normal 
-// <2=> High speed 
+
+// <0=> Low power
+// <1=> Normal
+// <2=> High speed
 
 #ifndef COMP_CONFIG_SPEED_MODE
 #define COMP_CONFIG_SPEED_MODE 2
 #endif
 
 // <o> COMP_CONFIG_HYST  - Hystheresis
- 
-// <0=> No 
-// <1=> 50mV 
+
+// <0=> No
+// <1=> 50mV
 
 #ifndef COMP_CONFIG_HYST
 #define COMP_CONFIG_HYST 0
 #endif
 
 // <o> COMP_CONFIG_ISOURCE  - Current Source
- 
-// <0=> Off 
-// <1=> 2.5 uA 
-// <2=> 5 uA 
-// <3=> 10 uA 
+
+// <0=> Off
+// <1=> 2.5 uA
+// <2=> 5 uA
+// <3=> 10 uA
 
 #ifndef COMP_CONFIG_ISOURCE
 #define COMP_CONFIG_ISOURCE 0
 #endif
 
 // <o> COMP_CONFIG_INPUT  - Analog input
- 
-// <0=> 0 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
+
+// <0=> 0
+// <1=> 1
+// <2=> 2
+// <3=> 3
+// <4=> 4
+// <5=> 5
+// <6=> 6
+// <7=> 7
 
 #ifndef COMP_CONFIG_INPUT
 #define COMP_CONFIG_INPUT 0
 #endif
 
 // <o> COMP_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
+
 
 // <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
 
 #ifndef COMP_CONFIG_IRQ_PRIORITY
 #define COMP_CONFIG_IRQ_PRIORITY 3
@@ -524,44 +524,44 @@
 #endif
 #if  COMP_CONFIG_LOG_ENABLED
 // <o> COMP_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
 
 #ifndef COMP_CONFIG_LOG_LEVEL
 #define COMP_CONFIG_LOG_LEVEL 3
 #endif
 
 // <o> COMP_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef COMP_CONFIG_INFO_COLOR
 #define COMP_CONFIG_INFO_COLOR 0
 #endif
 
 // <o> COMP_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef COMP_CONFIG_DEBUG_COLOR
 #define COMP_CONFIG_DEBUG_COLOR 0
@@ -586,44 +586,44 @@
 #endif
 #if  SWI_CONFIG_LOG_ENABLED
 // <o> SWI_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
 
 #ifndef SWI_CONFIG_LOG_LEVEL
 #define SWI_CONFIG_LOG_LEVEL 3
 #endif
 
 // <o> SWI_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef SWI_CONFIG_INFO_COLOR
 #define SWI_CONFIG_INFO_COLOR 0
 #endif
 
 // <o> SWI_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
 
 #ifndef SWI_CONFIG_DEBUG_COLOR
 #define SWI_CONFIG_DEBUG_COLOR 0
@@ -3763,20 +3763,20 @@
 #define NRF_LOG_BACKEND_SERIAL_UART_RX_PIN 6
 #endif
 
-// <o> NRF_LOG_BACKEND_SERIAL_UART_RTS_PIN - UART RTS pin 
+// <o> NRF_LOG_BACKEND_SERIAL_UART_RTS_PIN - UART RTS pin
 #ifndef NRF_LOG_BACKEND_SERIAL_UART_RTS_PIN
 #define NRF_LOG_BACKEND_SERIAL_UART_RTS_PIN 8
 #endif
 
-// <o> NRF_LOG_BACKEND_SERIAL_UART_CTS_PIN - UART CTS pin 
+// <o> NRF_LOG_BACKEND_SERIAL_UART_CTS_PIN - UART CTS pin
 #ifndef NRF_LOG_BACKEND_SERIAL_UART_CTS_PIN
 #define NRF_LOG_BACKEND_SERIAL_UART_CTS_PIN 10
 #endif
 
 // <o> NRF_LOG_BACKEND_SERIAL_UART_FLOW_CONTROL  - Hardware Flow Control
 
-// <0=> Disabled 
-// <1=> Enabled 
+// <0=> Disabled
+// <1=> Enabled
 
 #ifndef NRF_LOG_BACKEND_SERIAL_UART_FLOW_CONTROL
 #define NRF_LOG_BACKEND_SERIAL_UART_FLOW_CONTROL 0
@@ -3784,7 +3784,7 @@
 
 // <o> NRF_LOG_BACKEND_UART_INSTANCE  - UART instance used
 
-// <0=> 0 
+// <0=> 0
 
 #ifndef NRF_LOG_BACKEND_UART_INSTANCE
 #define NRF_LOG_BACKEND_UART_INSTANCE 0
@@ -3799,7 +3799,7 @@
 #define NRF_LOG_BACKEND_SERIAL_USES_RTT 0
 #endif
 #if  NRF_LOG_BACKEND_SERIAL_USES_RTT
-// <o> NRF_LOG_BACKEND_RTT_OUTPUT_BUFFER_SIZE - RTT output buffer size. 
+// <o> NRF_LOG_BACKEND_RTT_OUTPUT_BUFFER_SIZE - RTT output buffer size.
 // <i> Should be equal or bigger than \ref NRF_LOG_BACKEND_MAX_STRING_LENGTH.
 // <i> This value is used in Segger RTT configuration to set the buffer size
 // <i> if it is bigger than default RTT buffer size.
@@ -3811,42 +3811,42 @@
 #endif //NRF_LOG_BACKEND_SERIAL_USES_RTT
 // </e>
 
-// </h> 
+// </h>
 //==========================================================
 
-// </h> 
+// </h>
 //==========================================================
 
-// <h> nRF_Segger_RTT 
+// <h> nRF_Segger_RTT
 
 //==========================================================
 // <h> segger_rtt - SEGGER RTT
 
 //==========================================================
-// <o> SEGGER_RTT_CONFIG_BUFFER_SIZE_UP - Size of upstream buffer. 
+// <o> SEGGER_RTT_CONFIG_BUFFER_SIZE_UP - Size of upstream buffer.
 #ifndef SEGGER_RTT_CONFIG_BUFFER_SIZE_UP
 #define SEGGER_RTT_CONFIG_BUFFER_SIZE_UP 64
 #endif
 
-// <o> SEGGER_RTT_CONFIG_MAX_NUM_UP_BUFFERS - Size of upstream buffer. 
+// <o> SEGGER_RTT_CONFIG_MAX_NUM_UP_BUFFERS - Size of upstream buffer.
 #ifndef SEGGER_RTT_CONFIG_MAX_NUM_UP_BUFFERS
 #define SEGGER_RTT_CONFIG_MAX_NUM_UP_BUFFERS 2
 #endif
 
-// <o> SEGGER_RTT_CONFIG_BUFFER_SIZE_DOWN - Size of upstream buffer. 
+// <o> SEGGER_RTT_CONFIG_BUFFER_SIZE_DOWN - Size of upstream buffer.
 #ifndef SEGGER_RTT_CONFIG_BUFFER_SIZE_DOWN
 #define SEGGER_RTT_CONFIG_BUFFER_SIZE_DOWN 16
 #endif
 
-// <o> SEGGER_RTT_CONFIG_MAX_NUM_DOWN_BUFFERS - Size of upstream buffer. 
+// <o> SEGGER_RTT_CONFIG_MAX_NUM_DOWN_BUFFERS - Size of upstream buffer.
 #ifndef SEGGER_RTT_CONFIG_MAX_NUM_DOWN_BUFFERS
 #define SEGGER_RTT_CONFIG_MAX_NUM_DOWN_BUFFERS 2
 #endif
 
-// </h> 
+// </h>
 //==========================================================
 
-// </h> 
+// </h>
 //==========================================================
 
 // <<< end of configuration section >>>
