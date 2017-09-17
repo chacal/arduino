@@ -121,6 +121,12 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
       NRF_LOG_INFO("Running GC for flash..\n");
       APP_ERROR_CHECK(fds_gc());
       break;
+    case PM_EVT_CONN_SEC_CONFIG_REQ: {
+      NRF_LOG_INFO("Allowing re-pairing\n");
+      pm_conn_sec_config_t reply = { .allow_repairing = true };
+      pm_conn_sec_config_reply(p_evt->conn_handle, &reply);
+      break;
+    }
     default:
       break;
   }
