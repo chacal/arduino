@@ -15,6 +15,7 @@
 #include "internal_command.h"
 #include "marinedisplay.pb.h"
 #include "button_handler.h"
+#include "status_bar.h"
 #include <app_button.h>
 
 #define APP_GPIOTE_MAX_USERS        1
@@ -35,6 +36,7 @@ static void on_ble_event(ble_evt_t *p_ble_evt) {
   ble_data_service_on_ble_evt(p_ble_evt);
   ble_conn_state_on_ble_evt(p_ble_evt);
   pm_on_ble_evt(p_ble_evt);
+  status_bar_on_ble_evt(p_ble_evt);
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
