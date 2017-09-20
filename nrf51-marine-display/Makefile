@@ -1,14 +1,24 @@
 PROJECT_NAME       := nrf51-marine-display
 DFU_APP_VERSION    := 1
 DFU_APP_VERSION_STR:= 1.0.0
+PLATFORM_FAMILY    := NRF52
+PLATFORM           := NRF52832
 
-TARGETS            := nrf51822_xxaa
+TARGETS            := $(PLATFORM)_xxaa
 OUTPUT_DIRECTORY   := build
 BMP_DEV            := /dev/cu.usbmodemBEE7BD01
+ifeq ($(PLATFORM),NRF51822)
 LINKER_SCRIPT      := gcc_nrf51_s130.ld
+else
+LINKER_SCRIPT      := gcc_nrf52_s132.ld
+endif
 
 SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_12.3.0
-S130_HEX           := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
+ifeq ($(PLATFORM),NRF51822)
+SOFTDEVICE_HEX     := $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex
+else
+SOFTDEVICE_HEX     := $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_3.0.0_softdevice.hex
+endif
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
@@ -67,8 +77,6 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
-  $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf51.S \
-  $(SDK_ROOT)/components/toolchain/system_nrf51.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus/ble_nus.c \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
@@ -97,12 +105,32 @@ SRC_FILES += \
   $(U8G2_SOURCES) \
   $(NANOPB_SOURCES)
 
+ifeq ($(PLATFORM),NRF51822)
+SRC_FILES += \
+  $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf51.S \
+  $(SDK_ROOT)/components/toolchain/system_nrf51.c
+else
+SRC_FILES += \
+  $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
+  $(SDK_ROOT)/components/toolchain/system_nrf52.c
+endif
+
+
+ifeq ($(PLATFORM),NRF51822)
+INC_FOLDERS += \
+  $(SDK_ROOT)/components/softdevice/s130/headers \
+  $(SDK_ROOT)/components/softdevice/s130/headers/nrf51 \
+  $(SRC_DIR)/sdk_config_nrf51
+else
+INC_FOLDERS += \
+  $(SDK_ROOT)/components/softdevice/s132/headers \
+  $(SDK_ROOT)/components/softdevice/s132/headers/nrf52 \
+  $(SRC_DIR)/sdk_config_nrf52
+endif
 
 # Include folders common to all targets
 INC_FOLDERS += \
   $(SRC_DIR) \
-  $(SDK_ROOT)/components/softdevice/s130/headers \
-  $(SDK_ROOT)/components/softdevice/s130/headers/nrf51 \
   $(SDK_ROOT)/components/drivers_nrf/comp \
   $(SDK_ROOT)/components/drivers_nrf/twi_master \
   $(SDK_ROOT)/components/ble/ble_services/ble_ancs_c \
@@ -211,22 +239,34 @@ INC_FOLDERS += \
   $(NANOPB_PATH)
 
 # Libraries common to all targets
+ifeq ($(PLATFORM),NRF51822)
 LIB_FILES += \
-  $(SDK_ROOT)/external/micro-ecc/nrf51_armgcc/armgcc/micro_ecc_lib_nrf51.a \
+  $(SDK_ROOT)/external/micro-ecc/nrf51_armgcc/armgcc/micro_ecc_lib_nrf51.a
+else
+LIB_FILES += \
+  $(SDK_ROOT)/external/micro-ecc/nrf52_armgcc/armgcc/micro_ecc_lib_nrf52.a
+endif
 
 # C flags common to all targets
-CFLAGS += -DNRF51
-CFLAGS += -DNRF51822
+ifeq ($(PLATFORM),NRF51822)
+CFLAGS += -DS130
+CFLAGS += -DNRF_SD_BLE_API_VERSION=2
+CFLAGS += -mcpu=cortex-m0
+CFLAGS += -mfloat-abi=soft
+else
+CFLAGS += -DS132
+CFLAGS += -DNRF_SD_BLE_API_VERSION=3
+CFLAGS += -mcpu=cortex-m4
+CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+endif
+CFLAGS += -D$(PLATFORM_FAMILY)
+CFLAGS += -D$(PLATFORM)
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -DBOARD_CUSTOM
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DSOFTDEVICE_PRESENT
-CFLAGS += -DS130
-CFLAGS += -DNRF_SD_BLE_API_VERSION=2
-CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -O3 -g3
-CFLAGS += -mfloat-abi=soft
 CFLAGS += -D__HEAP_SIZE=0
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
@@ -238,47 +278,55 @@ CXXFLAGS += \
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
-ASMFLAGS += -DNRF51
-ASMFLAGS += -DNRF51822
+ASMFLAGS += -D$(PLATFORM_FAMILY)
+ASMFLAGS += -D$(PLATFORM)
 ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DBSP_DEFINES_ONLY
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 ASMFLAGS += -DSOFTDEVICE_PRESENT
-ASMFLAGS += -DS130
-ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
 ASMFLAGS += -D__HEAP_SIZE=0
 ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
+ifeq ($(PLATFORM),NRF51822)
+ASMFLAGS += -DS130
+ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
+else
+ASMFLAGS += -DS132
+ASMFLAGS += -DNRF_SD_BLE_API_VERSION=3
+endif
 
 # Linker flags
 LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)
-LDFLAGS += -mcpu=cortex-m0
-# let linker to dump unused sections
 LDFLAGS += -Wl,--gc-sections
-# use newlib in nano version
 LDFLAGS += --specs=nano.specs -lc -lnosys
+ifeq ($(PLATFORM),NRF51822)
+LDFLAGS += -mcpu=cortex-m0
+else
+LDFLAGS += -mcpu=cortex-m4
+LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+endif
 
 
 .PHONY: $(TARGETS) default all clean flash erase
 
 # Make default (=first) target -> needs to be before including Makefile.common
 default: clean_linked_binaries
-	@$(MAKE) -j8 nrf51822_xxaa
+	@$(MAKE) -j8 $(PLATFORM)_xxaa
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
-	nrfutil settings generate --family NRF51 --application $(OUTPUT_FILE).hex --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+	nrfutil settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
 flash_app: default
 	@echo Flashing: $(OUTPUT_FILE).hex
 	$(GDB_TARGET) -ex load -ex kill -ex quit $(OUTPUT_FILE).hex
 
-flash_s130:
-	@echo Flashing S130 Soft Device..
-	$(GDB_TARGET) -ex load -ex kill -ex quit $(S130_HEX)
+flash_softdevice:
+	@echo Flashing Soft Device..
+	$(GDB_TARGET) -ex load -ex kill -ex quit $(SOFTDEVICE_HEX)
 
 flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..

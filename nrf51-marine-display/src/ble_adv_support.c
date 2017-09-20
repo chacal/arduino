@@ -34,8 +34,9 @@ static void adv_start_with_whitelist() {
   m_adv_packet_data.flags = BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
   m_adv_params.fp         = BLE_GAP_ADV_FP_FILTER_BOTH;
   APP_ERROR_CHECK(ble_advdata_set(&m_adv_packet_data, &m_scan_response_data));
+  update_pm_whitelist_from_saved_peers();
 
-
+#if (NRF_SD_BLE_API_VERSION == 2)
   static uint32_t            irk_cnt   = REMEMBERED_PEER_COUNT;
   static uint32_t            addr_cnt  = REMEMBERED_PEER_COUNT;
   static ble_gap_irk_t       irks[REMEMBERED_PEER_COUNT];
@@ -47,7 +48,6 @@ static void adv_start_with_whitelist() {
       .pp_irks  = m_p_whitelist_irks
   };
 
-  update_pm_whitelist_from_saved_peers();
   APP_ERROR_CHECK(pm_whitelist_get(addrs, &addr_cnt, irks, &irk_cnt));
 
   whitelist.addr_count = addr_cnt;
@@ -62,6 +62,8 @@ static void adv_start_with_whitelist() {
   }
 
   m_adv_params.p_whitelist = &whitelist;
+#endif
+
   sd_ble_gap_adv_stop();
   APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params));
   NRF_LOG_INFO("Advertising with whitelist\n")
@@ -73,7 +75,12 @@ static void adv_start_public() {
   m_adv_params.fp         = BLE_GAP_ADV_FP_ANY;
   APP_ERROR_CHECK(ble_advdata_set(&m_adv_packet_data, &m_scan_response_data));
 
+#if (NRF_SD_BLE_API_VERSION == 2)
   m_adv_params.p_whitelist = NULL;
+#else
+  APP_ERROR_CHECK(pm_whitelist_set(NULL, 0));
+#endif
+
   sd_ble_gap_adv_stop();
   APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params));
   NRF_LOG_INFO("Advertising public\n")

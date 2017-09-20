@@ -9,4 +9,8 @@
 
 #define DISPLAY_LIST_LENGTH        10
 
+#if (NRF_SD_BLE_API_VERSION == 2)
 #define GATT_ATTR_TABLE_SIZE      420  // Minimum needed - found by trial & error
+#else
+#define GATT_ATTR_TABLE_SIZE      433  // Minimum needed - found by trial & error
+#endif
