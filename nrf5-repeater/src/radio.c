@@ -101,6 +101,8 @@ void radio_rx_start() {
 
   NRF_RADIO->PACKETPTR  = (uint32_t) &m_rx_buf;
   NRF_RADIO->SHORTS     = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
+  clear_events();
+
   NRF_RADIO->TASKS_RXEN = 1;
 }
 
