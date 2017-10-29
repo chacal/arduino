@@ -12,12 +12,12 @@
 #define PACKET_TYPE_ADV_NONCONN_IND    0x02
 
 static nrf_radio_packet_t m_rx_tx_buf;
-static radio_packet_cb_t m_on_rx_adv_packet;
+static radio_packet_cb_t  m_on_rx_adv_packet;
 
 static void clear_events() {
   NRF_RADIO->EVENTS_DISABLED = 0;
-  NRF_RADIO->EVENTS_END = 0;
-  NRF_RADIO->EVENTS_READY = 0;
+  NRF_RADIO->EVENTS_END      = 0;
+  NRF_RADIO->EVENTS_READY    = 0;
 }
 
 void radio_init(radio_packet_cb_t on_rx_adv_packet) {
@@ -99,8 +99,8 @@ void radio_rx_start() {
 
   RADIO_TIMER->CC[RADIO_TIMER_RX_TIMEOUT_COMPARE] = RX_TIMEOUT_US;
 
-  NRF_RADIO->PACKETPTR  = (uint32_t) &m_rx_tx_buf;
-  NRF_RADIO->SHORTS     = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
+  NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_tx_buf;
+  NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
   clear_events();
 
   NRF_RADIO->TASKS_RXEN = 1;
@@ -114,7 +114,7 @@ static void change_to_next_channel() {
 
 static void start_rx_on_next_adv_channel() {
   change_to_next_channel();
-  NRF_RADIO->TASKS_RXEN  = 1;
+  NRF_RADIO->TASKS_RXEN = 1;
 }
 
 static void on_rx_packet() {
@@ -134,7 +134,7 @@ void radio_send_packet(nrf_radio_packet_t *packet) {
   clear_events();
 
   // Disable radio first
-  NRF_RADIO->TASKS_DISABLE   = 1;
+  NRF_RADIO->TASKS_DISABLE = 1;
   while(NRF_RADIO->EVENTS_DISABLED == 0);
 
   // Set TX payload
@@ -146,7 +146,7 @@ void radio_send_packet(nrf_radio_packet_t *packet) {
   for(int i = 0; i < ADV_CHANNEL_COUNT; ++i) {
     // Send packet on current channel & wait for radio being disabled again
     NRF_RADIO->EVENTS_DISABLED = 0;
-    NRF_RADIO->TASKS_TXEN = 1;
+    NRF_RADIO->TASKS_TXEN      = 1;
     while(NRF_RADIO->EVENTS_DISABLED == 0);
 
     // Change to the next advertising channel
