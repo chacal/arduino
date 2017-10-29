@@ -26,8 +26,8 @@ void radio_init(radio_packet_cb_t on_rx_adv_packet) {
   /* Enable power to RADIO */
   NRF_RADIO->POWER = 1;
 
-  /* Set radio transmit power to 0dBm */
-  NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
+  /* Set radio transmit power to 4dBm */
+  NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_Pos4dBm << RADIO_TXPOWER_TXPOWER_Pos);
 
   /* Set radio mode to 1Mbit/s Bluetooth Low Energy */
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
