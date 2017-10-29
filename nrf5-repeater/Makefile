@@ -54,6 +54,7 @@ SRC_FILES += \
   $(SRC_DIR)/util.c \
   $(SRC_DIR)/channel_resolver.c \
   $(SRC_DIR)/tx_queue.c \
+  $(SRC_DIR)/tx_timer.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \

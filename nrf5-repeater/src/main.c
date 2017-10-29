@@ -6,27 +6,11 @@
 #include <stdlib.h>
 #include "util.h"
 #include "tx_queue.h"
+#include "tx_timer.h"
 
 #define FILTERED_MANUFACTURER_ID   0xDADA
 #define TX_DELAY_MIN_US              2000
 #define TX_DELAY_MAX_US             50000
-#define TX_TIMER               NRF_TIMER1
-#define TX_TIMER_CC                     0
-#define TX_TIMER_IRQ          TIMER1_IRQn
-
-static inline bool tx_timer_stopped() {
-  return TX_TIMER->CC[TX_TIMER_CC] == 0;
-}
-
-static inline uint32_t tx_timer_time_left() {
-  TX_TIMER->TASKS_CAPTURE[1] = 1;
-  return TX_TIMER->CC[TX_TIMER_CC] - TX_TIMER->CC[1];
-}
-
-static inline void tx_timer_start_with_delay(uint32_t delay) {
-  TX_TIMER->CC[TX_TIMER_CC] = delay;
-  TX_TIMER->TASKS_START = 1;
-}
 
 
 static void queue_repeating_tx(nrf_radio_packet_t *adv_packet) {
@@ -56,22 +40,9 @@ static void on_rx_adv_packet(nrf_radio_packet_t adv_packet) {
   }
 }
 
-static void tx_timer_init() {
-  TX_TIMER->PRESCALER = 4;  // 1MHz, 1 tick == 1µs
-  TX_TIMER->BITMODE   = TIMER_BITMODE_BITMODE_16Bit;  // Max timer length == ~65ms
-  TX_TIMER->SHORTS    = TIMER_SHORTS_COMPARE0_STOP_Msk | TIMER_SHORTS_COMPARE0_CLEAR_Msk;  // Stop and reset timer on compare0
-  TX_TIMER->INTENSET  = TIMER_INTENSET_COMPARE0_Msk;
-
-  NVIC_SetPriority(TX_TIMER_IRQ, 4);
-  NVIC_ClearPendingIRQ(TX_TIMER_IRQ);
-  NVIC_EnableIRQ(TX_TIMER_IRQ);
-
-  TX_TIMER->CC[TX_TIMER_CC] = 0;
-}
-
 static void process_tx_queue() {
   // Disable radio IRQ here
-  tx_queue_update_delays(TX_TIMER->CC[TX_TIMER_CC]);
+  tx_queue_update_delays(tx_timer_get_current_delay());
 
   // Transmit all expired packets
   tx_queue_element_t expired_element;
@@ -79,22 +50,17 @@ static void process_tx_queue() {
     NRF_LOG_INFO("TX!\n");
   }
 
-  // Start timer for the shortest existing tx delay
+  // Start timer for the shortest existing tx delay or disable if no packets in queue
   uint32_t delay_for_next_tx;
   if(tx_queue_get_delay_for_next(&delay_for_next_tx) == NRF_SUCCESS) {
     NRF_LOG_INFO("Next delay: %d\n", delay_for_next_tx);
     tx_timer_start_with_delay(delay_for_next_tx);
   } else {
-    TX_TIMER->CC[TX_TIMER_CC] = 0;
+    tx_timer_set_delay(0);
   }
   // Enable radio IRQ
 }
 
-
-void TIMER1_IRQHandler() {
-  TX_TIMER->EVENTS_COMPARE[TX_TIMER_CC] = 0; // Clear compare event
-  process_tx_queue();
-}
 
 int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
@@ -102,7 +68,7 @@ int main(void) {
 
   util_init_rand();
   util_start_clocks();
-  tx_timer_init();
+  tx_timer_init(process_tx_queue);
   radio_init(on_rx_adv_packet);
   radio_rx_start();
 
