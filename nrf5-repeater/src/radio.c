@@ -123,6 +123,13 @@ static void on_rx_packet() {
   }
 }
 
+static void replace_mac_address(nrf_radio_packet_t *packet) {
+  uint32_t temp[2];  // Use a temp array to store the values read from the registers (this fixes volatile warning with memcpy)
+  temp[0] = NRF_FICR->DEVICEADDR[0];
+  temp[1] = NRF_FICR->DEVICEADDR[1];
+  memcpy(&packet->payload[0], temp, 6);  // 4 LSB bytes of the MAC are in DEVICEADDR[0] and 2 MSB bytes are in DEVICEADDR[1]
+}
+
 void radio_send_packet(nrf_radio_packet_t *packet) {
   clear_events();
 
@@ -130,9 +137,9 @@ void radio_send_packet(nrf_radio_packet_t *packet) {
   NRF_RADIO->TASKS_DISABLE   = 1;
   while(NRF_RADIO->EVENTS_DISABLED == 0);
 
-  // Set TX payload (TODO: Add proper MAC address)
-  packet->payload[0] = 0xAA;
+  // Set TX payload
   memcpy(&m_rx_buf, packet, sizeof(nrf_radio_packet_t));
+  replace_mac_address(&m_rx_buf);
 
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
 
