@@ -100,6 +100,7 @@ int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_INFO("Starting..\n");
 
+  util_init_rand();
   util_start_clocks();
   tx_timer_init();
   radio_init(on_rx_adv_packet);

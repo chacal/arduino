@@ -30,6 +30,22 @@ uint32_t util_adv_report_parse(uint8_t adv_type, nrf_radio_packet_t *adv_report_
   return NRF_ERROR_NOT_FOUND;
 }
 
+static uint8_t get_hw_rnd_number() {
+  NRF_RNG->EVENTS_VALRDY = 0;
+  NRF_RNG->TASKS_START   = 1;
+  while(NRF_RNG->EVENTS_VALRDY == 0);
+  NRF_RNG->TASKS_STOP = 1;
+  return NRF_RNG->VALUE;
+}
+
+void util_init_rand() {
+  uint8_t bytes[sizeof(unsigned int)];
+  for(int i = 0; i < sizeof(bytes); ++i) {
+    bytes[i] = get_hw_rnd_number();
+  }
+  srand(*(unsigned int *) bytes);
+}
+
 uint32_t util_rand_between(uint32_t min, uint32_t max) {
   return rand() % (max + 1 - min) + min;
 }
