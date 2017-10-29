@@ -14,6 +14,12 @@
 static nrf_radio_packet_t m_rx_buf;
 static radio_packet_cb_t m_on_rx_adv_packet;
 
+static void clear_events() {
+  NRF_RADIO->EVENTS_DISABLED = 0;
+  NRF_RADIO->EVENTS_END = 0;
+  NRF_RADIO->EVENTS_READY = 0;
+}
+
 void radio_init(radio_packet_cb_t on_rx_adv_packet) {
   m_on_rx_adv_packet = on_rx_adv_packet;
 
@@ -65,11 +71,7 @@ void radio_init(radio_packet_cb_t on_rx_adv_packet) {
   NRF_RADIO->CRCINIT = 0x555555;                                                  /* Initial value of CRC */
   NRF_RADIO->CRCPOLY = 0x00065B;                                                  /* CRC polynomial function */
 
-  /* Clear events */
-  NRF_RADIO->EVENTS_DISABLED = 0;
-  NRF_RADIO->EVENTS_END      = 0;
-  NRF_RADIO->EVENTS_READY    = 0;
-  NRF_RADIO->EVENTS_ADDRESS  = 0;
+  clear_events();
 
   NRF_RADIO->INTENCLR = 0xFFFFFFFF;
   NRF_RADIO->INTENSET = RADIO_INTENSET_END_Msk | RADIO_INTENSET_DISABLED_Msk;
