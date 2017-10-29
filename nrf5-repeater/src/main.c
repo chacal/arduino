@@ -41,13 +41,15 @@ static void on_rx_adv_packet(nrf_radio_packet_t adv_packet) {
 }
 
 static void process_tx_queue() {
-  // Disable radio IRQ here
+  radio_disable_irq();
+
   tx_queue_update_delays(tx_timer_get_current_delay());
 
   // Transmit all expired packets
   tx_queue_element_t expired_element;
   while(tx_queue_remove_first_expired_element(&expired_element) == NRF_SUCCESS) {
     NRF_LOG_INFO("TX!\n");
+    radio_send_packet(&expired_element.tx_packet);
   }
 
   // Start timer for the shortest existing tx delay or disable if no packets in queue
@@ -58,7 +60,10 @@ static void process_tx_queue() {
   } else {
     tx_timer_set_delay(0);
   }
-  // Enable radio IRQ
+
+  radio_rx_start();
+
+  radio_enable_irq();
 }
 
 

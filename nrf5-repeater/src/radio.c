@@ -123,6 +123,39 @@ static void on_rx_packet() {
   }
 }
 
+void radio_send_packet(nrf_radio_packet_t *packet) {
+  clear_events();
+
+  // Disable radio first
+  NRF_RADIO->TASKS_DISABLE   = 1;
+  while(NRF_RADIO->EVENTS_DISABLED == 0);
+
+  // Set TX payload (TODO: Add proper MAC address)
+  packet->payload[0] = 0xAA;
+  memcpy(&m_rx_buf, packet, sizeof(packet));
+
+  NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
+
+  for(int i = 0; i < ADV_CHANNEL_COUNT; ++i) {
+    // Send packet on current channel & wait for radio being disabled again
+    NRF_RADIO->EVENTS_DISABLED = 0;
+    NRF_RADIO->TASKS_TXEN = 1;
+    while(NRF_RADIO->EVENTS_DISABLED == 0);
+
+    // Change to the next advertising channel
+    change_to_next_channel();
+  }
+}
+
+void radio_enable_irq() {
+  NVIC_ClearPendingIRQ(RADIO_IRQn);
+  NVIC_EnableIRQ(RADIO_IRQn);
+}
+
+void radio_disable_irq() {
+  NVIC_DisableIRQ(RADIO_IRQn);
+}
+
 void RADIO_IRQHandler() {
   NRF_RADIO->EVENTS_READY = 0;
 

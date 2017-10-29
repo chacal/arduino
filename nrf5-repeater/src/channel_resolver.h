@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#define ADV_CHANNEL_COUNT 3
+
 typedef enum {
   ADV_CHANNEL_37 = 37,
   ADV_CHANNEL_38 = 38,

@@ -13,3 +13,6 @@ typedef void (*radio_packet_cb_t)(nrf_radio_packet_t);
 
 void radio_init(radio_packet_cb_t on_rx_adv_packet);
 void radio_rx_start();
+void radio_send_packet(nrf_radio_packet_t *packet);
+void radio_enable_irq();
+void radio_disable_irq();
