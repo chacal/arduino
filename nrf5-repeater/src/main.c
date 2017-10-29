@@ -19,7 +19,6 @@ static void queue_repeating_tx(nrf_radio_packet_t *adv_packet) {
   if(tx_queue_add_packet(adv_packet, tx_delay) == NRF_SUCCESS) {
     // Start or reconfigure timer if needed
     if(tx_timer_stopped() || tx_timer_time_left() > tx_delay) {
-      NRF_LOG_INFO("Start delay: %d\n", tx_delay);
       tx_timer_start_with_delay(tx_delay);
     }
   } else {
@@ -35,6 +34,7 @@ static void on_rx_adv_packet(nrf_radio_packet_t adv_packet) {
   if(res == NRF_SUCCESS) {
     uint16_t *manufacturer_id = (uint16_t *) &manuf_data.data[0];  // First two bytes are the manufacturer ID
     if(*manufacturer_id == FILTERED_MANUFACTURER_ID) {
+      NRF_LOG_INFO("RX\n");
       queue_repeating_tx(&adv_packet);
     }
   }
@@ -48,14 +48,13 @@ static void process_tx_queue() {
   // Transmit all expired packets
   tx_queue_element_t expired_element;
   while(tx_queue_remove_first_expired_element(&expired_element) == NRF_SUCCESS) {
-    NRF_LOG_INFO("TX!\n");
+    NRF_LOG_INFO("TX\n");
     radio_send_packet(&expired_element.tx_packet);
   }
 
   // Start timer for the shortest existing tx delay or disable if no packets in queue
   uint32_t delay_for_next_tx;
   if(tx_queue_get_delay_for_next(&delay_for_next_tx) == NRF_SUCCESS) {
-    NRF_LOG_INFO("Next delay: %d\n", delay_for_next_tx);
     tx_timer_start_with_delay(delay_for_next_tx);
   } else {
     tx_timer_set_delay(0);
