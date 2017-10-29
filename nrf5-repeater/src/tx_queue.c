@@ -12,7 +12,7 @@ uint32_t tx_queue_add_packet(nrf_radio_packet_t *packet, uint32_t delay_us) {
     if(!tx_queue[i].in_use) {
       tx_queue[i].in_use = true;
       tx_queue[i].delay_us = delay_us;
-      memcpy(&tx_queue[i].tx_packet, packet, sizeof(packet));
+      memcpy(&tx_queue[i].tx_packet, packet, sizeof(nrf_radio_packet_t));
       return NRF_SUCCESS;
     }
   }

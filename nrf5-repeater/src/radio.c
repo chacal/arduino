@@ -132,7 +132,7 @@ void radio_send_packet(nrf_radio_packet_t *packet) {
 
   // Set TX payload (TODO: Add proper MAC address)
   packet->payload[0] = 0xAA;
-  memcpy(&m_rx_buf, packet, sizeof(packet));
+  memcpy(&m_rx_buf, packet, sizeof(nrf_radio_packet_t));
 
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
 
