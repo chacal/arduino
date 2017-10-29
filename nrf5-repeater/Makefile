@@ -50,6 +50,10 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
   $(SDK_ROOT)/components/drivers_nrf/rng/nrf_drv_rng.c \
   $(SRC_DIR)/main.c \
+  $(SRC_DIR)/radio.c \
+  $(SRC_DIR)/util.c \
+  $(SRC_DIR)/channel_resolver.c \
+  $(SRC_DIR)/tx_queue.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
