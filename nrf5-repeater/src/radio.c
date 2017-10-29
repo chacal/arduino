@@ -106,10 +106,14 @@ void radio_rx_start() {
   NRF_RADIO->TASKS_RXEN = 1;
 }
 
-static void start_rx_on_next_adv_channel() {
+static void change_to_next_channel() {
   uint8_t next_channel   = channel_resolver_get_next_channel();
   NRF_RADIO->FREQUENCY   = channel_resolver_get_frequency(next_channel);
   NRF_RADIO->DATAWHITEIV = next_channel;
+}
+
+static void start_rx_on_next_adv_channel() {
+  change_to_next_channel();
   NRF_RADIO->TASKS_RXEN  = 1;
 }
 
