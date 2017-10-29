@@ -11,7 +11,7 @@
 #define RX_TIMEOUT_US                 50000
 #define PACKET_TYPE_ADV_NONCONN_IND    0x02
 
-static nrf_radio_packet_t m_rx_buf;
+static nrf_radio_packet_t m_rx_tx_buf;
 static radio_packet_cb_t m_on_rx_adv_packet;
 
 static void clear_events() {
@@ -99,7 +99,7 @@ void radio_rx_start() {
 
   RADIO_TIMER->CC[RADIO_TIMER_RX_TIMEOUT_COMPARE] = RX_TIMEOUT_US;
 
-  NRF_RADIO->PACKETPTR  = (uint32_t) &m_rx_buf;
+  NRF_RADIO->PACKETPTR  = (uint32_t) &m_rx_tx_buf;
   NRF_RADIO->SHORTS     = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
   clear_events();
 
@@ -118,8 +118,8 @@ static void start_rx_on_next_adv_channel() {
 }
 
 static void on_rx_packet() {
-  if(NRF_RADIO->CRCSTATUS == 1U && (m_rx_buf.s0 & 0x0F) == PACKET_TYPE_ADV_NONCONN_IND) {
-    m_on_rx_adv_packet(m_rx_buf);
+  if(NRF_RADIO->CRCSTATUS == 1U && (m_rx_tx_buf.s0 & 0x0F) == PACKET_TYPE_ADV_NONCONN_IND) {
+    m_on_rx_adv_packet(m_rx_tx_buf);
   }
 }
 
@@ -138,8 +138,8 @@ void radio_send_packet(nrf_radio_packet_t *packet) {
   while(NRF_RADIO->EVENTS_DISABLED == 0);
 
   // Set TX payload
-  memcpy(&m_rx_buf, packet, sizeof(nrf_radio_packet_t));
-  replace_mac_address(&m_rx_buf);
+  memcpy(&m_rx_tx_buf, packet, sizeof(nrf_radio_packet_t));
+  replace_mac_address(&m_rx_tx_buf);
 
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
 
