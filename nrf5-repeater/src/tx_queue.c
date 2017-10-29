@@ -1,7 +1,6 @@
 #include <memory.h>
 #include <nrf_error.h>
 #include <stdint.h>
-#include <nrf_log.h>
 #include "tx_queue.h"
 
 #define TX_QUEUE_SIZE  10
@@ -38,7 +37,6 @@ uint32_t tx_queue_get_delay_for_next(uint32_t *delay_for_next) {
   for(int i = 0; i < TX_QUEUE_SIZE; ++i) {
     if(tx_queue[i].in_use && tx_queue[i].delay_us < *delay_for_next) {
       *delay_for_next = tx_queue[i].delay_us;
-      NRF_LOG_INFO("N: %d %d\n", *delay_for_next, tx_queue[i].delay_us);
       found = true;
     }
   }
@@ -49,7 +47,6 @@ uint32_t tx_queue_get_delay_for_next(uint32_t *delay_for_next) {
 void tx_queue_update_delays(uint32_t elapsed_us) {
   for(int i = 0; i < TX_QUEUE_SIZE; ++i) {
     if(tx_queue[i].in_use && tx_queue[i].delay_us > elapsed_us) {
-      NRF_LOG_INFO("Updat2e: %d-%d=%d\n", tx_queue[i].delay_us, elapsed_us, tx_queue[i].delay_us - elapsed_us);
       tx_queue[i].delay_us -= elapsed_us;
     } else {
       tx_queue[i].delay_us = 0;
