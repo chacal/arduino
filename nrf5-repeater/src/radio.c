@@ -120,6 +120,8 @@ static void on_rx_packet() {
 }
 
 void RADIO_IRQHandler() {
+  NRF_RADIO->EVENTS_READY = 0;
+
   if(NRF_RADIO->EVENTS_END && (NRF_RADIO->INTENSET & RADIO_INTENSET_END_Msk)) {
     NRF_RADIO->EVENTS_END = 0;
     on_rx_packet();
