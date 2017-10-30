@@ -23,7 +23,6 @@
 
 #define TX_POWER_LEVEL                  4                                 /** Max power, +4dBm */
 
-static ble_gap_adv_params_t  m_adv_params;                                 /**< Parameters to be passed to the stack when starting advertising. */
 static nrf_drv_adc_channel_t m_adc_channel_config;
 static uint16_t              m_vcc;
 
@@ -59,7 +58,7 @@ static void advertising_init(void) {
   sensor_data.temperature = 2150;
   sensor_data.humidity    = 5505;
   sensor_data.pressure    = 10153;
-  sensor_data.vcc         = 4015;
+  sensor_data.vcc         = m_vcc;
   manuf_data.data.p_data  = (uint8_t *) &sensor_data;
   manuf_data.data.size    = sizeof(sensor_data);
 
@@ -71,8 +70,11 @@ static void advertising_init(void) {
 
   err_code = ble_advdata_set(&advdata, NULL);
   APP_ERROR_CHECK(err_code);
+}
 
-  // Initialize advertising parameters (used when starting advertising).
+
+static void advertising_start(void) {
+  ble_gap_adv_params_t  m_adv_params;
   memset(&m_adv_params, 0, sizeof(m_adv_params));
 
   m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_NONCONN_IND;
@@ -80,10 +82,6 @@ static void advertising_init(void) {
   m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
   m_adv_params.interval    = NON_CONNECTABLE_ADV_INTERVAL;
   m_adv_params.timeout     = APP_CFG_NON_CONN_ADV_TIMEOUT;
-}
-
-
-static void advertising_start(void) {
   APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params));
 }
 
@@ -104,7 +102,7 @@ static void adc_sample(void *ctx) {
   nrf_adc_value_t value;
   nrf_drv_adc_sample_convert(&m_adc_channel_config, &value);
   m_vcc = value / (float) 1023 * 3 * 1.2 * 1000;  // ADC value * prescale (1/3) * 1.2V reference * mV
-  NRF_LOG_INFO("VCC: %d\n", m_vcc);
+  advertising_init();   // Update advertising data
 }
 
 static void adc_init(void) {
