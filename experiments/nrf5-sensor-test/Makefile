@@ -49,6 +49,7 @@ SRC_FILES += \
   $(SRC_DIR)/main.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
+  $(SDK_ROOT)/components/drivers_nrf/adc/nrf_drv_adc.c \
 
 ifeq ($(PLATFORM),NRF51822)
 SRC_FILES += \

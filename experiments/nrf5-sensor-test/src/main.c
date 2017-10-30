@@ -1,12 +1,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ble/common/ble_advdata.h>
+#include <nrf_drv_adc.h>
 #include "nordic_common.h"
 #include "softdevice_handler.h"
 #include "bsp.h"
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
+#include "sdk_config_nrf51/sdk_config.h"
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -21,7 +23,9 @@
 
 #define TX_POWER_LEVEL                  4                                 /** Max power, +4dBm */
 
-static ble_gap_adv_params_t m_adv_params;                                 /**< Parameters to be passed to the stack when starting advertising. */
+static ble_gap_adv_params_t  m_adv_params;                                 /**< Parameters to be passed to the stack when starting advertising. */
+static nrf_drv_adc_channel_t m_adc_channel_config;
+static uint16_t              m_vcc;
 
 #pragma pack(1)
 
@@ -32,7 +36,7 @@ typedef struct {
   uint16_t humidity;
   uint16_t pressure;
   uint16_t vcc;
-}                           sensor_data_t;
+}                            sensor_data_t;
 
 static void advertising_init(void) {
   uint32_t err_code;
@@ -96,6 +100,28 @@ static void ble_stack_init(void) {
   APP_ERROR_CHECK(sd_ble_gap_tx_power_set(TX_POWER_LEVEL));
 }
 
+static void adc_sample(void *ctx) {
+  nrf_adc_value_t value;
+  nrf_drv_adc_sample_convert(&m_adc_channel_config, &value);
+  m_vcc = value / (float) 1023 * 3 * 1.2 * 1000;  // ADC value * prescale (1/3) * 1.2V reference * mV
+  NRF_LOG_INFO("VCC: %d\n", m_vcc);
+}
+
+static void adc_init(void) {
+  nrf_drv_adc_config_t config = NRF_DRV_ADC_DEFAULT_CONFIG;
+  APP_ERROR_CHECK(nrf_drv_adc_init(&config, NULL));
+
+  m_adc_channel_config.config.config.input              = NRF_ADC_CONFIG_SCALING_SUPPLY_ONE_THIRD;
+  m_adc_channel_config.config.config.external_reference = NRF_ADC_CONFIG_REF_VBG;
+  m_adc_channel_config.config.config.resolution         = NRF_ADC_CONFIG_RES_10BIT;
+
+  nrf_drv_adc_channel_enable(&m_adc_channel_config);
+
+  APP_TIMER_DEF(adc_timer);
+  app_timer_create(&adc_timer, APP_TIMER_MODE_REPEATED, adc_sample);
+  app_timer_start(adc_timer, APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER), NULL);
+}
+
 
 static void power_manage(void) {
   uint32_t err_code = sd_app_evt_wait();
@@ -109,6 +135,7 @@ int main(void) {
   APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
   ble_stack_init();
   advertising_init();
+  adc_init();
 
   NRF_LOG_INFO("BLE Beacon started\n");
   advertising_start();
