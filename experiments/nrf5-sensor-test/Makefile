@@ -40,47 +40,15 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/hardfault/hardfault_implementation.c \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/util/sdk_errors.c \
-  $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
-  $(SDK_ROOT)/components/libraries/ecc/ecc.c \
-  $(SDK_ROOT)/components/libraries/sha256/sha256.c \
   $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/components/drivers_nrf/clock/nrf_drv_clock.c \
   $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
-  $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
-  $(SDK_ROOT)/components/drivers_nrf/rng/nrf_drv_rng.c \
   $(SRC_DIR)/main.c \
-  $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
-  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
-  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
-  $(SDK_ROOT)/components/ble/ble_services/ble_nus/ble_nus.c \
-  $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
-  $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
-  $(SDK_ROOT)/components/ble/common/ble_conn_params.c \
-  $(SDK_ROOT)/components/ble/common/ble_conn_state.c \
-  $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
-  $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
-  $(SDK_ROOT)/components/libraries/fds/fds.c \
-  $(SDK_ROOT)/components/libraries/button/app_button.c \
-  $(SDK_ROOT)/components/ble/peer_manager/peer_manager.c \
-  $(SDK_ROOT)/components/ble/peer_manager/peer_data_storage.c \
-  $(SDK_ROOT)/components/ble/peer_manager/peer_database.c \
-  $(SDK_ROOT)/components/ble/peer_manager/peer_id.c \
-  $(SDK_ROOT)/components/ble/peer_manager/security_manager.c \
-  $(SDK_ROOT)/components/ble/peer_manager/security_dispatcher.c \
-  $(SDK_ROOT)/components/ble/peer_manager/gatt_cache_manager.c \
-  $(SDK_ROOT)/components/ble/peer_manager/gatts_cache_manager.c \
-  $(SDK_ROOT)/components/ble/peer_manager/id_manager.c \
-  $(SDK_ROOT)/components/ble/peer_manager/pm_buffer.c \
-  $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c \
-  $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
-  $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
-  $(SDK_ROOT)/components/libraries/gpiote/app_gpiote.c \
-  $(SDK_ROOT)/components/ble/ble_db_discovery/ble_db_discovery.c \
 
 ifeq ($(PLATFORM),NRF51822)
 SRC_FILES += \
