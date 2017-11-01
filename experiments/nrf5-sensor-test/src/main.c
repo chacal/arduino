@@ -11,6 +11,7 @@
 #include "nrf_log_ctrl.h"
 #include "sdk_config_nrf51/sdk_config.h"
 #include "bmp180.h"
+#include "vcc_measurement.h"
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -25,7 +26,6 @@
 
 #define TX_POWER_LEVEL                  4                                 /** Max power, +4dBm */
 
-static nrf_drv_adc_channel_t m_adc_channel_config;
 static uint16_t              m_vcc;
 static nrf_drv_twi_t         m_twi = NRF_DRV_TWI_INSTANCE(0);
 
@@ -101,26 +101,9 @@ static void ble_stack_init(void) {
   APP_ERROR_CHECK(sd_ble_gap_tx_power_set(TX_POWER_LEVEL));
 }
 
-static void adc_sample(void *ctx) {
-  nrf_adc_value_t value;
-  nrf_drv_adc_sample_convert(&m_adc_channel_config, &value);
-  m_vcc = value / (float) 1023 * 3 * 1.2 * 1000;  // ADC value * prescale (1/3) * 1.2V reference * mV
+static void on_vcc_measurement(uint16_t vcc) {
+  m_vcc = vcc;
   advertising_init();   // Update advertising data
-}
-
-static void adc_init(void) {
-  nrf_drv_adc_config_t config = NRF_DRV_ADC_DEFAULT_CONFIG;
-  APP_ERROR_CHECK(nrf_drv_adc_init(&config, NULL));
-
-  m_adc_channel_config.config.config.input              = NRF_ADC_CONFIG_SCALING_SUPPLY_ONE_THIRD;
-  m_adc_channel_config.config.config.external_reference = NRF_ADC_CONFIG_REF_VBG;
-  m_adc_channel_config.config.config.resolution         = NRF_ADC_CONFIG_RES_10BIT;
-
-  nrf_drv_adc_channel_enable(&m_adc_channel_config);
-
-  APP_TIMER_DEF(adc_timer);
-  app_timer_create(&adc_timer, APP_TIMER_MODE_REPEATED, adc_sample);
-  app_timer_start(adc_timer, APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER), NULL);
 }
 
 static void twi_init(void) {
@@ -149,7 +132,7 @@ int main(void) {
   APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
   ble_stack_init();
   advertising_init();
-  adc_init();
+  vcc_measurement_init(30000, on_vcc_measurement);
   twi_init();
   bmp180_init(&m_twi);
 
