@@ -180,7 +180,7 @@ void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callb
   twi_init();
 
   uint8_t bmp180_id;
-  read(BMP180_REG_ID, &bmp180_id, 1);
+  read(BMP180_REG_ID, &bmp180_id, sizeof(bmp180_id));
 
   if(bmp180_id == BMP_180_DEVICE_ID) {
     NRF_LOG_INFO("BMP180 connected.\n")
