@@ -8,9 +8,18 @@
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-#include "sdk_config_nrf51/sdk_config.h"
 #include "bmp180.h"
 #include "vcc_measurement.h"
+
+#ifdef NRF51
+#include "sdk_config_nrf51/sdk_config.h"
+#define PIN_SCA 0
+#define PIN_SCL 1
+#else
+#include "sdk_config_nrf52/sdk_config.h"
+#define PIN_SCA 11
+#define PIN_SCL 12
+#endif
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -107,8 +116,8 @@ static void on_vcc_measurement(uint16_t vcc) {
 
 static void twi_init(void) {
   const nrf_drv_twi_config_t twi_config = {
-      .scl                = 1,
-      .sda                = 0,
+      .scl                = PIN_SCL,
+      .sda                = PIN_SCA,
       .frequency          = NRF_TWI_FREQ_400K,
       .interrupt_priority = APP_IRQ_PRIORITY_LOW,
       .clear_bus_init     = false
