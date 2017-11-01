@@ -2,13 +2,15 @@
 #include <stdint.h>
 #include <ble/common/ble_advdata.h>
 #include <nrf_drv_adc.h>
-#include "nordic_common.h"
+#include <nrf_drv_twi.h>
+#include <app_util_platform.h>
 #include "softdevice_handler.h"
 #include "bsp.h"
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "sdk_config_nrf51/sdk_config.h"
+#include "bmp180.h"
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -25,6 +27,7 @@
 
 static nrf_drv_adc_channel_t m_adc_channel_config;
 static uint16_t              m_vcc;
+static nrf_drv_twi_t         m_twi = NRF_DRV_TWI_INSTANCE(0);
 
 #pragma pack(1)
 
@@ -120,6 +123,19 @@ static void adc_init(void) {
   app_timer_start(adc_timer, APP_TIMER_TICKS(30000, APP_TIMER_PRESCALER), NULL);
 }
 
+static void twi_init(void) {
+  const nrf_drv_twi_config_t twi_config = {
+      .scl                = 1,
+      .sda                = 0,
+      .frequency          = NRF_TWI_FREQ_400K,
+      .interrupt_priority = APP_IRQ_PRIORITY_LOW,
+      .clear_bus_init     = false
+  };
+
+  APP_ERROR_CHECK(nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL));
+  nrf_drv_twi_enable(&m_twi);
+}
+
 
 static void power_manage(void) {
   uint32_t err_code = sd_app_evt_wait();
@@ -134,9 +150,13 @@ int main(void) {
   ble_stack_init();
   advertising_init();
   adc_init();
+  twi_init();
+  bmp180_init(&m_twi);
 
   NRF_LOG_INFO("BLE Beacon started\n");
   advertising_start();
+
+  bmp180_get_temp_and_pressure();
 
   for(;;) {
     power_manage();
