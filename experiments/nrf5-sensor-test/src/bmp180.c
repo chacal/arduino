@@ -54,6 +54,7 @@ static double                  b1, c3, c4, c5, c6, mc, md, x0, x1, x2, y_0, y_1,
 
 APP_TIMER_DEF(m_measurement_timer);
 static nrf_drv_twi_t           m_twi = NRF_DRV_TWI_INSTANCE(0);
+static uint32_t                m_measurement_interval_ms;
 static bmp180_measurement_cb_t m_measurement_cb;
 
 
@@ -153,6 +154,7 @@ static void on_measurement_timer(void *ctx) {
 
     case BMP180_TIMER_READ_PRESSURE: {
       m_measurement_cb(last_temp, read_pressure(last_temp));
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
     }
       break;
   }
@@ -173,7 +175,8 @@ static void twi_init(void) {
 
 
 void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callback) {
-  m_measurement_cb = callback;
+  m_measurement_interval_ms = measurement_interval_ms;
+  m_measurement_cb          = callback;
   twi_init();
 
   uint8_t bmp180_id;
