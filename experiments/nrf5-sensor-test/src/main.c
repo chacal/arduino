@@ -15,6 +15,8 @@
 
 #define APP_CFG_NON_CONN_ADV_TIMEOUT    0                                 /**< Time for which the device must be advertising in non-connectable mode (in seconds). 0 disables timeout. */
 #define NON_CONNECTABLE_ADV_INTERVAL    MSEC_TO_UNITS(3000, UNIT_0_625_MS) /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
+#define VCC_MEASUREMENT_INTERVAL_S    120
+#define BMP180_MEASUREMENT_INTERVAL_S  15
 
 #define DEVICE_NAME                     "S300"
 
@@ -119,8 +121,8 @@ int main(void) {
   APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
   ble_stack_init();
   advertising_init();
-  vcc_measurement_init(30000, on_vcc_measurement);
-  bmp180_init(30000, on_bmp180_measurement);
+  vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
+  bmp180_init(BMP180_MEASUREMENT_INTERVAL_S * 1000, on_bmp180_measurement);
 
   NRF_LOG_INFO("BLE Beacon started\n");
   advertising_start();
