@@ -109,6 +109,30 @@ static void calibrate() {
   p2  = 3038.0 * 100.0 * pow(2, -36);
 }
 
+static double read_temperature() {
+  uint8_t data[2];
+  read(BMP180_REG_RESULT, data, 2);
+
+  double tu = (data[0] * 256.0) + data[1];
+  double a  = c5 * (tu - c6);
+  double T  = a + (mc / (a + md));
+  return T;
+}
+
+static double read_pressure(double last_temp) {
+  uint8_t data[3];
+  read(BMP180_REG_RESULT, data, 3);
+
+  double pu = (data[0] * 256.0) + data[1] + (data[2] / 256.0);
+
+  double s = last_temp - 25.0;
+  double x = (x2 * pow(s, 2)) + (x1 * s) + x0;
+  double y = (y2 * pow(s, 2)) + (y_1 * s) + y_0;
+  double z = (pu - x) / y;
+  double P = (p2 * pow(z, 2)) + (p1 * z) + p0;
+  return P;
+}
+
 static void on_measurement_timer(void *ctx) {
   static double      last_temp = 0;
   bmp180_timer_cmd_t cmd       = (bmp180_timer_cmd_t) ctx;
@@ -120,13 +144,7 @@ static void on_measurement_timer(void *ctx) {
       break;
 
     case BMP180_TIMER_READ_TEMPERATURE: {
-      uint8_t data[2];
-      read(BMP180_REG_RESULT, data, 2);
-
-      double tu = (data[0] * 256.0) + data[1];
-      double a  = c5 * (tu - c6);
-      double T  = a + (mc / (a + md));
-      last_temp = T;
+      last_temp = read_temperature();
 
       write(BMP180_REG_CONTROL, BMP180_CMD_PRESSURE);
       app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_READ_PRESSURE);
@@ -134,18 +152,7 @@ static void on_measurement_timer(void *ctx) {
       break;
 
     case BMP180_TIMER_READ_PRESSURE: {
-      uint8_t data[3];
-      read(BMP180_REG_RESULT, data, 3);
-
-      double pu = (data[0] * 256.0) + data[1] + (data[2] / 256.0);
-
-      double s = last_temp - 25.0;
-      double x = (x2 * pow(s, 2)) + (x1 * s) + x0;
-      double y = (y2 * pow(s, 2)) + (y_1 * s) + y_0;
-      double z = (pu - x) / y;
-      double P = (p2 * pow(z, 2)) + (p1 * z) + p0;
-
-      m_measurement_cb(last_temp, P);
+      m_measurement_cb(last_temp, read_pressure(last_temp));
     }
       break;
   }
