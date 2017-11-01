@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ble/common/ble_advdata.h>
-#include <nrf_drv_twi.h>
 #include "softdevice_handler.h"
 #include "bsp.h"
 #include "app_timer.h"
@@ -39,9 +38,9 @@ typedef struct {
 static sensor_data_t m_sensor_data = {
     .ttl         = 2,
     .tag         = 'm',
-    .temperature = 2150,
+    .temperature = 0,
     .humidity    = 5505,
-    .pressure    = 10153,
+    .pressure    = 0,
     .vcc         = 0
 };
 
@@ -104,8 +103,8 @@ static void on_vcc_measurement(uint16_t vcc) {
 }
 
 static void on_bmp180_measurement(double temperature, double pressure) {
-  m_sensor_data.temperature = (uint16_t)(temperature * 100);
-  m_sensor_data.pressure = (uint16_t)(pressure * 10);
+  m_sensor_data.temperature = (uint16_t) (temperature * 100);
+  m_sensor_data.pressure    = (uint16_t) (pressure * 10);
   advertising_init();   // Update advertising data
 }
 
