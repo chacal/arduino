@@ -1,14 +1,22 @@
 #include "vcc_measurement.h"
-#include <nrf_drv_adc.h>
 #include <app_error.h>
-#include <sdk_config_nrf51/sdk_config.h>
 #include <app_timer.h>
 
 #define APP_TIMER_PRESCALER 0
 
-static nrf_drv_adc_channel_t m_adc_channel_config;
 static vcc_measurement_cb_t m_measurement_cb;
 
+
+/*
+ * ------------------------------------------------------------------------------------------------
+ * Implementation for NRF51 family
+ * ------------------------------------------------------------------------------------------------
+ */
+#ifdef NRF51
+#include <nrf_drv_adc.h>
+#include <sdk_config_nrf51/sdk_config.h>
+
+static nrf_drv_adc_channel_t m_adc_channel_config;
 
 static void sample_vcc(void *ctx) {
   nrf_adc_value_t value;
@@ -17,9 +25,7 @@ static void sample_vcc(void *ctx) {
   m_measurement_cb(vcc);
 }
 
-void vcc_measurement_init(uint32_t measurement_interval_ms, vcc_measurement_cb_t callback) {
-  m_measurement_cb = callback;
-
+static void adc_init() {
   nrf_drv_adc_config_t config = NRF_DRV_ADC_DEFAULT_CONFIG;
   APP_ERROR_CHECK(nrf_drv_adc_init(&config, NULL));
 
@@ -28,6 +34,23 @@ void vcc_measurement_init(uint32_t measurement_interval_ms, vcc_measurement_cb_t
   m_adc_channel_config.config.config.resolution         = NRF_ADC_CONFIG_RES_10BIT;
 
   nrf_drv_adc_channel_enable(&m_adc_channel_config);
+}
+
+
+#else
+/*
+ * ------------------------------------------------------------------------------------------------
+ * Implementation for NRF52 family
+ * ------------------------------------------------------------------------------------------------
+ */
+
+// TBD
+
+#endif
+
+void vcc_measurement_init(uint32_t measurement_interval_ms, vcc_measurement_cb_t callback) {
+  m_measurement_cb = callback;
+  adc_init();
 
   APP_TIMER_DEF(adc_timer);
   app_timer_create(&adc_timer, APP_TIMER_MODE_REPEATED, sample_vcc);

@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ble/common/ble_advdata.h>
-#include <nrf_drv_adc.h>
 #include <nrf_drv_twi.h>
 #include <app_util_platform.h>
 #include "softdevice_handler.h"
