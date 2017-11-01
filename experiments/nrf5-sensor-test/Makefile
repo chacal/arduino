@@ -52,6 +52,8 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/adc/nrf_drv_adc.c \
+  $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
+  $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/twi_master/nrf_drv_twi.c \
 
 ifeq ($(PLATFORM),NRF51822)

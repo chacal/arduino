@@ -1909,7 +1909,7 @@
 // <e> SAADC_ENABLED - nrf_drv_saadc - SAADC peripheral driver
 //==========================================================
 #ifndef SAADC_ENABLED
-#define SAADC_ENABLED 0
+#define SAADC_ENABLED 1
 #endif
 #if  SAADC_ENABLED
 // <o> SAADC_CONFIG_RESOLUTION  - Resolution
@@ -3699,7 +3699,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logging
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 0
+#define NRF_LOG_ENABLED 1
 #endif
 #if  NRF_LOG_ENABLED
 // <e> NRF_LOG_USES_COLORS - If enabled then ANSI escape code for colors is prefixed to every string
