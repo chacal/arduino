@@ -185,10 +185,9 @@ void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callb
   if(bmp180_id == BMP_180_DEVICE_ID) {
     NRF_LOG_INFO("BMP180 connected.\n")
     calibrate();
+    app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
+    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
   } else {
     NRF_LOG_ERROR("BMP180 not found!\n")
   }
-
-  app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
-  app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
 }
