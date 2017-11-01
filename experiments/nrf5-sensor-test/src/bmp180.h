@@ -2,11 +2,6 @@
 
 #include <nrf_drv_twi.h>
 
-typedef enum {
-  BMP180_MEASUREMENT_TYPE_TEMPERATURE,
-  BMP180_MEASUREMENT_TYPE_PRESSURE
-} bmp180_measurement_type_t;
+typedef void (*bmp180_measurement_cb_t)(double temperature, double pressure);
 
-
-void bmp180_init(nrf_drv_twi_t *twi);
-void bmp180_get_temp_and_pressure();
+void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callback);

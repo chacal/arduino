@@ -4,12 +4,36 @@
 #include "bmp180.h"
 #include <math.h>
 #include <app_timer.h>
+#include <app_util_platform.h>
+
+#ifdef NRF51
+
+#include "sdk_config_nrf51/sdk_config.h"
+
+#define PIN_SCA 0
+#define PIN_SCL 1
+
+#else
+
+#include "sdk_config_nrf52/sdk_config.h"
+
+#define PIN_SCA 11
+#define PIN_SCL 12
+#endif  // #ifdef NRF51
+
 
 #define BMP180_ADDRESS                 0x77
 #define BMP_180_DEVICE_ID              0x55
 #define BMP180_MEASUREMENT_TIME_MS        5
 #define CALIBRATION_BYTE_COUNT           22
 #define APP_TIMER_PRESCALER               0
+
+
+typedef enum {
+  BMP180_TIMER_START_MEASUREMENT,
+  BMP180_TIMER_READ_TEMPERATURE,
+  BMP180_TIMER_READ_PRESSURE
+} bmp180_timer_cmd_t;
 
 typedef enum {
   BMP180_REG_ID                = 0xD0,
@@ -23,12 +47,14 @@ typedef enum {
   BMP180_CMD_PRESSURE    = 0x34
 } bmp180_command_t;
 
-static int16_t  AC1, AC2, AC3, VB1, VB2, MB, MC, MD;
-static uint16_t AC4, AC5, AC6;
-static double   b1, c3, c4, c5, c6, mc, md, x0, x1, x2, y_0, y_1, y2, p0, p1, p2;  // y0 & y1 are already defined in math.h
 
-static nrf_drv_twi_t *m_twi;
+static int16_t                 AC1, AC2, AC3, VB1, VB2, MB, MC, MD;
+static uint16_t                AC4, AC5, AC6;
+static double                  b1, c3, c4, c5, c6, mc, md, x0, x1, x2, y_0, y_1, y2, p0, p1, p2;  // y0 & y1 are already defined in math.h
+
 APP_TIMER_DEF(m_measurement_timer);
+static nrf_drv_twi_t           m_twi = NRF_DRV_TWI_INSTANCE(0);
+static bmp180_measurement_cb_t m_measurement_cb;
 
 
 __STATIC_INLINE int16_t to_int16_t(uint8_t *buf) {
@@ -40,13 +66,13 @@ __STATIC_INLINE uint16_t to_uint16_t(uint8_t *buf) {
 }
 
 static void read(uint8_t reg, uint8_t *buf, uint8_t len) {
-  APP_ERROR_CHECK(nrf_drv_twi_tx(m_twi, BMP180_ADDRESS, &reg, 1, true));
-  APP_ERROR_CHECK(nrf_drv_twi_rx(m_twi, BMP180_ADDRESS, buf, len));
+  APP_ERROR_CHECK(nrf_drv_twi_tx(&m_twi, BMP180_ADDRESS, &reg, 1, true));
+  APP_ERROR_CHECK(nrf_drv_twi_rx(&m_twi, BMP180_ADDRESS, buf, len));
 }
 
 static void write(uint8_t reg, uint8_t data) {
   uint8_t buf[2] = {reg, data};
-  APP_ERROR_CHECK(nrf_drv_twi_tx(m_twi, BMP180_ADDRESS, buf, sizeof(buf), false));
+  APP_ERROR_CHECK(nrf_drv_twi_tx(&m_twi, BMP180_ADDRESS, buf, sizeof(buf), false));
 }
 
 static void calibrate() {
@@ -84,39 +110,64 @@ static void calibrate() {
 }
 
 static void on_measurement_timer(void *ctx) {
-  static double last_temp = 0;
+  static double      last_temp = 0;
+  bmp180_timer_cmd_t cmd       = (bmp180_timer_cmd_t) ctx;
 
-  if((int)ctx == BMP180_MEASUREMENT_TYPE_TEMPERATURE) {
-    uint8_t data[2];
-    read(BMP180_REG_RESULT, data, 2);
+  switch(cmd) {
+    case BMP180_TIMER_START_MEASUREMENT:
+      write(BMP180_REG_CONTROL, BMP180_CMD_TEMPERATURE);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_READ_TEMPERATURE);
+      break;
 
-    double tu = (data[0] * 256.0) + data[1];
-    double a = c5 * (tu - c6);
-    double T = a + (mc / (a + md));
-    last_temp = T;
-    NRF_LOG_INFO("Temp: %d\n", T*1000);
+    case BMP180_TIMER_READ_TEMPERATURE: {
+      uint8_t data[2];
+      read(BMP180_REG_RESULT, data, 2);
 
-    write(BMP180_REG_CONTROL, BMP180_CMD_PRESSURE);
-    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void*)BMP180_MEASUREMENT_TYPE_PRESSURE);
-  } else if((int)ctx == BMP180_MEASUREMENT_TYPE_PRESSURE) {
-    uint8_t data[3];
-    read(BMP180_REG_RESULT, data, 3);
+      double tu = (data[0] * 256.0) + data[1];
+      double a  = c5 * (tu - c6);
+      double T  = a + (mc / (a + md));
+      last_temp = T;
 
-    NRF_LOG_INFO("Last temp: %d\n", last_temp);
+      write(BMP180_REG_CONTROL, BMP180_CMD_PRESSURE);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_READ_PRESSURE);
+    }
+      break;
 
-    double pu = (data[0] * 256.0) + data[1] + (data[2]/256.0);
+    case BMP180_TIMER_READ_PRESSURE: {
+      uint8_t data[3];
+      read(BMP180_REG_RESULT, data, 3);
 
-    double s = last_temp - 25.0;
-    double x = (x2 * pow(s,2)) + (x1 * s) + x0;
-    double y = (y2 * pow(s,2)) + (y_1 * s) + y_0;
-    double z = (pu - x) / y;
-    double P = (p2 * pow(z,2)) + (p1 * z) + p0;
-    NRF_LOG_INFO("Pressure: %d\n", P*10);
+      double pu = (data[0] * 256.0) + data[1] + (data[2] / 256.0);
+
+      double s = last_temp - 25.0;
+      double x = (x2 * pow(s, 2)) + (x1 * s) + x0;
+      double y = (y2 * pow(s, 2)) + (y_1 * s) + y_0;
+      double z = (pu - x) / y;
+      double P = (p2 * pow(z, 2)) + (p1 * z) + p0;
+
+      m_measurement_cb(last_temp, P);
+    }
+      break;
   }
 }
 
-void bmp180_init(nrf_drv_twi_t *twi) {
-  m_twi = twi;
+static void twi_init(void) {
+  const nrf_drv_twi_config_t twi_config = {
+      .scl                = PIN_SCL,
+      .sda                = PIN_SCA,
+      .frequency          = NRF_TWI_FREQ_400K,
+      .interrupt_priority = APP_IRQ_PRIORITY_LOW,
+      .clear_bus_init     = false
+  };
+
+  APP_ERROR_CHECK(nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL));
+  nrf_drv_twi_enable(&m_twi);
+}
+
+
+void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callback) {
+  m_measurement_cb = callback;
+  twi_init();
 
   uint8_t bmp180_id;
   read(BMP180_REG_ID, &bmp180_id, 1);
@@ -129,9 +180,5 @@ void bmp180_init(nrf_drv_twi_t *twi) {
   }
 
   app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
-}
-
-void bmp180_get_temp_and_pressure() {
-  write(BMP180_REG_CONTROL, BMP180_CMD_TEMPERATURE);
-  app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void*)BMP180_MEASUREMENT_TYPE_TEMPERATURE);
+  app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
 }
