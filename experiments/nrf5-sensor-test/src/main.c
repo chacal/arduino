@@ -109,6 +109,10 @@ static void on_bmp180_measurement(double temperature, double pressure) {
 }
 
 static void power_manage(void) {
+  // Always clear FPU IRQs to allow CPU to sleep. See: https://devzone.nordicsemi.com/question/87838/high-power-consumption-when-using-fpu/
+  __set_FPSCR(__get_FPSCR()  & ~(0x0000009F));
+  (void) __get_FPSCR();
+  NVIC_ClearPendingIRQ(FPU_IRQn);
   uint32_t err_code = sd_app_evt_wait();
   APP_ERROR_CHECK(err_code);
 }
