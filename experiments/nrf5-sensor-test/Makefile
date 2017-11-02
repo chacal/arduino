@@ -55,6 +55,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/twi_master/nrf_drv_twi.c \
+  $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
 
 ifeq ($(PLATFORM),NRF51822)
 SRC_FILES += \

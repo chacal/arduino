@@ -5,31 +5,37 @@
 #include <math.h>
 #include <app_timer.h>
 #include <app_util_platform.h>
+#include <nrf_drv_gpiote.h>
+#include <drivers_nrf/delay/nrf_delay.h>
 
 #ifdef NRF51
 
 #include "sdk_config_nrf51/sdk_config.h"
 
-#define PIN_SCA 0
-#define PIN_SCL 1
+#define PIN_SCA           0
+#define PIN_SCL           1
+#define PIN_BMP180_POWER 13
 
 #else
 
 #include "sdk_config_nrf52/sdk_config.h"
 
-#define PIN_SCA 11
-#define PIN_SCL 12
+#define PIN_SCA          11
+#define PIN_SCL          12
+#define PIN_BMP180_POWER 13
 #endif  // #ifdef NRF51
 
 
 #define BMP180_ADDRESS                 0x77
 #define BMP_180_DEVICE_ID              0x55
+#define BMP180_STARTUP_TIME_MS           10
 #define BMP180_MEASUREMENT_TIME_MS        5
 #define CALIBRATION_BYTE_COUNT           22
 #define APP_TIMER_PRESCALER               0
 
 
 typedef enum {
+  BMP180_TIMER_POWER_ON,
   BMP180_TIMER_START_MEASUREMENT,
   BMP180_TIMER_READ_TEMPERATURE,
   BMP180_TIMER_READ_PRESSURE
@@ -134,11 +140,40 @@ static double read_pressure(double last_temp) {
   return P;
 }
 
+static void twi_init(void) {
+  const nrf_drv_twi_config_t twi_config = {
+      .scl                = PIN_SCL,
+      .sda                = PIN_SCA,
+      .frequency          = NRF_TWI_FREQ_400K,
+      .interrupt_priority = APP_IRQ_PRIORITY_LOW,
+      .clear_bus_init     = false
+  };
+
+  APP_ERROR_CHECK(nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL));
+  nrf_drv_twi_enable(&m_twi);
+}
+
+static void bmp180_power_on() {
+  twi_init();
+  nrf_drv_gpiote_out_config_t bmp180_power_pin_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
+  nrf_drv_gpiote_out_init(PIN_BMP180_POWER, &bmp180_power_pin_config);
+}
+
+static void bmp180_power_off() {
+  nrf_drv_gpiote_out_uninit(PIN_BMP180_POWER);
+  nrf_drv_twi_uninit(&m_twi);
+}
+
 static void on_measurement_timer(void *ctx) {
   static double      last_temp = 0;
   bmp180_timer_cmd_t cmd       = (bmp180_timer_cmd_t) ctx;
 
   switch(cmd) {
+    case BMP180_TIMER_POWER_ON:
+      bmp180_power_on();
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_STARTUP_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
+      break;
+
     case BMP180_TIMER_START_MEASUREMENT:
       write(BMP180_REG_CONTROL, BMP180_CMD_TEMPERATURE);
       app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BMP180_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_READ_TEMPERATURE);
@@ -154,30 +189,21 @@ static void on_measurement_timer(void *ctx) {
 
     case BMP180_TIMER_READ_PRESSURE: {
       m_measurement_cb(last_temp, read_pressure(last_temp));
-      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
+      bmp180_power_off();
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_POWER_ON);
     }
       break;
   }
-}
-
-static void twi_init(void) {
-  const nrf_drv_twi_config_t twi_config = {
-      .scl                = PIN_SCL,
-      .sda                = PIN_SCA,
-      .frequency          = NRF_TWI_FREQ_400K,
-      .interrupt_priority = APP_IRQ_PRIORITY_LOW,
-      .clear_bus_init     = false
-  };
-
-  APP_ERROR_CHECK(nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL));
-  nrf_drv_twi_enable(&m_twi);
 }
 
 
 void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callback) {
   m_measurement_interval_ms = measurement_interval_ms;
   m_measurement_cb          = callback;
-  twi_init();
+  nrf_drv_gpiote_init();
+
+  bmp180_power_on();
+  nrf_delay_ms(BMP180_STARTUP_TIME_MS);
 
   uint8_t bmp180_id;
   read(BMP180_REG_ID, &bmp180_id, sizeof(bmp180_id));
@@ -186,8 +212,10 @@ void bmp180_init(uint32_t measurement_interval_ms, bmp180_measurement_cb_t callb
     NRF_LOG_INFO("BMP180 connected.\n")
     calibrate();
     app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
-    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_START_MEASUREMENT);
+    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BMP180_TIMER_POWER_ON);
   } else {
     NRF_LOG_ERROR("BMP180 not found!\n")
   }
+
+  bmp180_power_off();
 }
