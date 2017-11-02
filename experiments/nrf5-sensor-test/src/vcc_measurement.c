@@ -21,7 +21,7 @@ static nrf_drv_adc_channel_t m_adc_channel_config;
 static void sample_vcc(void *ctx) {
   nrf_adc_value_t value;
   nrf_drv_adc_sample_convert(&m_adc_channel_config, &value);
-  uint16_t vcc = value / (float) 1023 * 3 * 1.2 * 1000;  // ADC value * prescale (1/3) * 1.2V reference * mV
+  uint16_t vcc = (uint16_t) (value / (float) 1023 * 3 * 1.2 * 1000);  // ADC value * prescale (1/3) * 1.2V reference * mV
   m_measurement_cb(vcc);
 }
 
@@ -53,7 +53,7 @@ static uint8_t m_adc_channel = 0;
 static void sample_vcc(void *ctx) {
   nrf_saadc_value_t value;
   nrf_drv_saadc_sample_convert(m_adc_channel, &value);
-  uint16_t vcc = value / (float) 1023 * 6 * 0.6 * 1000;  // ADC value * prescale (1/6) * 0.6V reference * mV
+  uint16_t vcc = (uint16_t) (value / (float) 1023 * 6 * 0.6 * 1000);  // ADC value * prescale (1/6) * 0.6V reference * mV
   m_measurement_cb(vcc);
 }
 
