@@ -2719,7 +2719,7 @@
 
 
 #ifndef UART_EASY_DMA_SUPPORT
-#define UART_EASY_DMA_SUPPORT 1
+#define UART_EASY_DMA_SUPPORT 0
 #endif
 
 // <q> UART_LEGACY_SUPPORT  - Driver supporting Legacy mode
@@ -2739,7 +2739,7 @@
 
 
 #ifndef UART0_CONFIG_USE_EASY_DMA
-#define UART0_CONFIG_USE_EASY_DMA 1
+#define UART0_CONFIG_USE_EASY_DMA 0
 #endif
 
 #endif //UART0_ENABLED
@@ -2998,7 +2998,7 @@
 // <e> APP_UART_ENABLED - app_uart - UART driver
 //==========================================================
 #ifndef APP_UART_ENABLED
-#define APP_UART_ENABLED 0
+#define APP_UART_ENABLED 1
 #endif
 #if  APP_UART_ENABLED
 // <o> APP_UART_DRIVER_INSTANCE  - UART instance used
