@@ -35,7 +35,7 @@ void tohex(char *in, size_t insz, char *out, size_t outsz) {
     }
   }
 
-  pout[-1] = 0;
+  pout[0] = 0;
 }
 
 void uart_send_str(char *str) {
