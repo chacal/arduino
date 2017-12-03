@@ -6,16 +6,16 @@
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-#include "bmp180.h"
 #include "vcc_measurement.h"
+#include "bme280.h"
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 
 #define APP_CFG_NON_CONN_ADV_TIMEOUT    0                                 /**< Time for which the device must be advertising in non-connectable mode (in seconds). 0 disables timeout. */
-#define NON_CONNECTABLE_ADV_INTERVAL    MSEC_TO_UNITS(3000, UNIT_0_625_MS) /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
+#define NON_CONNECTABLE_ADV_INTERVAL    MSEC_TO_UNITS(5000, UNIT_0_625_MS) /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
 #define VCC_MEASUREMENT_INTERVAL_S    120
-#define BMP180_MEASUREMENT_INTERVAL_S  15
+#define BME280_MEASUREMENT_INTERVAL_S  30
 
 #define DEVICE_NAME                     "S301"
 
@@ -39,7 +39,7 @@ static sensor_data_t m_sensor_data = {
     .ttl         = 2,
     .tag         = 'm',
     .temperature = 0,
-    .humidity    = 5505,
+    .humidity    = 0,
     .pressure    = 0,
     .vcc         = 0
 };
@@ -102,15 +102,16 @@ static void on_vcc_measurement(uint16_t vcc) {
   advertising_init();   // Update advertising data
 }
 
-static void on_bmp180_measurement(double temperature, double pressure) {
-  m_sensor_data.temperature = (uint16_t) (temperature * 100);
-  m_sensor_data.pressure    = (uint16_t) (pressure * 10);
+static void on_bme280_measurement(double temperature, double pressure, double humidity) {
+  m_sensor_data.temperature = (int16_t) (temperature * 100);  // -327.68°C - +327.67°C
+  m_sensor_data.pressure    = (uint16_t) (pressure * 10);     // 0 - 6553.5 mbar
+  m_sensor_data.humidity    = (uint16_t) (humidity * 100);    // 0 - 655.35 %H
   advertising_init();   // Update advertising data
 }
 
 static void power_manage(void) {
   // Always clear FPU IRQs to allow CPU to sleep. See: https://devzone.nordicsemi.com/question/87838/high-power-consumption-when-using-fpu/
-  __set_FPSCR(__get_FPSCR()  & ~(0x0000009F));
+  __set_FPSCR(__get_FPSCR() & ~(0x0000009F));
   (void) __get_FPSCR();
   NVIC_ClearPendingIRQ(FPU_IRQn);
   uint32_t err_code = sd_app_evt_wait();
@@ -125,7 +126,7 @@ int main(void) {
   ble_stack_init();
   advertising_init();
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
-  //bmp180_init(BMP180_MEASUREMENT_INTERVAL_S * 1000, on_bmp180_measurement);
+  bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
 
   NRF_LOG_INFO("BLE Beacon started\n");
   advertising_start();
