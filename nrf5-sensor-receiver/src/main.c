@@ -16,7 +16,7 @@
 #define RX_BASE_ADDR     {0x4E, 0x6F, 0x64, 0x65}  // "Node"
 #define RX_PREFIX_ADDR   {0x31}                    // "1"
 #define RX_CHANNEL       76
-#define RX_PIN           5
+#define UART_TX_PIN      5
 
 nrf_drv_uart_t    m_uart = NRF_DRV_UART_INSTANCE(UART0_INSTANCE_INDEX);
 nrf_esb_payload_t rx_payload;
@@ -63,7 +63,7 @@ void nrf_esb_event_handler(nrf_esb_evt_t const *p_event) {
 
 void uart_init() {
   nrf_drv_uart_config_t config = NRF_DRV_UART_DEFAULT_CONFIG;
-  config.pseltxd = RX_PIN;
+  config.pseltxd = UART_TX_PIN;
   APP_ERROR_CHECK(nrf_drv_uart_init(&m_uart, &config, NULL));
 }
 
