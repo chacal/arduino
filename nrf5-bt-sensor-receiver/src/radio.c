@@ -1,5 +1,4 @@
 #include <nrf.h>
-#include <nrf_log.h>
 #include "radio.h"
 #include "channel_resolver.h"
 
@@ -100,7 +99,7 @@ void radio_rx_start() {
   RADIO_TIMER->CC[RADIO_TIMER_RX_TIMEOUT_COMPARE] = RX_TIMEOUT_US;
 
   NRF_RADIO->PACKETPTR = (uint32_t) &m_rx_tx_buf;
-  NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk;
+  NRF_RADIO->SHORTS    = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_START_Msk | RADIO_SHORTS_ADDRESS_RSSISTART_Msk;
   clear_events();
 
   NRF_RADIO->TASKS_RXEN = 1;
@@ -119,7 +118,7 @@ static void start_rx_on_next_adv_channel() {
 
 static void on_rx_packet() {
   if(NRF_RADIO->CRCSTATUS == 1U && (m_rx_tx_buf.s0 & 0x0F) == PACKET_TYPE_ADV_NONCONN_IND) {
-    m_on_rx_adv_packet(m_rx_tx_buf);
+    m_on_rx_adv_packet(m_rx_tx_buf, (int)NRF_RADIO->RSSISAMPLE * -1);
   }
 }
 

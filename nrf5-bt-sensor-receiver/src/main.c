@@ -42,7 +42,7 @@ void uart_send_str(char *str) {
   nrf_drv_uart_tx(&m_uart, (uint8_t *) str, len);
 }
 
-static void on_rx_adv_packet(nrf_radio_packet_t adv_packet) {
+static void on_rx_adv_packet(nrf_radio_packet_t adv_packet, int rssi) {
   adv_data_t manuf_data;
 
   uint32_t res = util_adv_report_parse(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &adv_packet, &manuf_data);
@@ -54,7 +54,7 @@ static void on_rx_adv_packet(nrf_radio_packet_t adv_packet) {
       char hex_buf[80];
 
       tohex((char *) adv_packet.payload, adv_packet.payload_length, hex_buf, sizeof(hex_buf));
-      sprintf(tx_buf, "{\"data\": \"%s\", \"rssi\": %d}\n", hex_buf, 0);  // TODO: Get proper RSSI value
+      sprintf(tx_buf, "{\"data\": \"%s\", \"rssi\": %d}\n", hex_buf, rssi);
 
       uart_send_str(tx_buf);
     }
