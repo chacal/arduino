@@ -2517,14 +2517,14 @@
 // <8=> 256x
 
 #ifndef SAADC_CONFIG_OVERSAMPLE
-#define SAADC_CONFIG_OVERSAMPLE 3
+#define SAADC_CONFIG_OVERSAMPLE 6
 #endif
 
 // <q> SAADC_CONFIG_LP_MODE  - Enabling low power mode
 
 
 #ifndef SAADC_CONFIG_LP_MODE
-#define SAADC_CONFIG_LP_MODE 0
+#define SAADC_CONFIG_LP_MODE 1
 #endif
 
 // <o> SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
