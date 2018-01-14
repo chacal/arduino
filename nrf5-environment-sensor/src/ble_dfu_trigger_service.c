@@ -7,10 +7,21 @@
 #include "ble_sensor_advertising.h"
 #include "sdk_config.h"
 
-static uint16_t                 m_service_handle;
-static ble_uuid_t               m_ble_uuid;
-static ble_gatts_char_handles_t m_rx_char_handles;
+#include "ble_dfu_trigger_password.h"
 
+static uint16_t                     m_service_handle;
+static ble_uuid_t                   m_ble_uuid;
+static ble_gatts_char_handles_t     m_rx_char_handles;
+static ble_dfu_trigger_service_cb_t m_dfu_trigger_cb;
+
+
+static bool check_dfu_trigger_password(const uint8_t *data, uint16_t len) {
+  char received[len + 1];
+  strncpy(received, (char *) data, len);
+  received[len] = 0;
+
+  return strcmp(received, DFU_TRIGGER_PASSWORD) == 0;
+}
 
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   NRF_LOG_INFO("BLE event! %d", p_ble_evt->header.evt_id)
@@ -27,6 +38,13 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
       APP_ERROR_CHECK(sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle, BLE_GATT_ATT_MTU_DEFAULT));
       break;
+    case BLE_GATTS_EVT_WRITE: {
+      ble_gatts_evt_write_t const *p_write = &p_ble_evt->evt.gatts_evt.params.write;
+      if(p_write->handle == m_rx_char_handles.value_handle && check_dfu_trigger_password(p_write->data, p_write->len) && m_dfu_trigger_cb != NULL) {
+        m_dfu_trigger_cb();
+      }
+      break;
+    }
   }
 }
 
@@ -106,7 +124,8 @@ static void add_rx_characteristic() {
 }
 
 
-void ble_dfu_trigger_service_init(const char *device_name) {
+void ble_dfu_trigger_service_init(const char *device_name, ble_dfu_trigger_service_cb_t dfu_trigger_cb) {
+  m_dfu_trigger_cb = dfu_trigger_cb;
   softdevice_init();
   gap_params_init(device_name);
   add_custom_ble_service();

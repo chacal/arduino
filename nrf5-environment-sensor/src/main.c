@@ -49,6 +49,10 @@ static void on_bme280_measurement(double temperature, double pressure, double hu
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
 
+static void on_dfu_triggered() {
+  NRF_LOG_INFO("Triggering DFU!")
+}
+
 static void power_manage(void) {
   // Always clear FPU IRQs to allow CPU to sleep. See: https://devzone.nordicsemi.com/question/87838/high-power-consumption-when-using-fpu/
   __set_FPSCR(__get_FPSCR() & ~(0x0000009F));
@@ -64,7 +68,7 @@ int main(void) {
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   APP_ERROR_CHECK(app_timer_init());
 
-  ble_dfu_trigger_service_init(DEVICE_NAME);
+  ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);

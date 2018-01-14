@@ -1,5 +1,4 @@
 cmake-build-debug/
 build/
 .idea/
-*.pb.h
-*.pb.c
+src/ble_dfu_trigger_password.h
