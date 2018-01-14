@@ -3,6 +3,7 @@
 #include <nrf_sdm.h>
 #include <nrf_sdh.h>
 #include <nrf_log_default_backends.h>
+#include <ble_dfu.h>
 #include "bsp.h"
 #include "app_timer.h"
 #include "nrf_log.h"
@@ -51,6 +52,9 @@ static void on_bme280_measurement(double temperature, double pressure, double hu
 
 static void on_dfu_triggered() {
   NRF_LOG_INFO("Triggering DFU!")
+  APP_ERROR_CHECK(sd_power_gpregret_clr(0, 0xffffffff));
+  APP_ERROR_CHECK(sd_power_gpregret_set(0, BOOTLOADER_DFU_START));
+  NVIC_SystemReset();
 }
 
 static void power_manage(void) {
