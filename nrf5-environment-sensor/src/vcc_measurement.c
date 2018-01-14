@@ -46,7 +46,7 @@ static void adc_init() {
  * ------------------------------------------------------------------------------------------------
  */
 #include <nrf_drv_saadc.h>
-#include <sdk_config_nrf52/sdk_config.h>
+#include "sdk_config.h"
 
 static uint8_t m_adc_channel = 0;
 
@@ -81,7 +81,7 @@ void vcc_measurement_init(uint32_t measurement_interval_ms, vcc_measurement_cb_t
 
   APP_TIMER_DEF(adc_timer);
   app_timer_create(&adc_timer, APP_TIMER_MODE_REPEATED, sample_vcc);
-  app_timer_start(adc_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), NULL);
+  app_timer_start(adc_timer, APP_TIMER_TICKS(measurement_interval_ms), NULL);
 
   sample_vcc(NULL);
 }

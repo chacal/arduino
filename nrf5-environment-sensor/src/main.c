@@ -1,7 +1,9 @@
-#include <stdbool.h>
 #include <stdint.h>
 #include <ble/common/ble_advdata.h>
-#include "softdevice_handler.h"
+#include <nrf_sdm.h>
+#include <nrf_sdh.h>
+#include <nrf_sdh_ble.h>
+#include <nrf_log_default_backends.h>
 #include "bsp.h"
 #include "app_timer.h"
 #include "nrf_log.h"
@@ -9,18 +11,13 @@
 #include "vcc_measurement.h"
 #include "bme280.h"
 
-#define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
-#define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
-
+#define APP_BLE_CFG_TAG                 1
 #define APP_CFG_NON_CONN_ADV_TIMEOUT    0                                 /**< Time for which the device must be advertising in non-connectable mode (in seconds). 0 disables timeout. */
 #define NON_CONNECTABLE_ADV_INTERVAL    MSEC_TO_UNITS(5000, UNIT_0_625_MS) /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
 #define VCC_MEASUREMENT_INTERVAL_S    120
 #define BME280_MEASUREMENT_INTERVAL_S  30
 
 #define DEVICE_NAME                     "S301"
-
-#define APP_TIMER_PRESCALER             0                                 /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_OP_QUEUE_SIZE         4                                 /**< Size of timer operation queues. */
 
 #define TX_POWER_LEVEL                  4                                 /** Max power, +4dBm */
 
@@ -81,19 +78,16 @@ static void advertising_start(void) {
   m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
   m_adv_params.interval    = NON_CONNECTABLE_ADV_INTERVAL;
   m_adv_params.timeout     = APP_CFG_NON_CONN_ADV_TIMEOUT;
-  APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params));
+  APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params, BLE_CONN_CFG_TAG_DEFAULT));
 }
 
 static void ble_stack_init(void) {
-  nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
-  SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
+  APP_ERROR_CHECK(nrf_sdh_enable_request());
 
-  ble_enable_params_t ble_enable_params;
-  APP_ERROR_CHECK(softdevice_enable_get_default_config(CENTRAL_LINK_COUNT, PERIPHERAL_LINK_COUNT, &ble_enable_params));
+  uint32_t ram_start = 0;
+  APP_ERROR_CHECK(nrf_sdh_ble_default_cfg_set(APP_BLE_CFG_TAG, &ram_start));
 
-  CHECK_RAM_START_ADDR(CENTRAL_LINK_COUNT, PERIPHERAL_LINK_COUNT);
-
-  APP_ERROR_CHECK(softdevice_enable(&ble_enable_params));
+  APP_ERROR_CHECK(nrf_sdh_ble_enable(&ram_start));
   APP_ERROR_CHECK(sd_ble_gap_tx_power_set(TX_POWER_LEVEL));
 }
 
@@ -121,14 +115,16 @@ static void power_manage(void) {
 
 int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+  NRF_LOG_DEFAULT_BACKENDS_INIT();
+  APP_ERROR_CHECK(app_timer_init());
 
-  APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
   ble_stack_init();
   advertising_init();
+
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
 
-  NRF_LOG_INFO("BLE Beacon started\n");
+  NRF_LOG_INFO("BLE Beacon started");
   advertising_start();
 
   for(;;) {

@@ -6,7 +6,6 @@
 #include <app_timer.h>
 #include <app_util_platform.h>
 #include <nrf_drv_gpiote.h>
-#include <drivers_nrf/delay/nrf_delay.h>
 
 #ifdef NRF51
 
@@ -17,7 +16,7 @@
 
 #else
 
-#include "sdk_config_nrf52/sdk_config.h"
+#include "sdk_config.h"
 
 #define PIN_SCL           2
 #define PIN_SCA           3
@@ -228,7 +227,7 @@ static void on_measurement_timer(void *ctx) {
     case BME280_TIMER_START_MEASUREMENTS:
       twi_init();
       trigger_measurements();
-      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_MEASUREMENT_TIME_MS, APP_TIMER_PRESCALER), (void *) BMP280_TIMER_READ_MEASUREMENTS);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_MEASUREMENT_TIME_MS), (void *) BMP280_TIMER_READ_MEASUREMENTS);
       break;
 
     case BMP280_TIMER_READ_MEASUREMENTS: {
@@ -238,7 +237,7 @@ static void on_measurement_timer(void *ctx) {
 
       m_measurement_cb(temp, pressure, humidity);
 
-      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BME280_TIMER_START_MEASUREMENTS);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms), (void *) BME280_TIMER_START_MEASUREMENTS);
     }
       break;
   }
@@ -258,7 +257,7 @@ void bme280_init(uint32_t measurement_interval_ms, bme280_measurement_cb_t callb
     NRF_LOG_INFO("BME280 connected.\n")
     calibrate();
     app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
-    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms, APP_TIMER_PRESCALER), (void *) BME280_TIMER_START_MEASUREMENTS);
+    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms), (void *) BME280_TIMER_START_MEASUREMENTS);
   } else {
     NRF_LOG_ERROR("BME280 not found!\n")
   }
