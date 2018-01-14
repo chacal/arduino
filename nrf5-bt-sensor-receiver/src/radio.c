@@ -8,6 +8,7 @@
 #define PPI_CH_RX_TIMEOUT                 1
 
 #define RX_TIMEOUT_US                 50000
+#define PACKET_TYPE_ADV_IND            0x00
 #define PACKET_TYPE_ADV_NONCONN_IND    0x02
 
 static nrf_radio_packet_t m_rx_tx_buf;
@@ -117,8 +118,11 @@ static void start_rx_on_next_adv_channel() {
 }
 
 static void on_rx_packet() {
-  if(NRF_RADIO->CRCSTATUS == 1U && (m_rx_tx_buf.s0 & 0x0F) == PACKET_TYPE_ADV_NONCONN_IND) {
-    m_on_rx_adv_packet(m_rx_tx_buf, (int)NRF_RADIO->RSSISAMPLE * -1);
+  if(NRF_RADIO->CRCSTATUS == 1U) {
+    uint8_t pdu_type = m_rx_tx_buf.s0 & 0x0F;
+    if(pdu_type == PACKET_TYPE_ADV_NONCONN_IND || pdu_type == PACKET_TYPE_ADV_IND) {
+      m_on_rx_adv_packet(m_rx_tx_buf, (int) NRF_RADIO->RSSISAMPLE * -1);
+    }
   }
 }
 
