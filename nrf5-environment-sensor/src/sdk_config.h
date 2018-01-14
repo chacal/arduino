@@ -3071,7 +3071,7 @@
 // <e> UART0_ENABLED - Enable UART0 instance
 //==========================================================
 #ifndef UART0_ENABLED
-#define UART0_ENABLED 0
+#define UART0_ENABLED 1
 #endif
 // <q> UART0_CONFIG_USE_EASY_DMA  - Default setting for using EasyDMA
 
@@ -8206,12 +8206,12 @@
 
 // <o> NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE - Attribute Table size in bytes. The size must be a multiple of 4.
 #ifndef NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE
-#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 248
+#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 400  // Found by trial & error, see https://devzone.nordicsemi.com/question/165650/sd_ble_uuid_vs_add-get-error-nrf_error_no_mem-from-softdevice-s132-v500/
 #endif
 
 // <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs.
 #ifndef NRF_SDH_BLE_VS_UUID_COUNT
-#define NRF_SDH_BLE_VS_UUID_COUNT 0
+#define NRF_SDH_BLE_VS_UUID_COUNT 1
 #endif
 
 // <q> NRF_SDH_BLE_SERVICE_CHANGED  - Include the Service Changed characteristic in the Attribute Table.

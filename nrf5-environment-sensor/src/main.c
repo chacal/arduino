@@ -69,8 +69,9 @@ int main(void) {
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
 
-  NRF_LOG_INFO("BLE Beacon started");
   ble_support_advertising_start();
+
+  NRF_LOG_INFO("BLE Beacon started");
 
   for(;;) {
     power_manage();
