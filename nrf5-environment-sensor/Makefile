@@ -43,6 +43,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
   $(SRC_DIR)/main.c \
+  $(SRC_DIR)/ble_support.c \
   $(SRC_DIR)/vcc_measurement.c \
   $(SRC_DIR)/bme280.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
