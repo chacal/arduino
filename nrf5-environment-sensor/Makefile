@@ -1,6 +1,5 @@
 PROJECT_NAME       := nrf5-environment-sensor
-DFU_APP_VERSION    := 1
-DFU_APP_VERSION_STR:= 1.0.0
+DFU_APP_VERSION_STR:= 1.1.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
@@ -19,6 +18,11 @@ SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
 GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
 GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)"
+
+DFU_HW_VERSION     := 52
+# S132 v5.0.0, see https://github.com/NordicSemiconductor/pc-nrfutil#commands
+DFU_SOFT_DEVICE_ID := 0x9D
+DFU_PRIVATE_KEY    := private.key
 
 # Source files common to all targets
 SRC_FILES += \
@@ -248,7 +252,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
-	nrfutil settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version $(DFU_APP_VERSION) --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+	nrfutil settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
 flash_app: default
@@ -264,6 +268,9 @@ flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	$(GDB_TARGET) -ex load -ex kill -ex quit $<
 
 flash: flash_app flash_dfu_settings
+
+dfu_pkg: default
+	nrfutil pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
