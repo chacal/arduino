@@ -38,14 +38,14 @@ static sensor_data_t m_sensor_data = {
 
 static void on_vcc_measurement(uint16_t vcc) {
   m_sensor_data.vcc = vcc;
-  ble_support_advertising_init(DEVICE_NAME, &m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+  ble_support_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
 
 static void on_bme280_measurement(double temperature, double pressure, double humidity) {
   m_sensor_data.temperature = (int16_t) (temperature * 100);  // -327.68°C - +327.67°C
   m_sensor_data.pressure    = (uint16_t) (pressure * 10);     // 0 - 6553.5 mbar
   m_sensor_data.humidity    = (uint16_t) (humidity * 100);    // 0 - 655.35 %H
-  ble_support_advertising_init(DEVICE_NAME, &m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+  ble_support_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
 
 static void power_manage(void) {
@@ -63,8 +63,8 @@ int main(void) {
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   APP_ERROR_CHECK(app_timer_init());
 
-  ble_support_init();
-  ble_support_advertising_init(DEVICE_NAME, &m_sensor_data, sizeof(m_sensor_data));
+  ble_support_init(DEVICE_NAME);
+  ble_support_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
