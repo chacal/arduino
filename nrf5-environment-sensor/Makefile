@@ -1,5 +1,5 @@
 PROJECT_NAME       := nrf5-environment-sensor
-DFU_APP_VERSION_STR:= 1.1.0
+DFU_APP_VERSION_STR:= 1.2.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
