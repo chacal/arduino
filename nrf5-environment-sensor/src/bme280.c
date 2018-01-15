@@ -6,6 +6,7 @@
 #include <app_timer.h>
 #include <app_util_platform.h>
 #include <nrf_drv_gpiote.h>
+#include <drivers_nrf/delay/nrf_delay.h>
 
 #ifdef NRF51
 
@@ -13,6 +14,8 @@
 
 #define PIN_SCA           0
 #define PIN_SCL           1
+#define PIN_BME280_POWER 12
+
 
 #else
 
@@ -20,12 +23,15 @@
 
 #define PIN_SCL           2
 #define PIN_SCA           3
+#define PIN_BME280_POWER 12
+
 #endif  // #ifdef NRF51
 
 
 #define BME280_ADDRESS                 0x76
 #define BME280_DEVICE_ID               0x60
 #define BME280_MEASUREMENT_TIME_MS       10
+#define BME280_STARTUP_TIME_MS            5
 
 #define BME280_CALIBRATION_BYTE_COUNT    32
 #define BME280_TEMP_DIG_LENGTH            6
@@ -35,12 +41,11 @@
 
 #define BME280_SENSOR_DATA_LENGTH         8
 
-#define APP_TIMER_PRESCALER               0
-
 
 typedef enum {
+  BME280_TIMER_POWER_ON,
   BME280_TIMER_START_MEASUREMENTS,
-  BMP280_TIMER_READ_MEASUREMENTS,
+  BME280_TIMER_READ_MEASUREMENTS,
 }                              bme280_timer_cmd_t;
 
 typedef enum {
@@ -219,25 +224,43 @@ static void twi_init(void) {
   nrf_drv_twi_enable(&m_twi);
 }
 
+static void bme280_power_on() {
+  nrf_drv_gpiote_out_config_t bme280_power_pin_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
+  nrf_drv_gpiote_out_init(PIN_BME280_POWER, &bme280_power_pin_config);
+}
+
+static void bme280_power_off() {
+  nrf_drv_gpiote_out_uninit(PIN_BME280_POWER);
+}
+
 
 static void on_measurement_timer(void *ctx) {
   bme280_timer_cmd_t cmd = (bme280_timer_cmd_t) ctx;
 
   switch(cmd) {
+    case BME280_TIMER_POWER_ON:
+      bme280_power_on();
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_STARTUP_TIME_MS), (void *) BME280_TIMER_START_MEASUREMENTS);
+      break;
+
     case BME280_TIMER_START_MEASUREMENTS:
       twi_init();
       trigger_measurements();
-      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_MEASUREMENT_TIME_MS), (void *) BMP280_TIMER_READ_MEASUREMENTS);
+      nrf_drv_twi_uninit(&m_twi);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_MEASUREMENT_TIME_MS), (void *) BME280_TIMER_READ_MEASUREMENTS);
       break;
 
-    case BMP280_TIMER_READ_MEASUREMENTS: {
+    case BME280_TIMER_READ_MEASUREMENTS: {
       double temp, pressure, humidity;
+
+      twi_init();
       read_all_sensor_values(&temp, &pressure, &humidity);
       nrf_drv_twi_uninit(&m_twi);
+      bme280_power_off();
 
       m_measurement_cb(temp, pressure, humidity);
 
-      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms), (void *) BME280_TIMER_START_MEASUREMENTS);
+      app_timer_start(m_measurement_timer, APP_TIMER_TICKS(m_measurement_interval_ms), (void *) BME280_TIMER_POWER_ON);
     }
       break;
   }
@@ -247,20 +270,25 @@ static void on_measurement_timer(void *ctx) {
 void bme280_init(uint32_t measurement_interval_ms, bme280_measurement_cb_t callback) {
   m_measurement_interval_ms = measurement_interval_ms;
   m_measurement_cb          = callback;
+  nrf_drv_gpiote_init();
 
   twi_init();
+  bme280_power_on();
+
+  nrf_delay_ms(BME280_STARTUP_TIME_MS);
 
   uint8_t bme280_id;
   read(BME280_REG_ID, &bme280_id, sizeof(bme280_id));
 
   if(bme280_id == BME280_DEVICE_ID) {
-    NRF_LOG_INFO("BME280 connected.\n")
+    NRF_LOG_INFO("BME280 connected.")
     calibrate();
     app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
-    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms), (void *) BME280_TIMER_START_MEASUREMENTS);
+    app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms), (void *) BME280_TIMER_POWER_ON);
   } else {
-    NRF_LOG_ERROR("BME280 not found!\n")
+    NRF_LOG_ERROR("BME280 not found!")
   }
 
+  bme280_power_off();
   nrf_drv_twi_uninit(&m_twi);
 }
