@@ -11,7 +11,7 @@
 
 #define DEVICE_NAME                      "S214"
 #define VCC_MEASUREMENT_INTERVAL_S            5
-#define BME280_MEASUREMENT_INTERVAL_S        30
+#define INA226_MEASUREMENT_INTERVAL_MS      500
 
 #pragma pack(1)
 
@@ -38,10 +38,7 @@ static void on_vcc_measurement(uint16_t vcc) {
   NRF_LOG_INFO("VCC: %d", vcc);
 }
 
-static void on_bme280_measurement(double temperature, double pressure, double humidity) {
-  m_sensor_data.temperature = (int16_t) (temperature * 100);  // -327.68°C - +327.67°C
-  m_sensor_data.pressure    = (uint16_t) (pressure * 10);     // 0 - 6553.5 mbar
-  m_sensor_data.humidity    = (uint16_t) (humidity * 100);    // 0 - 655.35 %H
+static void on_ina226_measurement(int16_t raw_measurement, float shunt_voltage_mV, float shunt_current) {
 }
 
 static void power_manage(void) {
@@ -63,7 +60,7 @@ int main(void) {
   APP_ERROR_CHECK(app_timer_init());
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
-  //bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
+  ina226_init(INA226_MEASUREMENT_INTERVAL_MS, on_ina226_measurement);
 
 
   for(;;) {
