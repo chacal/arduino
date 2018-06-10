@@ -12,6 +12,8 @@
 #define DEVICE_NAME                      "S214"
 #define VCC_MEASUREMENT_INTERVAL_S            5
 #define INA226_MEASUREMENT_INTERVAL_MS      500
+#define SHUNT_RESISTANCE_OHMS           0.00025  // 0.25mΩ
+#define MAX_EXPECTED_CURRENT_A              100
 
 #pragma pack(1)
 
@@ -38,7 +40,9 @@ static void on_vcc_measurement(uint16_t vcc) {
   NRF_LOG_INFO("VCC: %d", vcc);
 }
 
-static void on_ina226_measurement(int16_t raw_measurement, float shunt_voltage_mV, float shunt_current) {
+static void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, double shunt_current) {
+  NRF_LOG_INFO("Raw: %d  Shunt: " NRF_LOG_FLOAT_MARKER "mV", raw_measurement, NRF_LOG_FLOAT(shunt_voltage_mV));
+  NRF_LOG_INFO("Current: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(shunt_current));
 }
 
 static void power_manage(void) {
@@ -60,7 +64,7 @@ int main(void) {
   APP_ERROR_CHECK(app_timer_init());
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
-  ina226_init(INA226_MEASUREMENT_INTERVAL_MS, on_ina226_measurement);
+  ina226_init(INA226_MEASUREMENT_INTERVAL_MS, SHUNT_RESISTANCE_OHMS, MAX_EXPECTED_CURRENT_A, on_ina226_measurement);
 
 
   for(;;) {
