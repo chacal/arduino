@@ -3289,7 +3289,7 @@
 // <1=> 1
 
 #ifndef APP_TIMER_CONFIG_SWI_NUMBER
-#define APP_TIMER_CONFIG_SWI_NUMBER 0
+#define APP_TIMER_CONFIG_SWI_NUMBER 1
 #endif
 
 // </e>

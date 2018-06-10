@@ -8,8 +8,9 @@
 #include "util.h"
 #include "ina226.h"
 #include "sdk_config.h"
+#include "radio.h"
 
-#define DEVICE_NAME                      "S214"
+#define DEVICE_INSTANCE                      99
 #define VCC_MEASUREMENT_INTERVAL_S            5
 #define INA226_MEASUREMENT_INTERVAL_MS      500
 #define SHUNT_RESISTANCE_OHMS           0.00025  // 0.25mΩ
@@ -18,21 +19,19 @@
 #pragma pack(1)
 
 typedef struct {
-  uint8_t  ttl;
-  uint16_t tag;
-  int16_t  temperature;
-  uint16_t humidity;
-  uint16_t pressure;
-  uint16_t vcc;
+  char tag;
+  uint8_t instance;
+  int16_t rawMeasurement;
+  float shuntVoltageMilliVolts;
+  float shuntCurrent;
+  int vcc;
+  unsigned long previousSampleTimeMicros;
 } sensor_data_t;
 
-static sensor_data_t m_sensor_data = {
-    .ttl         = 2,
-    .tag         = 'm',
-    .temperature = 0,
-    .humidity    = 0,
-    .pressure    = 0,
-    .vcc         = 0
+sensor_data_t m_sensor_data = {
+    .tag = 'c',
+    .instance = DEVICE_INSTANCE,
+    .previousSampleTimeMicros = 0
 };
 
 static void on_vcc_measurement(uint16_t vcc) {
@@ -43,6 +42,12 @@ static void on_vcc_measurement(uint16_t vcc) {
 static void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, double shunt_current) {
   NRF_LOG_INFO("Raw: %d  Shunt: " NRF_LOG_FLOAT_MARKER "mV", raw_measurement, NRF_LOG_FLOAT(shunt_voltage_mV));
   NRF_LOG_INFO("Current: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(shunt_current));
+
+  m_sensor_data.rawMeasurement = raw_measurement;
+  m_sensor_data.shuntVoltageMilliVolts = (float)shunt_voltage_mV;
+  m_sensor_data.shuntCurrent = (float)shunt_current;
+
+  radio_send((uint8_t *)&m_sensor_data, sizeof(m_sensor_data));
 }
 
 static void power_manage(void) {
@@ -58,10 +63,14 @@ static void power_manage(void) {
 int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
-  NRF_LOG_INFO("BLE environment sensor started");
 
+  NRF_LOG_INFO("Initializing clocks..");
   util_start_clocks();
+  NRF_LOG_INFO("Initializing app_timer..");
   APP_ERROR_CHECK(app_timer_init());
+  NRF_LOG_INFO("Initializing radio..");
+  radio_init();
+  NRF_LOG_INFO("Radio initialized!");
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   ina226_init(INA226_MEASUREMENT_INTERVAL_MS, SHUNT_RESISTANCE_OHMS, MAX_EXPECTED_CURRENT_A, on_ina226_measurement);

@@ -10,10 +10,6 @@ add_definitions(-DNRF52)
 add_definitions(-DNRF52832)
 add_definitions(-DBOARD_CUSTOM)
 add_definitions(-DUSE_LFXO)
-add_definitions(-DBLE_STACK_SUPPORT_REQD)
-add_definitions(-DSOFTDEVICE_PRESENT)
-add_definitions(-DS132)
-add_definitions(-DNRF_SD_BLE_API_VERSION=5)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${SDK_ROOT}/components/drivers_nrf/comp")
@@ -127,6 +123,7 @@ include_directories("${SDK_ROOT}/components/ble/ble_services/ble_rscs")
 include_directories("${SDK_ROOT}/components/drivers_nrf/usbd")
 include_directories("${SDK_ROOT}/components/ble/ble_services/ble_hrs")
 include_directories("${SDK_ROOT}/components/libraries/serial")
+include_directories("${SDK_ROOT}/components/proprietary_rf/esb")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")

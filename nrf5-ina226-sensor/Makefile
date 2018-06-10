@@ -44,13 +44,15 @@ SRC_FILES += \
   $(SRC_DIR)/vcc_measurement.c \
   $(SRC_DIR)/ina226.c \
   $(SRC_DIR)/util.c \
+  $(SRC_DIR)/radio.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/twi_master/nrf_drv_twi.c \
-  $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
   $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
+  $(SDK_ROOT)/components/proprietary_rf/esb/nrf_esb.c \
+
 
 
 SRC_FILES += \
@@ -172,6 +174,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/components/libraries/atomic \
   $(SDK_ROOT)/components/softdevice/common \
+  $(SDK_ROOT)/components/proprietary_rf/esb \
 
 # Libraries common to all targets
 LIB_FILES += \
@@ -197,6 +200,8 @@ CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
 CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
+CFLAGS += -DDEBUG
+
 
 # C++ flags common to all targets
 CXXFLAGS += \
