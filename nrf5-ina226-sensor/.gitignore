@@ -1,3 +1,5 @@
 cmake-build-debug/
 build/
 .idea/
+private.key
+src/ble_dfu_trigger_password.h

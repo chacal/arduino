@@ -4,13 +4,13 @@
 #include "app_timer.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
+#include <ble_dfu.h>
 #include "vcc_measurement.h"
-#include "util.h"
 #include "ina226.h"
-#include "sdk_config.h"
-#include "radio.h"
+#include "ble_sensor_advertising.h"
+#include "ble_dfu_trigger_service.h"
 
-#define DEVICE_INSTANCE                      99
+#define DEVICE_NAME                      "S300"
 #define VCC_MEASUREMENT_INTERVAL_S            5
 #define INA226_MEASUREMENT_INTERVAL_MS      500
 #define SHUNT_RESISTANCE_OHMS           0.00025  // 0.25mΩ
@@ -19,35 +19,42 @@
 #pragma pack(1)
 
 typedef struct {
-  char tag;
-  uint8_t instance;
-  int16_t rawMeasurement;
-  float shuntVoltageMilliVolts;
-  float shuntCurrent;
-  int vcc;
-  unsigned long previousSampleTimeMicros;
+  uint8_t  ttl;
+  uint16_t tag;
+  int16_t  raw_measurement;
+  float shunt_voltage_milli_volts;
+  float shunt_current;
+  uint16_t vcc;
 } sensor_data_t;
 
-sensor_data_t m_sensor_data = {
-    .tag = 'c',
-    .instance = DEVICE_INSTANCE,
-    .previousSampleTimeMicros = 0
+static sensor_data_t m_sensor_data = {
+    .ttl         = 2,
+    .tag         = 'n',
 };
 
+
 static void on_vcc_measurement(uint16_t vcc) {
-  m_sensor_data.vcc = vcc;
   NRF_LOG_INFO("VCC: %d", vcc);
+  m_sensor_data.vcc = vcc;
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
 
 static void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, double shunt_current) {
   NRF_LOG_INFO("Raw: %d  Shunt: " NRF_LOG_FLOAT_MARKER "mV", raw_measurement, NRF_LOG_FLOAT(shunt_voltage_mV));
   NRF_LOG_INFO("Current: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(shunt_current));
 
-  m_sensor_data.rawMeasurement = raw_measurement;
-  m_sensor_data.shuntVoltageMilliVolts = (float)shunt_voltage_mV;
-  m_sensor_data.shuntCurrent = (float)shunt_current;
+  m_sensor_data.raw_measurement = raw_measurement;
+  m_sensor_data.shunt_voltage_milli_volts = (float)shunt_voltage_mV;
+  m_sensor_data.shunt_current = (float)shunt_current;
 
-  radio_send((uint8_t *)&m_sensor_data, sizeof(m_sensor_data));
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+}
+
+static void on_dfu_triggered() {
+  NRF_LOG_INFO("Triggering DFU!")
+  APP_ERROR_CHECK(sd_power_gpregret_clr(0, 0xffffffff));
+  APP_ERROR_CHECK(sd_power_gpregret_set(0, BOOTLOADER_DFU_START));
+  NVIC_SystemReset();
 }
 
 static void power_manage(void) {
@@ -55,26 +62,25 @@ static void power_manage(void) {
   __set_FPSCR(__get_FPSCR() & ~(0x0000009F));
   (void) __get_FPSCR();
   NVIC_ClearPendingIRQ(FPU_IRQn);
-  __WFE();
-  __WFI();
+  uint32_t err_code = sd_app_evt_wait();
+  APP_ERROR_CHECK(err_code);
 }
 
 
 int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
-
-  NRF_LOG_INFO("Initializing clocks..");
-  util_start_clocks();
-  NRF_LOG_INFO("Initializing app_timer..");
   APP_ERROR_CHECK(app_timer_init());
-  NRF_LOG_INFO("Initializing radio..");
-  radio_init();
-  NRF_LOG_INFO("Radio initialized!");
+
+  ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
 
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   ina226_init(INA226_MEASUREMENT_INTERVAL_MS, SHUNT_RESISTANCE_OHMS, MAX_EXPECTED_CURRENT_A, on_ina226_measurement);
 
+  ble_sensor_advertising_start();
+
+  NRF_LOG_INFO("BLE current sensor started");
 
   for(;;) {
     power_manage();
