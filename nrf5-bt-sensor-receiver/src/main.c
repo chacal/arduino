@@ -6,6 +6,12 @@
 #include "util.h"
 #include "radio.h"
 
+/*
+ * NOTE! This project still uses SDK v12 instead of SDK v14. This means that bootloader & softdevice from
+ * nrf52-ble-bootloader won't work! Instead erase, flash softdevice and flash app using this project's
+ * Makefile.
+ */
+
 #ifdef NRF51
 
 #include <sdk_config_nrf51/sdk_config.h>
@@ -16,7 +22,7 @@
 
 
 #define FILTERED_MANUFACTURER_ID   0xDADA
-#define UART_TX_PIN                13
+#define UART_TX_PIN                13      // Use pin 2 if flashed on bme280 sensor board using SCL pin as UART TX
 
 nrf_drv_uart_t m_uart = NRF_DRV_UART_INSTANCE(UART0_INSTANCE_INDEX);
 
