@@ -45,3 +45,6 @@ void ble_sensor_advertising_start() {
   APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params, APP_BLE_CFG_TAG));
 }
 
+void ble_sensor_advertising_stop() {
+  sd_ble_gap_adv_stop();
+}

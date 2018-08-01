@@ -4,6 +4,10 @@
 #include "ble_sensor_advertising.h"
 #include "vcc_measurement.h"
 #include <nrf_nvic.h>
+#include <nrf_drv_gpiote.h>
+#include <ble_gap.h>
+
+#define PIN_PIR_INPUT      2
 
 #pragma pack(1)
 
@@ -26,11 +30,26 @@ static void on_vcc_measurement(uint16_t vcc) {
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
 
+static void on_pir_change(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
+  m_sensor_data.motion_detected = (uint8_t) nrf_gpio_pin_read(PIN_PIR_INPUT);
+  NRF_LOG_INFO("Motion detected: %d", m_sensor_data.motion_detected);
+
+  ble_sensor_advertising_stop();
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
+  ble_sensor_advertising_start();
+}
+
+static void pir_input_init() {
+  APP_ERROR_CHECK(nrf_drv_gpiote_init());
+  nrf_drv_gpiote_in_config_t pir_pin_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
+  APP_ERROR_CHECK(nrf_drv_gpiote_in_init(PIN_PIR_INPUT, &pir_pin_config, on_pir_change));
+  nrf_drv_gpiote_in_event_enable(PIN_PIR_INPUT, true);
+}
 
 void pir_sensor_start() {
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
-
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
+  pir_input_init();
 
   ble_sensor_advertising_start();
 
