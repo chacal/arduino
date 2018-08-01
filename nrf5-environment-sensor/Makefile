@@ -52,6 +52,7 @@ SRC_FILES += \
   $(SRC_DIR)/vcc_measurement.c \
   $(SRC_DIR)/bme280.c \
   $(SRC_DIR)/environmental_sensor.c \
+  $(SRC_DIR)/pir_sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \

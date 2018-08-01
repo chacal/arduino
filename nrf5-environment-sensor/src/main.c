@@ -9,9 +9,9 @@
 #include "sdk_config.h"
 #include "ble_dfu_trigger_service.h"
 #include "environmental_sensor.h"
+#include "pir_sensor.h"
 
-
-#define DEVICE_NAME                      "S300"
+#define DEVICE_NAME                      "P300"
 
 
 static void on_dfu_triggered() {
@@ -38,7 +38,8 @@ int main(void) {
 
   ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
 
-  environmental_sensor_start();
+  //environmental_sensor_start();
+  pir_sensor_start();
 
   for(;;) {
     power_manage();
