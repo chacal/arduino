@@ -11,7 +11,12 @@
 #include "environmental_sensor.h"
 #include "pir_sensor.h"
 
-#define DEVICE_NAME                      "P300"
+#define SENSOR_TYPE_BME280  1
+#define SENSOR_TYPE_PIR     2
+
+
+#define DEVICE_NAME         "P300"
+#define SENSOR_TYPE         SENSOR_TYPE_PIR
 
 
 static void on_dfu_triggered() {
@@ -38,8 +43,13 @@ int main(void) {
 
   ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
 
-  //environmental_sensor_start();
+#if SENSOR_TYPE == SENSOR_TYPE_BME280
+  environmental_sensor_start();
+#elif SENSOR_TYPE == SENSOR_TYPE_PIR
   pir_sensor_start();
+#else
+#error Unknown sensor type!
+#endif
 
   for(;;) {
     power_manage();
