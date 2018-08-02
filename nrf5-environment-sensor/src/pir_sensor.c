@@ -8,6 +8,7 @@
 #include <ble_gap.h>
 
 #define PIN_PIR_INPUT      2
+#define PIN_PIR_POWER      3
 
 #pragma pack(1)
 
@@ -46,11 +47,16 @@ static void pir_input_init() {
   nrf_drv_gpiote_in_event_enable(PIN_PIR_INPUT, true);
 }
 
+static void pir_power_on_sensor() {
+  nrf_drv_gpiote_out_config_t pir_power_pin_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
+  nrf_drv_gpiote_out_init(PIN_PIR_POWER, &pir_power_pin_config);
+}
+
 void pir_sensor_start() {
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   pir_input_init();
-
+  pir_power_on_sensor();
   ble_sensor_advertising_start();
 
   NRF_LOG_INFO("BLE PIR sensor started");
