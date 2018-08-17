@@ -19,11 +19,13 @@ typedef struct {
   float    shunt_voltage_milli_volts;
   float    shunt_current;
   uint16_t vcc;
+  uint16_t msg_counter;
 } current_sensor_data_t;
 
 static current_sensor_data_t m_sensor_data = {
     .ttl         = 2,
     .tag         = 'n',
+    .msg_counter = 0
 };
 
 
@@ -36,6 +38,7 @@ void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, dou
   m_sensor_data.shunt_voltage_milli_volts = (float)shunt_voltage_mV;
   m_sensor_data.shunt_current = (float)shunt_current_A;
   m_sensor_data.vcc = (uint16_t)bus_voltage_mV;
+  m_sensor_data.msg_counter++;
 
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
 }
