@@ -3,7 +3,6 @@
 #include <string.h>
 #include <nrf_log.h>
 #include "ble_dfu_trigger_service.h"
-#include "ble_config.h"
 #include "ble_sensor_advertising.h"
 #include "sdk_config.h"
 
@@ -28,7 +27,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
   switch(p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_DISCONNECTED:
-      ble_sensor_advertising_start();
+      ble_sensor_advertising_start(DEFAULT_ADV_INTERVAL);
       break;
     case BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST: {
       ble_gap_data_length_params_t dl_params = {0};  // Use auto settings

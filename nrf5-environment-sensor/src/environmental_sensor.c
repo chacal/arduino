@@ -47,7 +47,7 @@ void environmental_sensor_start() {
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   bme280_init(BME280_MEASUREMENT_INTERVAL_S * 1000, on_bme280_measurement);
 
-  ble_sensor_advertising_start();
+  ble_sensor_advertising_start(DEFAULT_ADV_INTERVAL);
 
   NRF_LOG_INFO("BLE environment sensor started");
 }

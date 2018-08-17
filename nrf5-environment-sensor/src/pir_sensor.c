@@ -37,7 +37,7 @@ static void on_pir_change(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action
 
   ble_sensor_advertising_stop();
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
-  ble_sensor_advertising_start();
+  ble_sensor_advertising_start(DEFAULT_ADV_INTERVAL);
 }
 
 static void pir_input_init() {
@@ -57,7 +57,7 @@ void pir_sensor_start() {
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   pir_input_init();
   pir_power_on_sensor();
-  ble_sensor_advertising_start();
+  ble_sensor_advertising_start(DEFAULT_ADV_INTERVAL);
 
   NRF_LOG_INFO("BLE PIR sensor started");
 }

@@ -33,14 +33,14 @@ void ble_sensor_advertising_init(void *manuf_data, uint8_t manuf_data_len) {
 }
 
 
-void ble_sensor_advertising_start() {
+void ble_sensor_advertising_start(uint16_t adv_interval) {
   ble_gap_adv_params_t m_adv_params;
   memset(&m_adv_params, 0, sizeof(m_adv_params));
 
   m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
   m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
   m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-  m_adv_params.interval    = ADV_INTERVAL;
+  m_adv_params.interval    = adv_interval;
   m_adv_params.timeout     = ADV_TIMEOUT;
   APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params, APP_BLE_CFG_TAG));
 }
