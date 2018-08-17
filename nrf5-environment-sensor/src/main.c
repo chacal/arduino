@@ -10,13 +10,15 @@
 #include "ble_dfu_trigger_service.h"
 #include "environmental_sensor.h"
 #include "pir_sensor.h"
+#include "current_sensor.h"
 
 #define SENSOR_TYPE_BME280  1
 #define SENSOR_TYPE_PIR     2
+#define SENSOR_TYPE_INA226  3
 
 
-#define DEVICE_NAME         "P300"
-#define SENSOR_TYPE         SENSOR_TYPE_PIR
+#define DEVICE_NAME         "C400"
+#define SENSOR_TYPE         SENSOR_TYPE_INA226
 
 
 static void on_dfu_triggered() {
@@ -47,6 +49,8 @@ int main(void) {
   environmental_sensor_start();
 #elif SENSOR_TYPE == SENSOR_TYPE_PIR
   pir_sensor_start();
+#elif SENSOR_TYPE == SENSOR_TYPE_INA226
+  current_sensor_start();
 #else
 #error Unknown sensor type!
 #endif
