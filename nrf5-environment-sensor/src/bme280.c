@@ -22,7 +22,7 @@
 #include "sdk_config.h"
 
 #define PIN_SCL           2
-#define PIN_SCA           3
+#define PIN_SDA           3
 #define PIN_BME280_POWER 12
 
 #endif  // #ifdef NRF51
@@ -214,7 +214,7 @@ static void trigger_measurements() {
 static void twi_init(void) {
   const nrf_drv_twi_config_t twi_config = {
       .scl                = PIN_SCL,
-      .sda                = PIN_SCA,
+      .sda                = PIN_SDA,
       .frequency          = NRF_TWI_FREQ_400K,
       .interrupt_priority = APP_IRQ_PRIORITY_LOW,
       .clear_bus_init     = false
