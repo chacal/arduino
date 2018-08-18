@@ -15,6 +15,7 @@
 typedef struct {
   uint8_t  ttl;
   uint16_t tag;
+  uint32_t crc;
   uint8_t  motion_detected;
   uint16_t vcc;
 } pir_sensor_data_t;
@@ -22,13 +23,20 @@ typedef struct {
 static pir_sensor_data_t m_sensor_data = {
     .ttl             = 2,
     .tag             = 'k',
+    .crc             = 0,
     .motion_detected = 0,
     .vcc             = 0
 };
 
+static void update_advertisement_data() {
+  m_sensor_data.crc = 0;
+  m_sensor_data.crc = ble_sensor_advertising_crc32(&m_sensor_data, sizeof(m_sensor_data));  // Calculate CRC
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+}
+
 static void on_vcc_measurement(uint16_t vcc) {
   m_sensor_data.vcc = vcc;
-  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+  update_advertisement_data();
 }
 
 static void on_pir_change(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
@@ -36,7 +44,7 @@ static void on_pir_change(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action
   NRF_LOG_INFO("Motion detected: %d", m_sensor_data.motion_detected);
 
   ble_sensor_advertising_stop();
-  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
+  update_advertisement_data();
   ble_sensor_advertising_start(DEFAULT_ADV_INTERVAL);
 }
 
@@ -53,7 +61,7 @@ static void pir_power_on_sensor() {
 }
 
 void pir_sensor_start() {
-  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
+  update_advertisement_data();
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   pir_input_init();
   pir_power_on_sensor();
