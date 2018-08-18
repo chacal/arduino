@@ -28,6 +28,11 @@ static current_sensor_data_t m_sensor_data = {
     .msg_counter = 0
 };
 
+static void update_advertisement_data() {
+  m_sensor_data.crc = 0;
+  m_sensor_data.crc = ble_sensor_advertising_crc32(&m_sensor_data, sizeof(m_sensor_data));  // Calculate CRC
+  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+}
 
 void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, double shunt_current_A, double bus_voltage_mV) {
   NRF_LOG_INFO("Raw: %d  Shunt: " NRF_LOG_FLOAT_MARKER "mV", raw_measurement, NRF_LOG_FLOAT(shunt_voltage_mV));
@@ -38,15 +43,13 @@ void on_ina226_measurement(int16_t raw_measurement, double shunt_voltage_mV, dou
   m_sensor_data.shunt_current = (float)shunt_current_A;
   m_sensor_data.vcc = (uint16_t)bus_voltage_mV;
   m_sensor_data.msg_counter++;
-  m_sensor_data.crc = 0;
 
-  m_sensor_data.crc = ble_sensor_advertising_crc32(&m_sensor_data, sizeof(m_sensor_data));
-  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
+  update_advertisement_data();
 }
 
 
 void current_sensor_start() {
-  ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));
+  update_advertisement_data();
   ina226_init(MEASUREMENT_INTERVAL_MS, SHUNT_RESISTANCE_OHMS, MAX_EXPECTED_CURRENT_A, on_ina226_measurement);
 
   ble_sensor_advertising_start(CURRENT_ADV_INTERVAL_MS);
