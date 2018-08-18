@@ -127,6 +127,7 @@ include_directories("${SDK_ROOT}/components/ble/ble_services/ble_rscs")
 include_directories("${SDK_ROOT}/components/drivers_nrf/usbd")
 include_directories("${SDK_ROOT}/components/ble/ble_services/ble_hrs")
 include_directories("${SDK_ROOT}/components/libraries/serial")
+include_directories("${SDK_ROOT}/components/libraries/crc32")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
