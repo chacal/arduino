@@ -3,3 +3,4 @@ build/
 .idea/
 *.pb.h
 *.pb.c
+private.key

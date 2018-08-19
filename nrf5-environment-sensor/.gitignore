@@ -3,3 +3,4 @@ build/
 .idea/
 src/ble_dfu_trigger_password.h
 private.key
+app_dfu_package_*.zip
