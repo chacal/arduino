@@ -54,7 +54,8 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(SRC_DIR)/main.c \
-
+  $(SRC_DIR)/power_manager.c \
+  $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
 
 SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
@@ -177,6 +178,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/components/libraries/atomic \
   $(SDK_ROOT)/components/softdevice/common \
+  $(SDK_ROOT)/components/libraries/mutex \
 
 # Libraries common to all targets
 LIB_FILES += \
