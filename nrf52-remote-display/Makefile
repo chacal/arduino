@@ -24,6 +24,9 @@ DFU_HW_VERSION     := 52
 DFU_SOFT_DEVICE_ID := 0x9D
 DFU_PRIVATE_KEY    := private.key
 
+U8G2_PATH          := $(HOME)/arduino/u8g2
+U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
+
 # Source files common to all targets
 SRC_FILES += \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
@@ -53,9 +56,12 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
+  $(U8G2_SOURCES) \
   $(SRC_DIR)/main.c \
   $(SRC_DIR)/power_manager.c \
+  $(SRC_DIR)/display.c \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
+  $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
 
 SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
@@ -179,6 +185,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/atomic \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/libraries/mutex \
+  $(U8G2_PATH)/csrc \
 
 # Libraries common to all targets
 LIB_FILES += \
