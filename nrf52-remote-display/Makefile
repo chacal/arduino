@@ -57,9 +57,10 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(U8G2_SOURCES) \
-  $(SRC_DIR)/main.c \
-  $(SRC_DIR)/power_manager.c \
-  $(SRC_DIR)/display.c \
+  $(SRC_DIR)/main.cpp \
+  $(SRC_DIR)/PowerManager.cpp \
+  $(SRC_DIR)/Display.cpp \
+  $(SRC_DIR)/NRFu8g2Adapter.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
 
@@ -217,7 +218,8 @@ CFLAGS += -fno-builtin --short-enums
 CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 
 # C++ flags common to all targets
-CXXFLAGS += \
+CXXFLAGS += -std=c++14
+CXXFLAGS += -fno-threadsafe-statics
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
