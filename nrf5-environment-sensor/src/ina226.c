@@ -71,7 +71,7 @@ static void twi_init(void) {
 static void on_measurement_timer(void *ctx) {
   int16_t raw_shunt_voltage = read16(INA226_REG_SHUNT_VOLTAGE);
   int16_t raw_bus_voltage   = read16(INA226_REG_BUS_VOLTAGE);
-  int16_t raw_shunt_current = read16(INA226_REG_SHUNT_CURRENT);
+  int16_t raw_shunt_current = -read16(INA226_REG_SHUNT_CURRENT);  // Use minus sign to get charging currents to be positive
   double  shunt_voltage_mv  = raw_shunt_voltage * INA226_SHUNT_VOLTAGE_LSB_UV / 1000;
   double  bus_voltage_mv    = raw_bus_voltage * INA226_BUS_VOLTAGE_LSB_MV;
   double  shunt_current_A   = raw_shunt_current * m_current_lsb;
