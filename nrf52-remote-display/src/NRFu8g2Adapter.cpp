@@ -21,9 +21,7 @@ NRFu8g2Adapter &NRFu8g2Adapter::getInstance() {
 nrf_drv_spi_t NRFu8g2Adapter::spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);
 volatile bool NRFu8g2Adapter::spi_xfer_done = false;
 
-NRFu8g2Adapter::NRFu8g2Adapter() {
-  spi_init();
-}
+NRFu8g2Adapter::NRFu8g2Adapter() = default;
 
 void NRFu8g2Adapter::spi_evt_handler(nrf_drv_spi_evt_t const *p_event, void *p_context) {
   spi_xfer_done = true;
