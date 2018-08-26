@@ -259,15 +259,15 @@ $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
 # Flash the program
 flash_app: default
 	@echo Flashing: $(OUTPUT_FILE).hex
-	$(GDB_TARGET) -ex load -ex kill -ex quit $(OUTPUT_FILE).hex
+	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $(OUTPUT_FILE).hex
 
 flash_softdevice:
 	@echo Flashing Soft Device..
-	$(GDB_TARGET) -ex load -ex kill -ex quit $(SOFTDEVICE_HEX)
+	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $(SOFTDEVICE_HEX)
 
 flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..
-	$(GDB_TARGET) -ex load -ex kill -ex quit $<
+	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $<
 
 flash: flash_app flash_dfu_settings
 
