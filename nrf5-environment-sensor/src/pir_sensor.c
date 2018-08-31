@@ -7,8 +7,8 @@
 #include <nrf_drv_gpiote.h>
 #include <ble_gap.h>
 
-#define PIN_PIR_INPUT      2
-#define PIN_PIR_POWER      3
+#define PIN_PIR_INPUT     11
+#define PIN_PIR_POWER     12
 
 #pragma pack(1)
 

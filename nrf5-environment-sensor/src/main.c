@@ -17,8 +17,8 @@
 #define SENSOR_TYPE_INA226  3
 
 
-#define DEVICE_NAME         "C400"
-#define SENSOR_TYPE         SENSOR_TYPE_INA226
+#define DEVICE_NAME         "P303"
+#define SENSOR_TYPE         SENSOR_TYPE_PIR  // Remember also to check the PIR sensor pins in pir_sensor.c!
 
 
 static void on_dfu_triggered() {
