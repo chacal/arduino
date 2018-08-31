@@ -5,7 +5,7 @@ PLATFORM           := NRF52832
 
 TARGETS            := $(PLATFORM)_xxaa
 OUTPUT_DIRECTORY   := build
-BMP_DEV            := /dev/cu.usbmodemBEE7BD01
+BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := gcc_nrf52_s132.ld
 
 SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_14.2.0
@@ -17,7 +17,7 @@ CMSIS_CONFIG_TOOL  := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
 GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
-GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)"
+GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
 
 DFU_HW_VERSION     := 52
 # S132 v5.0.0, see https://github.com/NordicSemiconductor/pc-nrfutil#commands

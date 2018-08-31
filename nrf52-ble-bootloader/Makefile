@@ -4,7 +4,7 @@ PLATFORM           := NRF52832
 
 TARGETS            := $(PLATFORM)_xxaa
 OUTPUT_DIRECTORY   := build
-BMP_DEV            := /dev/cu.usbmodemBEE7BD01
+BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := secure_dfu_ble_gcc_nrf52.ld
 
 MERGEHEX           := $(HOME)/backupped/dev/nRF5x-Command-Line-Tools_9_5_0_OSX/mergehex/mergehex
@@ -18,7 +18,7 @@ CMSIS_CONFIG_TOOL  := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
 GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
-GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)"
+GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
 
 # Source files common to all targets
 SRC_FILES += \
