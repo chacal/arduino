@@ -42,7 +42,7 @@ void uart_send_str(char *str) {
 static void on_rx_adv_packet(nrf_radio_packet_t adv_packet, int rssi) {
   adv_data_t manuf_data;
 
-  uint32_t res = util_adv_report_parse(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &adv_packet, &manuf_data);
+  uint32_t res = Util::parseAdvReport(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &adv_packet, &manuf_data);
 
   if(res == NRF_SUCCESS) {
     uint16_t *manufacturer_id = (uint16_t *) &manuf_data.data[0];  // First two bytes are the manufacturer ID
@@ -65,7 +65,7 @@ void uart_init() {
 }
 
 int main(void) {
-  util_start_clocks();
+  Util::startClocks();
   uart_init();
 
   char msg[] = "BT sensor receiver started\n";
