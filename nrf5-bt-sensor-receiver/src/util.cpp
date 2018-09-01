@@ -8,7 +8,7 @@ void Util::startClocks() {
   while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 }
 
-std::vector<uint8_t> Util::getAdvPacketField(uint8_t adv_type, nrf_radio_packet_t *adv_report_packet) {
+std::optional<std::vector<uint8_t>> Util::getAdvPacketField(uint8_t adv_type, nrf_radio_packet_t *adv_report_packet) {
   uint8_t *p_data         = &adv_report_packet->payload[6];  // Skip first 6 bytes of adv report (they are a BLE MAC address)
   int     adv_data_length = adv_report_packet->payload_length - 6;
 
@@ -20,10 +20,10 @@ std::vector<uint8_t> Util::getAdvPacketField(uint8_t adv_type, nrf_radio_packet_
     if(field_type == adv_type) {
       uint8_t *field_data       = &p_data[index + 2];
       int     field_data_length = field_length - 1;
-      return {field_data, field_data + field_data_length};
+      return {{field_data, field_data + field_data_length}};
     }
     index += field_length + 1;
   }
 
-  return {};
+  return std::nullopt;
 }

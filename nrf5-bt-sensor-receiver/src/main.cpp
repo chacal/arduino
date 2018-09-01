@@ -42,8 +42,8 @@ void uart_send_str(char *str) {
 static void on_rx_adv_packet(nrf_radio_packet_t adv_packet, int rssi) {
   auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &adv_packet);
 
-  if(res.size() > 0) {
-    uint16_t manufacturer_id = (res[0] << 8) | res[1];  // First two bytes are the manufacturer ID
+  if(res) {
+    uint16_t manufacturer_id = (res.value()[0] << 8) | res.value()[1];  // First two bytes are the manufacturer ID
     if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
       char tx_buf[250];
       char hex_buf[80];
