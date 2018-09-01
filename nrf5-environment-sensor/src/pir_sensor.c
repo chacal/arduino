@@ -6,6 +6,7 @@
 #include <nrf_nvic.h>
 #include <nrf_drv_gpiote.h>
 #include <ble_gap.h>
+#include "random.h"
 
 #define PIN_PIR_INPUT     11
 #define PIN_PIR_POWER     12
@@ -18,6 +19,7 @@ typedef struct {
   uint32_t crc;
   uint8_t  motion_detected;
   uint16_t vcc;
+  uint32_t message_id;
 } pir_sensor_data_t;
 
 static pir_sensor_data_t m_sensor_data = {
@@ -25,10 +27,12 @@ static pir_sensor_data_t m_sensor_data = {
     .tag             = 'k',
     .crc             = 0,
     .motion_detected = 0,
-    .vcc             = 0
+    .vcc             = 0,
+    .message_id      = 0
 };
 
 static void update_advertisement_data() {
+  m_sensor_data.message_id = random_get();
   m_sensor_data.crc = 0;
   m_sensor_data.crc = ble_sensor_advertising_crc32(&m_sensor_data, sizeof(m_sensor_data));  // Calculate CRC
   ble_sensor_advertising_init(&m_sensor_data, sizeof(m_sensor_data));   // Update advertising data
@@ -61,6 +65,7 @@ static void pir_power_on_sensor() {
 }
 
 void pir_sensor_start() {
+  random_init();
   update_advertisement_data();
   vcc_measurement_init(VCC_MEASUREMENT_INTERVAL_S * 1000, on_vcc_measurement);
   pir_input_init();

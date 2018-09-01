@@ -1,5 +1,5 @@
 PROJECT_NAME       := nrf5-environment-sensor
-DFU_APP_VERSION_STR:= 1.4.0
+DFU_APP_VERSION_STR:= 1.5.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
@@ -55,13 +55,16 @@ SRC_FILES += \
   $(SRC_DIR)/environmental_sensor.c \
   $(SRC_DIR)/pir_sensor.c \
   $(SRC_DIR)/current_sensor.c \
+  $(SRC_DIR)/random.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/twi_master/nrf_drv_twi.c \
   $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
+  $(SDK_ROOT)/components/drivers_nrf/rng/nrf_drv_rng.c \
   $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
+  $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
