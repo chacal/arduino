@@ -31,7 +31,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
   $(SDK_ROOT)/components/toolchain/system_nrf52.c \
-  $(SRC_DIR)/main.c \
+  $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/radio.c \
   $(SRC_DIR)/util.c \
   $(SRC_DIR)/channel_resolver.c \
@@ -175,7 +175,8 @@ CFLAGS += -fno-builtin --short-enums
 CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 
 # C++ flags common to all targets
-CXXFLAGS += \
+CXXFLAGS += -std=c++17
+CXXFLAGS += -Wno-register
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp

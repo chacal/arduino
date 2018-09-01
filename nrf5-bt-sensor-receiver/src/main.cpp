@@ -3,15 +3,20 @@
 #include <ble_gap.h>
 #include <string.h>
 #include <nrf_drv_uart.h>
+
+extern "C" {
 #include "util.h"
 #include "radio.h"
-
+}
 
 #define FILTERED_MANUFACTURER_ID   0xDADA
 #define UART_TX_PIN                13      // Use pin 2 if flashed on bme280 sensor board using SCL pin as UART TX
 
-nrf_drv_uart_t m_uart = NRF_DRV_UART_INSTANCE(UART0_INSTANCE_INDEX);
-
+// Can't use NRF_DRV_UART_INSTANCE macro here due to compile error on C++, see: https://devzone.nordicsemi.com/f/nordic-q-a/18616/can-t-instantiate-uart-driver
+nrf_drv_uart_t m_uart = {
+    .reg          = {(NRF_UARTE_Type *) NRF_DRV_UART_PERIPHERAL(UART0_INSTANCE_INDEX)},
+    .drv_inst_idx = UART0_INSTANCE_INDEX,
+};
 
 void tohex(char *in, size_t insz, char *out, size_t outsz) {
   char       *pin  = in;
