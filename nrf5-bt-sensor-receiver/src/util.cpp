@@ -27,3 +27,16 @@ std::optional<std::vector<uint8_t>> Util::getAdvPacketField(uint8_t adv_type, nr
 
   return std::nullopt;
 }
+
+
+std::string Util::tohex(uint8_t *in, size_t insz) {
+  const char *hex = "0123456789ABCDEF";
+  std::string out;
+
+  for(size_t i = 0; i < insz; ++i) {
+    out += hex[(in[i] >> 4) & 0xF];
+    out += hex[in[i] & 0xF];
+  }
+
+  return out;
+}
