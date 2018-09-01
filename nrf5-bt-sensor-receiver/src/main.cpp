@@ -3,9 +3,9 @@
 #include <ble_gap.h>
 #include <string.h>
 #include <nrf_drv_uart.h>
+#include "util.hpp"
 
 extern "C" {
-#include "util.h"
 #include "radio.h"
 }
 

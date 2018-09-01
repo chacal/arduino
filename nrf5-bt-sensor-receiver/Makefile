@@ -33,7 +33,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/system_nrf52.c \
   $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/radio.c \
-  $(SRC_DIR)/util.c \
+  $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/channel_resolver.c \
 
 INC_FOLDERS += \

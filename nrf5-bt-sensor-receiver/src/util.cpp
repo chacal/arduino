@@ -1,6 +1,6 @@
 #include <nrf.h>
 #include <nrf_error.h>
-#include "util.h"
+#include "util.hpp"
 
 void util_start_clocks() {
   NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;

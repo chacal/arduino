@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #define RADIO_PACKET_PAYLOAD_LENGTH  37
 
 typedef struct {
