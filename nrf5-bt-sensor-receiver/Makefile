@@ -154,6 +154,9 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/libraries/mutex \
 
+LIB_FILES += \
+  -lstdc++ \
+
 # Optimization flags
 OPT = -Wall -O3 -g3
 # Uncomment the line below to enable link time optimization
