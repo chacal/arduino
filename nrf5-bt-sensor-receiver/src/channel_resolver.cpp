@@ -45,7 +45,7 @@ namespace channel_resolver{
     static adv_channel_hop_sequence_t hop_sequence = {{ ADV_CHANNEL_37, ADV_CHANNEL_38, ADV_CHANNEL_39 }, 3 };
 
     /* Returns the logical channel corresponding to the current radio frequency */
-    uint8_t channel_resolver_get_channel() {
+    uint8_t get_channel() {
       uint8_t freq = NRF_RADIO->FREQUENCY;
 
       uint8_t channel;
@@ -71,14 +71,14 @@ namespace channel_resolver{
     }
 
 
-    uint8_t channel_resolver_get_next_channel() {
-      adv_channel_t current_channel = (adv_channel_t) channel_resolver_get_channel();
+    uint8_t get_next_channel() {
+      adv_channel_t current_channel = (adv_channel_t) get_channel();
       int           current_index   = get_index_in_hop_sequence(current_channel);
       int           next_index      = (current_index + 1) % hop_sequence.n_channels;
       return (uint8_t) hop_sequence.channels[next_index];
     }
 
-    uint8_t channel_resolver_get_frequency(uint8_t channel) {
+    uint8_t get_frequency(uint8_t channel) {
       uint8_t freq;
 
       /* Special cases for the advertise channels */

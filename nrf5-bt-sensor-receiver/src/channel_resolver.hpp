@@ -9,7 +9,7 @@ namespace channel_resolver{
       ADV_CHANNEL_39 = 39
     } adv_channel_t;
 
-    uint8_t channel_resolver_get_channel();
-    uint8_t channel_resolver_get_next_channel();
-    uint8_t channel_resolver_get_frequency(uint8_t channel);
+    uint8_t get_channel();
+    uint8_t get_next_channel();
+    uint8_t get_frequency(uint8_t channel);
 }
