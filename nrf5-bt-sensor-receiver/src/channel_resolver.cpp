@@ -35,61 +35,63 @@
 #include "channel_resolver.hpp"
 #include "nrf_gpio.h"
 
+namespace channel_resolver{
 
-typedef struct {
-  adv_channel_t channels[3];
-  uint8_t       n_channels;
-} adv_channel_hop_sequence_t;
+    typedef struct {
+      adv_channel_t channels[3];
+      uint8_t       n_channels;
+    } adv_channel_hop_sequence_t;
 
-static adv_channel_hop_sequence_t hop_sequence = {{ADV_CHANNEL_37, ADV_CHANNEL_38, ADV_CHANNEL_39}, 3};
+    static adv_channel_hop_sequence_t hop_sequence = {{ ADV_CHANNEL_37, ADV_CHANNEL_38, ADV_CHANNEL_39 }, 3 };
 
-/* Returns the logical channel corresponding to the current radio frequency */
-uint8_t channel_resolver_get_channel(void) {
-  uint8_t freq = NRF_RADIO->FREQUENCY;
+    /* Returns the logical channel corresponding to the current radio frequency */
+    uint8_t channel_resolver_get_channel() {
+      uint8_t freq = NRF_RADIO->FREQUENCY;
 
-  uint8_t channel;
-  /* Special cases for the advertise channels */
-  if(freq == 2) {
-    channel = 37;
-  } else if(freq == 26) {
-    channel = 38;
-  } else if(freq == 80) {
-    channel = 39;
-    /* Data channels */
-  } else {
-    channel = (freq / 2) - (freq < 26 ? 2 : 3);
-  } // Spec Vol. 6, Part B, 1.4.1
+      uint8_t channel;
+      /* Special cases for the advertise channels */
+      if(freq == 2) {
+        channel = 37;
+      } else if(freq == 26) {
+        channel = 38;
+      } else if(freq == 80) {
+        channel = 39;
+        /* Data channels */
+      } else {
+        channel = (freq / 2) - (freq < 26 ? 2 : 3);
+      } // Spec Vol. 6, Part B, 1.4.1
 
-  return channel;
-}
+      return channel;
+    }
 
-int get_index_in_hop_sequence(adv_channel_t channel) {
-  int i;
-  for(i = 0; (i < hop_sequence.n_channels) && (channel != hop_sequence.channels[i]); i++) {}
-  return i;
-}
+    int get_index_in_hop_sequence(adv_channel_t channel) {
+      int i;
+      for(i = 0; (i < hop_sequence.n_channels) && (channel != hop_sequence.channels[i]); i++) {}
+      return i;
+    }
 
 
-uint8_t channel_resolver_get_next_channel(void) {
-  adv_channel_t current_channel = (adv_channel_t) channel_resolver_get_channel();
-  int           current_index   = get_index_in_hop_sequence(current_channel);
-  int           next_index      = (current_index + 1) % hop_sequence.n_channels;
-  return (uint8_t) hop_sequence.channels[next_index];
-}
+    uint8_t channel_resolver_get_next_channel() {
+      adv_channel_t current_channel = (adv_channel_t) channel_resolver_get_channel();
+      int           current_index   = get_index_in_hop_sequence(current_channel);
+      int           next_index      = (current_index + 1) % hop_sequence.n_channels;
+      return (uint8_t) hop_sequence.channels[next_index];
+    }
 
-uint8_t channel_resolver_get_frequency(uint8_t channel) {
-  uint8_t freq;
+    uint8_t channel_resolver_get_frequency(uint8_t channel) {
+      uint8_t freq;
 
-  /* Special cases for the advertise channels */
-  if(channel == 37) {
-    freq = 2;
-  } else if(channel == 38) {
-    freq = 26;
-  } else if(channel == 39) {
-    freq = 80;
-  } else {
-    freq = channel + (channel < 11 ? 2 : 3) * 2;
-  } // Spec Vol. 6, Part B, 1.4.1
+      /* Special cases for the advertise channels */
+      if(channel == 37) {
+        freq = 2;
+      } else if(channel == 38) {
+        freq = 26;
+      } else if(channel == 39) {
+        freq = 80;
+      } else {
+        freq = channel + (channel < 11 ? 2 : 3) * 2;
+      } // Spec Vol. 6, Part B, 1.4.1
 
-  return freq;
+      return freq;
+    }
 }
