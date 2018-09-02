@@ -11,7 +11,7 @@
 #define PACKET_TYPE_ADV_IND            0x00
 #define PACKET_TYPE_ADV_NONCONN_IND    0x02
 
-static nrf_radio_packet_t m_rx_tx_buf;
+static nrf_packet_data m_rx_tx_buf;
 static radio_packet_cb_t  m_on_rx_adv_packet;
 
 static void clear_events() {

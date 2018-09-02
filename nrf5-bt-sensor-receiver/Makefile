@@ -35,6 +35,7 @@ SRC_FILES += \
   $(SRC_DIR)/radio.c \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/channel_resolver.c \
+  $(SRC_DIR)/packet_queue.cpp \
 
 INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/s132/headers \

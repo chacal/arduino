@@ -4,7 +4,7 @@
 #include <string.h>
 #include <nrf_drv_uart.h>
 #include "util.hpp"
-#include <queue>
+#include "packet_queue.hpp"
 
 extern "C" {
 #include "radio.h"
@@ -20,38 +20,31 @@ nrf_drv_uart_t m_uart = {
     .drv_inst_idx = UART0_INSTANCE_INDEX,
 };
 
-std::queue<std::string> m_tx_queue;
+packet_queue m_received_packets(MAX_TX_QUEUE_SIZE);
 
 
-void uart_send_str(const std::string &str) {
+static void uart_send_str(const std::string &str) {
   nrf_drv_uart_tx(&m_uart, (uint8_t *) str.c_str(), str.size());
 }
 
-static void on_rx_adv_packet(nrf_radio_packet_t adv_packet, int rssi) {
-  auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &adv_packet);
+static void on_rx_adv_packet(nrf_packet_data adv_packet, int rssi) {
+  m_received_packets.push({adv_packet, rssi});
+}
+
+static void process_received_packet(const packet &packet) {
+  auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &packet.data);
 
   if(res) {
     uint16_t manufacturer_id = (res.value()[0] << 8) | res.value()[1];  // First two bytes are the manufacturer ID
     if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
-      while(m_tx_queue.size() >= MAX_TX_QUEUE_SIZE) {
-        m_tx_queue.pop();
-      }
-
-      auto hex_data = Util::tohex(adv_packet.payload, adv_packet.payload_length);
-      auto json_msg = R"({"data": ")" + hex_data + R"(", "rssi": )" + std::to_string(rssi) + "}\n";
-      m_tx_queue.push(json_msg);
+      auto hex_data = Util::tohex(packet.data.payload, packet.data.payload_length);
+      auto json_msg = R"({"data": ")" + hex_data + R"(", "rssi": )" + std::to_string(packet.rssi) + "}\n";
+      uart_send_str(json_msg);
     }
   }
 }
 
-static void send_buffered_messages() {
-  while(!m_tx_queue.empty()) {
-    uart_send_str(m_tx_queue.front());
-    m_tx_queue.pop();
-  }
-}
-
-void uart_init() {
+static void uart_init() {
   nrf_drv_uart_config_t config = NRF_DRV_UART_DEFAULT_CONFIG;
   config.pseltxd = UART_TX_PIN;
   APP_ERROR_CHECK(nrf_drv_uart_init(&m_uart, &config, NULL));
@@ -67,9 +60,10 @@ int main() {
   radio_rx_start();
 
   for(;;) {
-    send_buffered_messages();
-    __WFE();
-    __SEV();
-    __WFI();
+    if(m_received_packets.process_next_with(process_received_packet)) {
+      __WFE();
+      __SEV();
+      __WFI();
+    }
   }
 }
