@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "channel_resolver.h"
+#include "channel_resolver.hpp"
 #include "nrf_gpio.h"
 
 

@@ -4,9 +4,7 @@
 #include <functional>
 #include <optional>
 
-extern "C" {
-#include "radio.h"
-}
+#include "radio.hpp"
 
 struct adv_packet {
   nrf_packet_data data;

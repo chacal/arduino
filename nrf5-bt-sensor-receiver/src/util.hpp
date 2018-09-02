@@ -4,9 +4,7 @@
 #include <vector>
 #include <optional>
 
-extern "C" {
-#include "radio.h"
-}
+#include "radio.hpp"
 
 namespace util {
   void start_clocks();

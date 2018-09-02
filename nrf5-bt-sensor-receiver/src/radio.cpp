@@ -1,6 +1,6 @@
 #include <nrf.h>
-#include "radio.h"
-#include "channel_resolver.h"
+#include "radio.hpp"
+#include "channel_resolver.hpp"
 
 #define RADIO_TIMER                       NRF_TIMER2
 #define RADIO_TIMER_RX_TIMEOUT_COMPARE    0
@@ -11,8 +11,8 @@
 #define PACKET_TYPE_ADV_IND            0x00
 #define PACKET_TYPE_ADV_NONCONN_IND    0x02
 
-static nrf_packet_data m_rx_tx_buf;
-static radio_packet_cb_t  m_on_rx_adv_packet;
+static nrf_packet_data   m_rx_tx_buf;
+static radio_packet_cb_t m_on_rx_adv_packet;
 
 static void clear_events() {
   NRF_RADIO->EVENTS_DISABLED = 0;
@@ -126,6 +126,7 @@ static void on_rx_packet() {
   }
 }
 
+extern "C" {
 void RADIO_IRQHandler() {
   NRF_RADIO->EVENTS_READY = 0;
 
@@ -136,4 +137,5 @@ void RADIO_IRQHandler() {
     NRF_RADIO->EVENTS_DISABLED = 0;
     start_rx_on_next_adv_channel();
   }
+}
 }

@@ -32,9 +32,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
   $(SDK_ROOT)/components/toolchain/system_nrf52.c \
   $(SRC_DIR)/main.cpp \
-  $(SRC_DIR)/radio.c \
+  $(SRC_DIR)/radio.cpp \
   $(SRC_DIR)/util.cpp \
-  $(SRC_DIR)/channel_resolver.c \
+  $(SRC_DIR)/channel_resolver.cpp \
   $(SRC_DIR)/packet_queue.cpp \
 
 INC_FOLDERS += \

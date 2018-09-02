@@ -5,10 +5,8 @@
 #include <nrf_drv_uart.h>
 #include "util.hpp"
 #include "packet_queue.hpp"
+#include "radio.hpp"
 
-extern "C" {
-#include "radio.h"
-}
 
 #define FILTERED_MANUFACTURER_ID   0xDADA
 #define UART_TX_PIN                13      // Use pin 2 if flashed on bme280 sensor board using SCL pin as UART TX
