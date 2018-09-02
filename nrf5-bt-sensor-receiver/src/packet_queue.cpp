@@ -3,7 +3,7 @@
 #include <app_util_platform.h>
 #include <ble_gap.h>
 
-std::optional<uint16_t> packet::manufacturer_id() const {
+std::optional<uint16_t> adv_packet::manufacturer_id() const {
   auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &data);
 
   if(res) {
@@ -18,7 +18,7 @@ std::optional<uint16_t> packet::manufacturer_id() const {
 
 packet_queue::packet_queue(size_t max_size) : max_size{max_size} {}
 
-void packet_queue::push(const packet &packet) {
+void packet_queue::push(const adv_packet &packet) {
   CRITICAL_REGION_ENTER();
   while(m_packets.size() >= max_size) {
     m_packets.pop();

@@ -31,7 +31,7 @@ static void on_rx_adv_packet(nrf_packet_data adv_packet, int rssi) {
   m_received_packets.push({adv_packet, rssi});
 }
 
-static void process_received_packet(const packet &packet) {
+static void process_received_packet(const adv_packet &packet) {
   auto manufacturer_id = packet.manufacturer_id();
 
   if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
