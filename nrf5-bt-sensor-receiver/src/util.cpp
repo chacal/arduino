@@ -2,7 +2,7 @@
 #include <nrf_error.h>
 #include "util.hpp"
 
-void Util::startClocks() {
+void Util::start_clocks() {
   NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
   NRF_CLOCK->TASKS_HFCLKSTART    = 1;
   while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);

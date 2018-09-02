@@ -48,7 +48,7 @@ static void uart_init() {
 }
 
 int main() {
-  Util::startClocks();
+  Util::start_clocks();
   uart_init();
 
   uart_send_str("BT sensor receiver started\n");
