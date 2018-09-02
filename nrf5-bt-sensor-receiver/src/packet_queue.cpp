@@ -1,5 +1,20 @@
 #include "packet_queue.hpp"
+#include "util.hpp"
 #include <app_util_platform.h>
+#include <ble_gap.h>
+
+std::optional<uint16_t> packet::manufacturer_id() const {
+  auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &data);
+
+  if(res) {
+    uint16_t manufacturer_id = (res.value()[0] << 8) | res.value()[1];  // First two bytes are the manufacturer ID
+    return {manufacturer_id};
+  } else {
+    return std::nullopt;
+  }
+}
+
+
 
 packet_queue::packet_queue(size_t max_size) : max_size{max_size} {}
 

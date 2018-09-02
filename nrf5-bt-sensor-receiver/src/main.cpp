@@ -32,15 +32,12 @@ static void on_rx_adv_packet(nrf_packet_data adv_packet, int rssi) {
 }
 
 static void process_received_packet(const packet &packet) {
-  auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &packet.data);
+  auto manufacturer_id = packet.manufacturer_id();
 
-  if(res) {
-    uint16_t manufacturer_id = (res.value()[0] << 8) | res.value()[1];  // First two bytes are the manufacturer ID
-    if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
-      auto hex_data = Util::tohex(packet.data.payload, packet.data.payload_length);
-      auto json_msg = R"({"data": ")" + hex_data + R"(", "rssi": )" + std::to_string(packet.rssi) + "}\n";
-      uart_send_str(json_msg);
-    }
+  if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
+    auto hex_data = Util::tohex(packet.data.payload, packet.data.payload_length);
+    auto json_msg = R"({"data": ")" + hex_data + R"(", "rssi": )" + std::to_string(packet.rssi) + "}\n";
+    uart_send_str(json_msg);
   }
 }
 

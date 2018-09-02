@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <functional>
+#include <optional>
 
 extern "C" {
 #include "radio.h"
@@ -10,6 +11,7 @@ extern "C" {
 struct packet {
   nrf_packet_data data;
   int             rssi;
+  std::optional<uint16_t> manufacturer_id() const;
 };
 
 using packet_processor = std::function<void(const packet &)>;
