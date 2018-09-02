@@ -35,7 +35,7 @@ static void process_received_packet(const adv_packet &packet) {
   auto manufacturer_id = packet.manufacturer_id();
 
   if(manufacturer_id == FILTERED_MANUFACTURER_ID) {
-    auto hex_data = Util::tohex(packet.data.payload, packet.data.payload_length);
+    auto hex_data = util::tohex(packet.data.payload, packet.data.payload_length);
     auto json_msg = R"({"data": ")" + hex_data + R"(", "rssi": )" + std::to_string(packet.rssi) + "}\n";
     uart_send_str(json_msg);
   }
@@ -48,7 +48,7 @@ static void uart_init() {
 }
 
 int main() {
-  Util::start_clocks();
+  util::start_clocks();
   uart_init();
 
   uart_send_str("BT sensor receiver started\n");

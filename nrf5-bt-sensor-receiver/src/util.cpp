@@ -2,13 +2,13 @@
 #include <nrf_error.h>
 #include "util.hpp"
 
-void Util::start_clocks() {
+void util::start_clocks() {
   NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
   NRF_CLOCK->TASKS_HFCLKSTART    = 1;
   while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 }
 
-std::string Util::tohex(const uint8_t *in, size_t insz) {
+std::string util::tohex(const uint8_t *in, size_t insz) {
   const char  *hex = "0123456789ABCDEF";
   std::string out;
 

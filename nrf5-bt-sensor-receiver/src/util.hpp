@@ -8,7 +8,7 @@ extern "C" {
 #include "radio.h"
 }
 
-namespace Util {
+namespace util {
   void start_clocks();
   std::string tohex(const uint8_t *in, size_t insz);
 }
