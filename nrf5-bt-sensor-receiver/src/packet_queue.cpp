@@ -4,7 +4,7 @@
 #include <ble_gap.h>
 
 std::optional<uint16_t> adv_packet::manufacturer_id() const {
-  auto res = Util::getAdvPacketField(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &data);
+  auto res = adv_field_data(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA);
 
   if(res) {
     uint16_t manufacturer_id = (res.value()[0] << 8) | res.value()[1];  // First two bytes are the manufacturer ID
@@ -14,6 +14,25 @@ std::optional<uint16_t> adv_packet::manufacturer_id() const {
   }
 }
 
+std::optional<std::vector<uint8_t>> adv_packet::adv_field_data(uint8_t adv_field_type) const {
+  const uint8_t *p_data         = &data.payload[6];  // Skip first 6 bytes of adv report (they are a BLE MAC address)
+  int           adv_data_length = data.payload_length - 6;
+
+  int index = 0;
+  while(index < adv_data_length - 1) {
+    uint8_t field_length = p_data[index];
+    uint8_t field_type   = p_data[index + 1];
+
+    if(field_type == adv_field_type) {
+      const uint8_t *field_data       = &p_data[index + 2];
+      int           field_data_length = field_length - 1;
+      return {{field_data, field_data + field_data_length}};
+    }
+    index += field_length + 1;
+  }
+
+  return std::nullopt;
+}
 
 
 packet_queue::packet_queue(size_t max_size) : max_size{max_size} {}

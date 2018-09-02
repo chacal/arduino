@@ -12,6 +12,7 @@ struct adv_packet {
   nrf_packet_data data;
   int             rssi;
   std::optional<uint16_t> manufacturer_id() const;
+  std::optional<std::vector<uint8_t>> adv_field_data(uint8_t adv_field_type) const;
 };
 
 using packet_processor = std::function<void(const adv_packet &)>;
