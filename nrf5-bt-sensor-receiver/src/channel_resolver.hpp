@@ -2,14 +2,13 @@
 
 #include <stdint.h>
 
-namespace channel_resolver{
-    typedef enum {
-      ADV_CHANNEL_37 = 37,
-      ADV_CHANNEL_38 = 38,
-      ADV_CHANNEL_39 = 39
-    } adv_channel_t;
+namespace channel_resolver {
+  enum class adv_ch {
+    ch_37 = 37,
+    ch_38 = 38,
+    ch_39 = 39,
+  };
 
-    uint8_t get_channel();
-    uint8_t get_next_channel();
-    uint8_t get_frequency(uint8_t channel);
+  adv_ch get_next_channel();
+  uint8_t get_frequency(adv_ch channel);
 }

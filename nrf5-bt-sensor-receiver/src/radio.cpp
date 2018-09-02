@@ -33,10 +33,10 @@ void radio_init(radio_packet_cb_t on_rx_adv_packet) {
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
 
   /* Set the requested channel */
-  NRF_RADIO->FREQUENCY = channel_resolver::get_frequency(channel_resolver::ADV_CHANNEL_37);
+  NRF_RADIO->FREQUENCY = channel_resolver::get_frequency(channel_resolver::adv_ch::ch_37);
 
   /* This value needs to correspond to the channel being used */
-  NRF_RADIO->DATAWHITEIV = channel_resolver::ADV_CHANNEL_37;
+  NRF_RADIO->DATAWHITEIV = static_cast<uint32_t>(channel_resolver::adv_ch::ch_37);
 
   /* Configure Access Address according to the BLE standard */
   NRF_RADIO->PREFIX0 = 0x8e;
@@ -107,9 +107,9 @@ void radio_rx_start() {
 }
 
 static void change_to_next_channel() {
-  uint8_t next_channel   = channel_resolver::get_next_channel();
+  auto next_channel      = channel_resolver::get_next_channel();
   NRF_RADIO->FREQUENCY   = channel_resolver::get_frequency(next_channel);
-  NRF_RADIO->DATAWHITEIV = next_channel;
+  NRF_RADIO->DATAWHITEIV = static_cast<uint32_t>(next_channel);
 }
 
 static void start_rx_on_next_adv_channel() {

@@ -1,97 +1,52 @@
-/* Copyright (c) Nordic Semiconductor ASA
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- *   1. Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- *
- *   2. Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- *   3. Neither the name of Nordic Semiconductor ASA nor the names of other
- *   contributors to this software may be used to endorse or promote products
- *   derived from this software without specific prior written permission.
- *
- *   4. This software must only be used in a processor manufactured by Nordic
- *   Semiconductor ASA, or in a processor manufactured by a third party that
- *   is used in combination with a processor manufactured by Nordic Semiconductor.
- *
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+#include <vector>
+#include <algorithm>
+#include <iterator>
+
 
 #include "channel_resolver.hpp"
 #include "nrf_gpio.h"
 
-namespace channel_resolver{
+namespace channel_resolver {
 
-    typedef struct {
-      adv_channel_t channels[3];
-      uint8_t       n_channels;
-    } adv_channel_hop_sequence_t;
+  static std::vector<adv_ch> hop_sequence = {adv_ch::ch_37, adv_ch::ch_38, adv_ch::ch_39};
 
-    static adv_channel_hop_sequence_t hop_sequence = {{ ADV_CHANNEL_37, ADV_CHANNEL_38, ADV_CHANNEL_39 }, 3 };
+  /* Returns the logical channel corresponding to the current radio frequency */
+  adv_ch get_current_adv_channel() {
+    uint8_t freq = NRF_RADIO->FREQUENCY;
 
-    /* Returns the logical channel corresponding to the current radio frequency */
-    uint8_t get_channel() {
-      uint8_t freq = NRF_RADIO->FREQUENCY;
-
-      uint8_t channel;
-      /* Special cases for the advertise channels */
-      if(freq == 2) {
-        channel = 37;
-      } else if(freq == 26) {
-        channel = 38;
-      } else if(freq == 80) {
-        channel = 39;
-        /* Data channels */
-      } else {
-        channel = (freq / 2) - (freq < 26 ? 2 : 3);
-      } // Spec Vol. 6, Part B, 1.4.1
-
-      return channel;
+    switch(freq) {
+      case 2:
+        return adv_ch::ch_37;
+      case 26:
+        return adv_ch::ch_38;
+      case 80:
+        return adv_ch::ch_39;
+      default:
+        return adv_ch::ch_37;  // Should not happen as we are only listening on advertisement channels
     }
+  }
 
-    int get_index_in_hop_sequence(adv_channel_t channel) {
-      int i;
-      for(i = 0; (i < hop_sequence.n_channels) && (channel != hop_sequence.channels[i]); i++) {}
-      return i;
+  int get_index_in_hop_sequence(adv_ch channel) {
+    return std::distance(hop_sequence.begin(), find(hop_sequence.begin(), hop_sequence.end(), channel));
+  }
+
+  adv_ch get_next_channel() {
+    auto current_channel = get_current_adv_channel();
+    int  current_index   = get_index_in_hop_sequence(current_channel);
+    int  next_index      = (current_index + 1) % hop_sequence.size();
+    return hop_sequence[next_index];
+  }
+
+  uint8_t get_frequency(adv_ch channel) {
+    switch(channel) {
+      case adv_ch::ch_37:
+        return 2;
+      case adv_ch::ch_38:
+        return 26;
+      case adv_ch::ch_39:
+        return 80;
+      default:
+        return 2;  // Should not happen as we are only listening on advertisement channels
     }
-
-
-    uint8_t get_next_channel() {
-      adv_channel_t current_channel = (adv_channel_t) get_channel();
-      int           current_index   = get_index_in_hop_sequence(current_channel);
-      int           next_index      = (current_index + 1) % hop_sequence.n_channels;
-      return (uint8_t) hop_sequence.channels[next_index];
-    }
-
-    uint8_t get_frequency(uint8_t channel) {
-      uint8_t freq;
-
-      /* Special cases for the advertise channels */
-      if(channel == 37) {
-        freq = 2;
-      } else if(channel == 38) {
-        freq = 26;
-      } else if(channel == 39) {
-        freq = 80;
-      } else {
-        freq = channel + (channel < 11 ? 2 : 3) * 2;
-      } // Spec Vol. 6, Part B, 1.4.1
-
-      return freq;
-    }
+  }
 }
