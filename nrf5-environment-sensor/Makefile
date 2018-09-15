@@ -1,6 +1,6 @@
 PROJECT_NAME       := nrf5-environment-sensor
 PROJECT_DIR_NAME   := $(shell basename "$(dir $(strip $(MAKEFILE_LIST)))")
-DFU_APP_VERSION_STR:= 1.5.0
+DFU_APP_VERSION_STR:= 1.6.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
