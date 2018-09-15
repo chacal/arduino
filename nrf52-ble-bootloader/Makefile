@@ -7,7 +7,7 @@ OUTPUT_DIRECTORY   := build
 BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := secure_dfu_ble_gcc_nrf52.ld
 
-MERGEHEX           := $(HOME)/backupped/dev/nRF5x-Command-Line-Tools_9_5_0_OSX/mergehex/mergehex
+MERGEHEX           := mergehex
 
 SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_14.2.0
 SOFTDEVICE_HEX     := $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_5.0.0_softdevice.hex
