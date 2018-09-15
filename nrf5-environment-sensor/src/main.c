@@ -15,6 +15,7 @@
 #define SENSOR_TYPE_BME280  1
 #define SENSOR_TYPE_PIR     2
 #define SENSOR_TYPE_INA226  3
+#define DCDC_STATE          NRF_POWER_DCDC_DISABLE
 
 
 #define DEVICE_NAME         "P303"
@@ -44,6 +45,7 @@ int main(void) {
   APP_ERROR_CHECK(app_timer_init());
 
   ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
+  APP_ERROR_CHECK(sd_power_dcdc_mode_set(DCDC_STATE));
 
 #if SENSOR_TYPE == SENSOR_TYPE_BME280
   environmental_sensor_start();
@@ -55,7 +57,7 @@ int main(void) {
 #error Unknown sensor type!
 #endif
 
-  for(;;) {
+  for (;;) {
     power_manage();
   }
 }
