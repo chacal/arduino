@@ -1,0 +1,14 @@
+REMOTE_HOST         := pannu
+REMOTE_ARDUINO_ROOT := /mnt/hgfs/Arduino
+BMP_DEV             := /dev/cu.usbmodemD6DC8FD1
+
+REMOTE_PROJECT_DIR  := $(REMOTE_ARDUINO_ROOT)/$(PROJECT_DIR_NAME)
+REMOTE_CMD          := ssh $(REMOTE_HOST) -C cd "$(REMOTE_PROJECT_DIR)"\;
+
+CMSIS_CONFIG_TOOL   := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
+
+GDB                  = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
+GDB_TARGET           = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
+
+NRF_UTIL            := $(REMOTE_CMD) nrfutil
+MERGEHEX            := mergehex

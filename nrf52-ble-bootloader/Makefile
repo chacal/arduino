@@ -1,24 +1,20 @@
 PROJECT_NAME       := nrf52-ble-bootloader
+PROJECT_DIR_NAME   := $(shell basename "$(dir $(strip $(MAKEFILE_LIST)))")
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
 TARGETS            := $(PLATFORM)_xxaa
 OUTPUT_DIRECTORY   := build
-BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := secure_dfu_ble_gcc_nrf52.ld
-
-MERGEHEX           := mergehex
 
 SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_14.2.0
 SOFTDEVICE_HEX     := $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_5.0.0_softdevice.hex
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
-CMSIS_CONFIG_TOOL  := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
-GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
-GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
+include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
 # Source files common to all targets
 SRC_FILES += \

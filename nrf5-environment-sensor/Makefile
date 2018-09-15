@@ -1,11 +1,11 @@
 PROJECT_NAME       := nrf5-environment-sensor
+PROJECT_DIR_NAME   := $(shell basename "$(dir $(strip $(MAKEFILE_LIST)))")
 DFU_APP_VERSION_STR:= 1.5.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
 TARGETS            := $(PLATFORM)_xxaa
 OUTPUT_DIRECTORY   := build
-BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := gcc_nrf52_s132.ld
 
 SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_14.2.0
@@ -13,11 +13,9 @@ SOFTDEVICE_HEX     := $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_5.0.
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
-CMSIS_CONFIG_TOOL  := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
-GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
-GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
+include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
 DFU_HW_VERSION     := 52
 # S132 v5.0.0, see https://github.com/NordicSemiconductor/pc-nrfutil#commands
@@ -260,7 +258,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
-	nrfutil settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+	$(NRF_UTIL) settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
 flash_app: default
@@ -278,7 +276,7 @@ flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 flash: flash_app flash_dfu_settings
 
 dfu_pkg: default
-	nrfutil pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+	$(NRF_UTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 erase:
 	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
