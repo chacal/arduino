@@ -21,7 +21,7 @@ void display::off() {
   u8g2_SetPowerSave(&u8g2, 1);
 }
 
-static const uint8_t *font_for_size(font_size size) {
+static const uint8_t *font_for_size(const font_size &size) {
   if(size.get() <= 8) {
     return u8g2_font_helvB08_tr;
   } else if(size.get() <= 10) {
@@ -45,7 +45,7 @@ static const uint8_t *font_for_size(font_size size) {
   }
 }
 
-void display::draw_str(uint8_t x, uint8_t y, font_size size, char *str) {
+void display::draw_str(uint8_t x, uint8_t y, const font_size &size, char *str) {
   const uint8_t *font = font_for_size(size);
   u8g2_SetFont(&u8g2, font);
   u8g2_DrawStr(&u8g2, x, y, str);
@@ -63,7 +63,7 @@ void display::render() {
   u8g2_SendBuffer(&u8g2);
 }
 
-uint8_t display::centered_x(const char *str, font_size size) {
+uint8_t display::centered_x(const char *str, const font_size &size) {
   u8g2_SetFont(&u8g2, font_for_size(size));
   int x = SCREEN_WIDTH / 2 - u8g2_GetStrWidth(&u8g2, str) / 2;
   return x >= 0 ? x : 0;
