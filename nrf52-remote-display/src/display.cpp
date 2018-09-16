@@ -56,7 +56,7 @@ void display::clear() {
 }
 
 void display::draw_line(const point &start, const point &end) {
-  u8g2_DrawLine(&u8g2, start.x, start.y, start.x, start.y);
+  u8g2_DrawLine(&u8g2, start.x, start.y, end.x, end.y);
 }
 
 void display::render() {
