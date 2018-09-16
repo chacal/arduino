@@ -11,7 +11,7 @@ int main() {
 
   display d;
   d.on();
-  d.draw_str(0, 12, 10, (char *) "Hello world!");
+  d.draw_str(0, 12, font_size(10), (char *) "Hello world!");
   d.draw_line(0, 13, 128, 13);
   d.render();
 

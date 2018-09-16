@@ -21,32 +21,32 @@ void display::off() {
   u8g2_SetPowerSave(&u8g2, 1);
 }
 
-static const uint8_t *font_for_size(uint8_t font_size) {
-  if(font_size <= 8) {
+static const uint8_t *font_for_size(font_size size) {
+  if(size.get() <= 8) {
     return u8g2_font_helvB08_tr;
-  } else if(font_size <= 10) {
+  } else if(size.get() <= 10) {
     return u8g2_font_helvB10_tr;
-  } else if(font_size <= 12) {
+  } else if(size.get() <= 12) {
     return u8g2_font_helvB12_tr;
-  } else if(font_size <= 14) {
+  } else if(size.get() <= 14) {
     return u8g2_font_helvB14_tr;
-  } else if(font_size <= 18) {
+  } else if(size.get() <= 18) {
     return u8g2_font_helvB18_tr;
-  } else if(font_size <= 24) {
+  } else if(size.get() <= 24) {
     return u8g2_font_helvB24_tr;
-  } else if(font_size <= 25) {
+  } else if(size.get() <= 25) {
     return u8g2_font_fub25_tn;
-  } else if(font_size <= 30) {
+  } else if(size.get() <= 30) {
     return u8g2_font_fub30_tn;
-  } else if(font_size <= 35) {
+  } else if(size.get() <= 35) {
     return u8g2_font_fub35_tn;
   } else {
     return u8g2_font_fub42_tn;
   }
 }
 
-void display::draw_str(uint8_t x, uint8_t y, uint8_t font_size, char *str) {
-  const uint8_t *font = font_for_size(font_size);
+void display::draw_str(uint8_t x, uint8_t y, font_size size, char *str) {
+  const uint8_t *font = font_for_size(size);
   u8g2_SetFont(&u8g2, font);
   u8g2_DrawStr(&u8g2, x, y, str);
 }
@@ -63,8 +63,8 @@ void display::render() {
   u8g2_SendBuffer(&u8g2);
 }
 
-uint8_t display::centered_x(const char *str, uint8_t font_size) {
-  u8g2_SetFont(&u8g2, font_for_size(font_size));
+uint8_t display::centered_x(const char *str, font_size size) {
+  u8g2_SetFont(&u8g2, font_for_size(size));
   int x = SCREEN_WIDTH / 2 - u8g2_GetStrWidth(&u8g2, str) / 2;
   return x >= 0 ? x : 0;
 }
