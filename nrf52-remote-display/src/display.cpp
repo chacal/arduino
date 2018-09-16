@@ -22,23 +22,23 @@ void display::off() {
 }
 
 static const uint8_t *font_for_size(const font_size &size) {
-  if(size.get() <= 8) {
+  if (size.get() <= 8) {
     return u8g2_font_helvB08_tr;
-  } else if(size.get() <= 10) {
+  } else if (size.get() <= 10) {
     return u8g2_font_helvB10_tr;
-  } else if(size.get() <= 12) {
+  } else if (size.get() <= 12) {
     return u8g2_font_helvB12_tr;
-  } else if(size.get() <= 14) {
+  } else if (size.get() <= 14) {
     return u8g2_font_helvB14_tr;
-  } else if(size.get() <= 18) {
+  } else if (size.get() <= 18) {
     return u8g2_font_helvB18_tr;
-  } else if(size.get() <= 24) {
+  } else if (size.get() <= 24) {
     return u8g2_font_helvB24_tr;
-  } else if(size.get() <= 25) {
+  } else if (size.get() <= 25) {
     return u8g2_font_fub25_tn;
-  } else if(size.get() <= 30) {
+  } else if (size.get() <= 30) {
     return u8g2_font_fub30_tn;
-  } else if(size.get() <= 35) {
+  } else if (size.get() <= 35) {
     return u8g2_font_fub35_tn;
   } else {
     return u8g2_font_fub42_tn;

@@ -17,7 +17,7 @@ int main() {
 
   NRF_LOG_INFO("Hello world!")
 
-  for(;;) {
+  for (;;) {
     power_manager::manage();
   }
 }
