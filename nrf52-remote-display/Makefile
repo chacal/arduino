@@ -58,7 +58,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(U8G2_SOURCES) \
   $(SRC_DIR)/main.cpp \
-  $(SRC_DIR)/PowerManager.cpp \
+  $(SRC_DIR)/power_manager.cpp \
   $(SRC_DIR)/Display.cpp \
   $(SRC_DIR)/NRFu8g2Adapter.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \

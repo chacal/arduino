@@ -3,7 +3,7 @@
 #include <nrf_drv_spi.h>
 
 #include "NRFu8g2Adapter.hpp"
-#include "PowerManager.hpp"
+#include "power_manager.hpp"
 
 #define SCK_PIN         11   // Display PIN 1
 #define MOSI_PIN        12   // Display PIN 2
@@ -40,7 +40,7 @@ void NRFu8g2Adapter::spi_send(uint8_t *data, uint8_t length) {
   spi_xfer_done = false;
   APP_ERROR_CHECK(nrf_drv_spi_transfer(&spi, data, length, NULL, 0));
   while(!spi_xfer_done) {
-    PowerManager::getInstance().manage();
+    power_manager::manage();
   }
 }
 
