@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 #include "nrf_u8g2_adapter.hpp"
 #include "named_type.hpp"
 
@@ -27,7 +28,7 @@ public:
 
   void off();
 
-  void draw_str(const point &bottom_left, const font_size &, char *str);
+  void draw_str(const point &bottom_left, const font_size &, const std::string &);
 
   void draw_line(const point &start, const point &end);
 
@@ -35,7 +36,7 @@ public:
 
   void clear();
 
-  uint8_t centered_x(const char *str, const font_size &);
+  uint8_t centered_x(const std::string &, const font_size &);
 
 private:
   u8g2_t u8g2;

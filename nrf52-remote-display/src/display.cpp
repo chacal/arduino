@@ -45,10 +45,10 @@ static const uint8_t *font_for_size(const font_size &size) {
   }
 }
 
-void display::draw_str(const point &bottom_left, const font_size &size, char *str) {
+void display::draw_str(const point &bottom_left, const font_size &size, const std::string &str) {
   const uint8_t *font = font_for_size(size);
   u8g2_SetFont(&u8g2, font);
-  u8g2_DrawStr(&u8g2, bottom_left.x, bottom_left.y, str);
+  u8g2_DrawStr(&u8g2, bottom_left.x, bottom_left.y, str.c_str());
 }
 
 void display::clear() {
@@ -63,8 +63,8 @@ void display::render() {
   u8g2_SendBuffer(&u8g2);
 }
 
-uint8_t display::centered_x(const char *str, const font_size &size) {
+uint8_t display::centered_x(const std::string &str, const font_size &size) {
   u8g2_SetFont(&u8g2, font_for_size(size));
-  int x = SCREEN_WIDTH / 2 - u8g2_GetStrWidth(&u8g2, str) / 2;
+  int x = SCREEN_WIDTH / 2 - u8g2_GetStrWidth(&u8g2, str.c_str()) / 2;
   return x >= 0 ? x : 0;
 }
