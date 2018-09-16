@@ -248,7 +248,7 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 # Make default (=first) target -> needs to be before including Makefile.common
 default: clean_linked_binaries
-	@$(MAKE) -j8 $(PLATFORM)_xxaa
+	@$(MAKE) -j12 $(PLATFORM)_xxaa
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
