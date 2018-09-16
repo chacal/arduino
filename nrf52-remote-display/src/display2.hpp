@@ -10,9 +10,19 @@ extern "C" {
 
 using font_size = named_type<uint8_t, struct font_size_param>;
 
-class display {
+struct point {
 public:
-  display();
+  point(uint8_t x, uint8_t y) : x{x}, y{y} {}
+
+private:
+  uint8_t x = 0;
+  uint8_t y = 0;
+};
+
+
+class display2 {
+public:
+  display2();
 
   void on();
 
