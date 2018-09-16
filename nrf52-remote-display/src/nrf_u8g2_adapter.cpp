@@ -2,7 +2,7 @@
 #include <nrf_delay.h>
 #include <nrf_drv_spi.h>
 
-#include "NRFu8g2Adapter.hpp"
+#include "nrf_u8g2_adapter.hpp"
 #include "power_manager.hpp"
 
 #define SCK_PIN         11   // Display PIN 1
@@ -13,21 +13,14 @@
 
 #define SPI_INSTANCE     0
 
-NRFu8g2Adapter &NRFu8g2Adapter::getInstance() {
-  static NRFu8g2Adapter theInstance;
-  return theInstance;
-}
+nrf_drv_spi_t nrf_u8g2_adapter::spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);
+volatile bool nrf_u8g2_adapter::spi_xfer_done = false;
 
-nrf_drv_spi_t NRFu8g2Adapter::spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);
-volatile bool NRFu8g2Adapter::spi_xfer_done = false;
-
-NRFu8g2Adapter::NRFu8g2Adapter() = default;
-
-void NRFu8g2Adapter::spi_evt_handler(nrf_drv_spi_evt_t const *p_event, void *p_context) {
+void nrf_u8g2_adapter::spi_evt_handler(nrf_drv_spi_evt_t const *p_event, void *p_context) {
   spi_xfer_done = true;
 }
 
-void NRFu8g2Adapter::spi_init() {
+void nrf_u8g2_adapter::spi_init() {
   nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
   spi_config.ss_pin   = CS_PIN;
   spi_config.miso_pin = NRF_DRV_SPI_PIN_NOT_USED;
@@ -36,7 +29,7 @@ void NRFu8g2Adapter::spi_init() {
   APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_evt_handler, NULL));
 }
 
-void NRFu8g2Adapter::spi_send(uint8_t *data, uint8_t length) {
+void nrf_u8g2_adapter::spi_send(uint8_t *data, uint8_t length) {
   spi_xfer_done = false;
   APP_ERROR_CHECK(nrf_drv_spi_transfer(&spi, data, length, NULL, 0));
   while(!spi_xfer_done) {
@@ -44,7 +37,7 @@ void NRFu8g2Adapter::spi_send(uint8_t *data, uint8_t length) {
   }
 }
 
-uint8_t NRFu8g2Adapter::u8x8_gpio_and_delay_nrf52(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+uint8_t nrf_u8g2_adapter::u8x8_gpio_and_delay_nrf52(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
   switch(msg) {
     case U8X8_MSG_GPIO_AND_DELAY_INIT:  // called once during init phase of u8g2/u8x8, can be used to setup pins
       nrf_gpio_cfg(SCK_PIN, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE);
@@ -85,7 +78,7 @@ uint8_t NRFu8g2Adapter::u8x8_gpio_and_delay_nrf52(u8x8_t *u8x8, uint8_t msg, uin
   return 1;
 }
 
-uint8_t NRFu8g2Adapter::u8x8_byte_nrf52_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+uint8_t nrf_u8g2_adapter::u8x8_byte_nrf52_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
   switch(msg) {
     case U8X8_MSG_BYTE_INIT:
       spi_init();

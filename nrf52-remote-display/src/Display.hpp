@@ -1,23 +1,24 @@
 #pragma once
 
 #include <stdint.h>
+#include "nrf_u8g2_adapter.hpp"
 
 extern "C" {
 #include <u8g2.h>
 }
 
-class Display {
-private:
-  Display();
-  u8g2_t u8g2;
-
+class display {
 public:
-  static Display &getInstance();
+  display();
   void on();
   void off();
-  void drawStr(uint8_t x, uint8_t y, uint8_t fontSize, char *str);
-  void drawLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY);
+  void draw_str(uint8_t x, uint8_t y, uint8_t font_size, char *str);
+  void draw_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y);
   void render();
   void clear();
-  uint8_t centeredX(const char *str, uint8_t fontSize);
+  uint8_t centered_x(const char *str, uint8_t font_size);
+
+private:
+  u8g2_t u8g2;
+  nrf_u8g2_adapter adapter;
 };
