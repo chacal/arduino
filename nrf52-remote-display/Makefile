@@ -25,6 +25,8 @@ DFU_PRIVATE_KEY    := private.key
 U8G2_PATH          := $(HOME)/arduino/u8g2
 U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
+HFSM_PATH          := $(HOME)/Documents/dev/HFSM
+
 # Source files common to all targets
 SRC_FILES += \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
@@ -185,6 +187,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/libraries/mutex \
   $(U8G2_PATH)/csrc \
+  $(HFSM_PATH)/include \
 
 # Libraries common to all targets
 LIB_FILES += \

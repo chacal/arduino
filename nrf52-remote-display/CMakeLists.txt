@@ -6,6 +6,7 @@ set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_14.2.0")
 set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
+set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")
 
 add_definitions(-DNRF5)
 add_definitions(-DNRF52)
@@ -131,6 +132,7 @@ include_directories("${SDK_ROOT}/components/ble/ble_services/ble_hrs")
 include_directories("${SDK_ROOT}/components/libraries/serial")
 include_directories("${SDK_ROOT}/components/libraries/crc32")
 include_directories("${U8G2_ROOT}/csrc")
+include_directories("${HFSM_ROOT}/include")
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
 

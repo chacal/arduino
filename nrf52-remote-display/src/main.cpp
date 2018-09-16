@@ -1,6 +1,7 @@
 #include <nrf_log_default_backends.h>
 #include <nrf_log.h>
 #include <nrf_log_ctrl.h>
+#include <hfsm/machine_single.hpp>
 #include "power_manager.hpp"
 #include "display.hpp"
 
