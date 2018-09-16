@@ -10,5 +10,5 @@ CMSIS_CONFIG_TOOL   := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuratio
 GDB                  = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
 GDB_TARGET           = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
 
-NRF_UTIL            := $(REMOTE_CMD) nrfutil
+NRFUTIL             := $(REMOTE_CMD) nrfutil
 MERGEHEX            := mergehex
