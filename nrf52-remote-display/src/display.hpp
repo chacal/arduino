@@ -14,7 +14,6 @@ struct point {
 public:
   point(uint8_t x, uint8_t y) : x{x}, y{y} {}
 
-private:
   uint8_t x = 0;
   uint8_t y = 0;
 };
@@ -28,9 +27,9 @@ public:
 
   void off();
 
-  void draw_str(uint8_t x, uint8_t y, const font_size &, char *str);
+  void draw_str(const point &bottom_left, const font_size &, char *str);
 
-  void draw_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y);
+  void draw_line(const point &start, const point &end);
 
   void render();
 

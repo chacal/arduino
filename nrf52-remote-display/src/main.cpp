@@ -11,8 +11,8 @@ int main() {
 
   display d;
   d.on();
-  d.draw_str(0, 12, font_size(10), (char *) "Hello world!");
-  d.draw_line(0, 13, 128, 13);
+  d.draw_str(point{0, 12}, font_size(10), (char *) "Hello world!");
+  d.draw_line(point{0, 13}, point{128, 1});
   d.render();
 
   NRF_LOG_INFO("Hello world!")

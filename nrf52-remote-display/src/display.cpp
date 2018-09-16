@@ -45,18 +45,18 @@ static const uint8_t *font_for_size(const font_size &size) {
   }
 }
 
-void display::draw_str(uint8_t x, uint8_t y, const font_size &size, char *str) {
+void display::draw_str(const point &bottom_left, const font_size &size, char *str) {
   const uint8_t *font = font_for_size(size);
   u8g2_SetFont(&u8g2, font);
-  u8g2_DrawStr(&u8g2, x, y, str);
+  u8g2_DrawStr(&u8g2, bottom_left.x, bottom_left.y, str);
 }
 
 void display::clear() {
   u8g2_ClearBuffer(&u8g2);
 }
 
-void display::draw_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y) {
-  u8g2_DrawLine(&u8g2, start_x, start_y, end_x, end_y);
+void display::draw_line(const point &start, const point &end) {
+  u8g2_DrawLine(&u8g2, start.x, start.y, start.x, start.y);
 }
 
 void display::render() {
