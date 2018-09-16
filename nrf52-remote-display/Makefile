@@ -211,7 +211,6 @@ CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -O3 -g3
-CFLAGS += -D__HEAP_SIZE=0
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
@@ -230,7 +229,6 @@ ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DBSP_DEFINES_ONLY
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 ASMFLAGS += -DSOFTDEVICE_PRESENT
-ASMFLAGS += -D__HEAP_SIZE=0
 ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 ASMFLAGS += -DS132
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=5
