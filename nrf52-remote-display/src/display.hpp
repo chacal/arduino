@@ -20,9 +20,9 @@ private:
 };
 
 
-class display2 {
+class display {
 public:
-  display2();
+  display();
 
   void on();
 
