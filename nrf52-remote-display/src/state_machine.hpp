@@ -3,6 +3,9 @@
 #include "states/idle.hpp"
 #include "states/start.hpp"
 
+using namespace fsm;
+using namespace states;
+
 class state_machine {
 public:
   state_machine() : ctx{this}, hfsm_root{ctx} {}
@@ -17,12 +20,12 @@ public:
   }
 
 private:
-  states::Context ctx;
-  states::M::PeerRoot<states::start, states::idle> hfsm_root;
+  Context ctx;
+  M::PeerRoot <start, idle> hfsm_root;
 };
 
 
-namespace states {
+namespace fsm {
   template<typename T>
   void Context::react(const T &event) {
     fsm->react(event);

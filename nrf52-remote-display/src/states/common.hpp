@@ -4,7 +4,7 @@
 
 struct state_machine;
 
-namespace states {
+namespace fsm {
 
   struct Context {
     Context(state_machine *sm) : fsm{sm} {}
@@ -17,4 +17,5 @@ namespace states {
   };
 
   using M = hfsm::Machine<Context>;
+  using Base = M::Base;
 }

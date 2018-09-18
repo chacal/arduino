@@ -3,15 +3,16 @@
 #include <nrf_log.h>
 #include <app_timer.h>
 #include <state_machine.hpp>
-#include "states_common.hpp"
+#include "common.hpp"
 
+using namespace fsm;
 
 APP_TIMER_DEF(adc_timer);
 
 namespace states {
   struct start;
 
-  struct idle : M::Base {
+  struct idle : Base {
     struct timer_elapsed_evt {};
 
     idle() {
@@ -29,7 +30,7 @@ namespace states {
       control.changeTo<start>();
     }
 
-    using M::Base::react;
+    using Base::react;
 
     virtual void leave(Context &context) {
       NRF_LOG_INFO("Leave idle")
@@ -38,7 +39,7 @@ namespace states {
 
     static void sample_vcc(void *ctx) {
       NRF_LOG_INFO("Timer!");
-      auto c = static_cast<states::Context *>(ctx);
+      auto c = static_cast<Context *>(ctx);
       c->react(timer_elapsed_evt{});
     }
   };
