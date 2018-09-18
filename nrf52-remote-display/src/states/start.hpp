@@ -6,7 +6,7 @@
 namespace states {
   struct idle;
 
-  struct Start : M::Base {
+  struct start : M::Base {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Start");
     }

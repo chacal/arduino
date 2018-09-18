@@ -6,10 +6,18 @@
 #include "display.hpp"
 #include "state_machine.hpp"
 
+void start_clocks() {
+  NRF_CLOCK->EVENTS_LFCLKSTARTED = 0;
+  NRF_CLOCK->TASKS_LFCLKSTART    = 1;
+  while(NRF_CLOCK->EVENTS_LFCLKSTARTED == 0);
+}
+
 
 int main() {
+  start_clocks();
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
+  APP_ERROR_CHECK(app_timer_init());
   power_manager::init();
 
   NRF_LOG_INFO("Starting nrf52-remote-display..")
