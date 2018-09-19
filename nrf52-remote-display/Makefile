@@ -61,6 +61,7 @@ SRC_FILES += \
   $(SRC_DIR)/power_manager.cpp \
   $(SRC_DIR)/display.cpp \
   $(SRC_DIR)/nrf_u8g2_adapter.cpp \
+  $(SRC_DIR)/ble_support.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
 
