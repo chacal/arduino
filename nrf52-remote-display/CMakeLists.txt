@@ -131,6 +131,7 @@ include_directories("${SDK_ROOT}/components/drivers_nrf/usbd")
 include_directories("${SDK_ROOT}/components/ble/ble_services/ble_hrs")
 include_directories("${SDK_ROOT}/components/libraries/serial")
 include_directories("${SDK_ROOT}/components/libraries/crc32")
+include_directories("${SDK_ROOT}/components/libraries/crypto")
 include_directories("${U8G2_ROOT}/csrc")
 include_directories("${HFSM_ROOT}/include")
 

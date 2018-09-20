@@ -5,6 +5,9 @@
 #include <cstring>
 #include <ble_conn_params.h>
 #include <app_timer.h>
+#include <peer_manager.h>
+#include <ecc.h>
+
 
 #define DEVICE_NAME               "MarineDisplay"
 #define TX_POWER_LEVEL            4
@@ -18,6 +21,11 @@
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1000)                    /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000)                    /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
+
+typedef struct { uint8_t sk[32]; }       ble_gap_lesc_p256_sk_t;
+__ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
+__ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
+
 
 namespace ble_support {
 
@@ -71,10 +79,37 @@ namespace ble_support {
     APP_ERROR_CHECK(ble_conn_params_init(&cp_init));
   }
 
+  static void pairing_init() {
+    ecc_init(true);
+
+    APP_ERROR_CHECK(pm_init());
+    APP_ERROR_CHECK(ecc_p256_keypair_gen(m_lesc_sk.sk, m_lesc_pk.pk));
+    APP_ERROR_CHECK(pm_lesc_public_key_set(&m_lesc_pk));
+
+    ble_gap_sec_params_t sec_param;
+    memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+    // Security parameters to be used for all security procedures.
+    sec_param.bond           = 1;
+    sec_param.mitm           = 1;
+    sec_param.lesc           = 1;
+    sec_param.io_caps        = BLE_GAP_IO_CAPS_DISPLAY_ONLY;
+    sec_param.min_key_size   = 7;
+    sec_param.max_key_size   = 16;
+    sec_param.kdist_own.enc  = 1;
+    sec_param.kdist_own.id   = 1;
+    sec_param.kdist_peer.enc = 1;
+    sec_param.kdist_peer.id  = 1;
+
+    APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
+    //APP_ERROR_CHECK(pm_register(pm_evt_handler));
+  }
+
 
   void init() {
     ble_stack_init();
     gap_params_init();
     conn_params_init();
+    pairing_init();
   }
 }
