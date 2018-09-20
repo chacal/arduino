@@ -3,6 +3,8 @@
 #include <nrf_sdh.h>
 #include <nrf_sdh_ble.h>
 #include <cstring>
+#include <ble_conn_params.h>
+#include <app_timer.h>
 
 #define DEVICE_NAME               "MarineDisplay"
 #define TX_POWER_LEVEL            4
@@ -12,6 +14,10 @@
 #define MAX_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
 #define SLAVE_LATENCY             12
 #define CONN_SUP_TIMEOUT          MSEC_TO_UNITS(4000, UNIT_10_MS)
+
+#define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1000)                    /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000)                    /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT    3                                           /**< Number of attempts before giving up the connection parameter negotiation. */
 
 namespace ble_support {
 
@@ -50,9 +56,25 @@ namespace ble_support {
     APP_ERROR_CHECK(sd_ble_gap_ppcp_set(&gap_conn_params));
   }
 
+  static void conn_params_init() {
+    ble_conn_params_init_t cp_init;
+    memset(&cp_init, 0, sizeof(cp_init));
+
+    cp_init.p_conn_params                  = NULL;
+    cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;
+    cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;
+    cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
+    cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
+    cp_init.disconnect_on_fail             = true;
+    cp_init.error_handler                  = [](uint32_t nrf_error) { APP_ERROR_HANDLER(nrf_error); };
+
+    APP_ERROR_CHECK(ble_conn_params_init(&cp_init));
+  }
+
 
   void init() {
     ble_stack_init();
     gap_params_init();
+    conn_params_init();
   }
 }
