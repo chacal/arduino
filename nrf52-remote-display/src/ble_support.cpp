@@ -1,4 +1,3 @@
-#include "ble_support.hpp"
 #include <ble.h>
 #include <nrf_sdh.h>
 #include <nrf_sdh_ble.h>
@@ -7,11 +6,12 @@
 #include <app_timer.h>
 #include <peer_manager.h>
 #include <ecc.h>
+#include "ble_support.hpp"
+#include "config.hpp"
 
 
 #define DEVICE_NAME               "MarineDisplay"
 #define TX_POWER_LEVEL            4
-#define BLE_CONN_CFG_TAG          1
 
 #define MIN_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
 #define MAX_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
