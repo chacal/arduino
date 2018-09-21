@@ -1,12 +1,14 @@
 #pragma once
 
 #include <nrf_log.h>
+#include <peer_manager.h>
 #include "common.hpp"
 
 using namespace fsm;
 
 namespace states {
   struct idle;
+  struct adv_with_whitelist;
 
   struct start : Base {
     virtual void enter(Context &context) {
@@ -14,7 +16,11 @@ namespace states {
     }
 
     void transition(Control &control, Context &context) {
-      control.changeTo<idle>();
+      if(pm_peer_count() == 0) {
+        control.changeTo<idle>();
+      } else {
+        control.changeTo<adv_with_whitelist>();
+      }
     }
   };
 }

@@ -6,11 +6,9 @@
 using namespace fsm;
 
 namespace states {
-  struct idle : Base {
-
+  struct adv_with_whitelist : Base {
     virtual void enter(Context &context) {
-      NRF_LOG_INFO("Enter idle");
+      NRF_LOG_INFO("Advertising with whitelist");
     }
   };
 }
-

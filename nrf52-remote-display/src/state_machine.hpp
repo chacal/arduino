@@ -2,6 +2,7 @@
 
 #include "states/idle.hpp"
 #include "states/start.hpp"
+#include "states/adv_with_whitelist.hpp"
 
 using namespace fsm;
 using namespace states;
@@ -21,7 +22,7 @@ public:
 
 private:
   Context ctx;
-  M::PeerRoot <start, idle> hfsm_root;
+  M::PeerRoot <start, idle, adv_with_whitelist> hfsm_root;
 };
 
 
