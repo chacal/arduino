@@ -1228,7 +1228,7 @@
 
 
 #ifndef NRF_BLE_QWR_ENABLED
-#define NRF_BLE_QWR_ENABLED 0
+#define NRF_BLE_QWR_ENABLED 1
 #endif
 
 // <e> PEER_MANAGER_ENABLED - peer_manager - Peer Manager
@@ -8230,7 +8230,7 @@
 
 // <o> NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE - Attribute Table size in bytes. The size must be a multiple of 4.
 #ifndef NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE
-#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 400  // Found by trial & error, see https://devzone.nordicsemi.com/question/165650/sd_ble_uuid_vs_add-get-error-nrf_error_no_mem-from-softdevice-s132-v500/
+#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 580  // Found by trial & error, see https://devzone.nordicsemi.com/question/165650/sd_ble_uuid_vs_add-get-error-nrf_error_no_mem-from-softdevice-s132-v500/
 #endif
 
 // <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs.

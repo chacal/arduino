@@ -72,6 +72,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/peer_manager/id_manager.c \
   $(SDK_ROOT)/components/ble/peer_manager/pm_buffer.c \
   $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c \
+  $(SDK_ROOT)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
   $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
@@ -84,6 +85,8 @@ SRC_FILES += \
   $(SRC_DIR)/display.cpp \
   $(SRC_DIR)/nrf_u8g2_adapter.cpp \
   $(SRC_DIR)/ble_support.cpp \
+  $(SRC_DIR)/ble_support_adv.cpp \
+  $(SRC_DIR)/ble_data_service.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
 
