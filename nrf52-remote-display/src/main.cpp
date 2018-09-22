@@ -18,11 +18,11 @@ int main() {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   NRF_LOG_INFO("Starting nrf52-remote-display..")
+  APP_ERROR_CHECK(app_timer_init());
 
   display d;
   state_machine fsm(d);
 
-  APP_ERROR_CHECK(app_timer_init());
   power_manager::init();
   ble_support::init(pass_ble_events_to_fsm, &fsm);
   ble_data_service::init();
