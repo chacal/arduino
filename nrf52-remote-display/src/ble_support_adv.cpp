@@ -48,4 +48,9 @@ namespace ble_support::adv {
     APP_ERROR_CHECK(sd_ble_gap_adv_start(&m_adv_params, BLE_CONN_CFG_TAG));
     NRF_LOG_INFO("Advertising public")
   }
+
+  void stop() {
+    NRF_LOG_INFO("Advertising stop")
+    sd_ble_gap_adv_stop();
+  }
 }
