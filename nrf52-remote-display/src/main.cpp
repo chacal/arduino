@@ -22,7 +22,8 @@ int main() {
   ble_data_service::init();
   ble_support::adv::init();
 
-  state_machine fsm;
+  display d;
+  state_machine fsm(d);
 
   for (;;) {
     if(fsm.update()) {

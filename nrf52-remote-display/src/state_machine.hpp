@@ -4,13 +4,14 @@
 #include "states/start.hpp"
 #include "states/adv_with_whitelist.hpp"
 #include "states/discoverable.hpp"
+#include "display.hpp"
 
 using namespace fsm;
 using namespace states;
 
 class state_machine {
 public:
-  state_machine() : ctx{this}, hfsm_root{ctx} {}
+  state_machine(const display &d) : ctx{this, d}, hfsm_root{ctx} {}
 
   bool update() {
     return hfsm_root.update();
