@@ -1,11 +1,9 @@
 #pragma once
 
 #include <stdint.h>
-#include "named_type.hpp"
+#include <chrono>
+#include <app_timer.h>
 
 namespace util {
-  using seconds = named_type<uint32_t, struct seconds_param>;
-
-  seconds calculate_seconds_left(uint32_t start_time_ticks, const seconds &duration_s);
+  using rtc_ticks = std::chrono::duration<uint32_t , std::ratio<1, APP_TIMER_CLOCK_FREQ>>;
 }
-
