@@ -10,11 +10,6 @@
 #include "ble_data_service.hpp"
 #include "ble_support_adv.hpp"
 
-static void pass_ble_events_to_fsm(const ble_evt_t *p_ble_evt, void *ctx) {
-  auto h = static_cast<ble_support::ble_observer_holder*>(ctx);
-  auto fsm = static_cast<state_machine*>(h->ctx);
-  fsm->react(p_ble_evt);
-}
 
 int main() {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
@@ -22,16 +17,17 @@ int main() {
   NRF_LOG_INFO("Starting nrf52-remote-display..")
   APP_ERROR_CHECK(app_timer_init());
 
-  display d;
+  display       d;
   state_machine fsm(d);
+  auto          ble_evt_handler = [&](ble_evt_t const *p_ble_evt) { fsm.react(p_ble_evt); };
 
   power_manager::init();
-  ble_support::init(pass_ble_events_to_fsm, &fsm);
+  ble_support::init(ble_evt_handler);
   ble_data_service::init();
   ble_support::adv::init();
 
   for (;;) {
-    if(fsm.update()) {
+    if (fsm.update()) {
       power_manager::manage();
     }
   }

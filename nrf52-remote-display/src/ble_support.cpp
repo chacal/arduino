@@ -30,15 +30,14 @@ __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
 
 namespace ble_support {
 
-  static ble_observer_holder m_observer_holder;
+  static ble_evt_handler_t m_evt_handler;
 
   static void on_ble_event(const ble_evt_t *p_ble_evt, void *ctx) {
-    m_observer_holder.handler(p_ble_evt, m_observer_holder.ctx);
+    m_evt_handler(p_ble_evt);
   }
 
-  static void ble_stack_init(nrf_sdh_ble_evt_handler_t ble_evt_handler, void *ctx) {
-    m_observer_holder.handler = ble_evt_handler;
-    m_observer_holder.ctx     = ctx;
+  static void ble_stack_init(const ble_evt_handler_t &ble_evt_handler) {
+    m_evt_handler = ble_evt_handler;
 
     APP_ERROR_CHECK(nrf_sdh_enable_request());
 
@@ -116,8 +115,8 @@ namespace ble_support {
   }
 
 
-  void init(nrf_sdh_ble_evt_handler_t ble_evt_handler, void *ctx) {
-    ble_stack_init(ble_evt_handler, ctx);
+  void init(const ble_evt_handler_t &ble_evt_handler) {
+    ble_stack_init(ble_evt_handler);
     gap_params_init();
     conn_params_init();
     pairing_init();
