@@ -87,6 +87,7 @@ SRC_FILES += \
   $(SRC_DIR)/ble_support.cpp \
   $(SRC_DIR)/ble_support_adv.cpp \
   $(SRC_DIR)/ble_data_service.cpp \
+  $(SRC_DIR)/rendering.cpp \
   $(SRC_DIR)/util.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
