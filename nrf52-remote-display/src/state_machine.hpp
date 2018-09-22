@@ -1,9 +1,11 @@
 #pragma once
 
+#include "states/base.hpp"
 #include "states/idle.hpp"
 #include "states/start.hpp"
 #include "states/adv_with_whitelist.hpp"
 #include "states/discoverable.hpp"
+#include "states/connected.hpp"
 #include "display.hpp"
 
 using namespace fsm;
@@ -29,7 +31,15 @@ public:
 
 private:
   Context ctx;
-  M::PeerRoot <start, idle, adv_with_whitelist, discoverable> hfsm_root;
+  M::PeerRoot <
+  M::Composite<base,
+      start,
+      idle,
+      adv_with_whitelist,
+      discoverable,
+      connected
+  >
+  >       hfsm_root;
 };
 
 

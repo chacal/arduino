@@ -2,6 +2,7 @@
 
 #include <nrf_log.h>
 #include <ble.h>
+#include <ble_gap.h>
 #include "common.hpp"
 #include "ble_support_adv.hpp"
 #include "util.hpp"
@@ -16,6 +17,7 @@ using namespace fsm;
 
 namespace states {
   struct start;
+  struct connected;
 
   struct discoverable : Base {
     struct timer_elapsed {};
@@ -43,7 +45,12 @@ namespace states {
     }
 
     virtual void react(const ble_evt_t *p_ble_evt, Control &control, Context &context) {
-      NRF_LOG_INFO("BLE event in discoverable: %d", p_ble_evt->header.evt_id);
+      switch (p_ble_evt->header.evt_id) {
+        case BLE_GAP_EVT_CONNECTED:
+          context.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+          control.changeTo<connected>();
+          break;
+      }
     }
 
     using Base::react;

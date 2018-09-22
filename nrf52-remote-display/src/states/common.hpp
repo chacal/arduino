@@ -13,6 +13,7 @@ namespace fsm {
     template<typename T>
     void react(const T &event);
     const display &disp;
+    uint16_t conn_handle;
 
   private:
     state_machine *fsm;
