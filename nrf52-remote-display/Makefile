@@ -251,7 +251,7 @@ CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 CFLAGS += -DDEBUG
 
 # C++ flags common to all targets
-CXXFLAGS += -std=c++14
+CXXFLAGS += -std=c++17 -Wno-register
 CXXFLAGS += -fno-threadsafe-statics
 CXXFLAGS += -DDEBUG
 
