@@ -40,6 +40,8 @@ namespace states {
       }
     }
 
+    using Base::react;
+
 
   private:
     countdown_timer discoverable_timer{

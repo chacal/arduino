@@ -1,17 +1,18 @@
 #include <ble.h>
 #include <nrf_sdh.h>
-#include <nrf_sdh_ble.h>
 #include <cstring>
 #include <ble_conn_params.h>
 #include <app_timer.h>
 #include <peer_manager.h>
 #include <ecc.h>
+#include <nrf_log.h>
 #include "ble_support.hpp"
 #include "config.hpp"
 
 
 #define DEVICE_NAME               "MarineDisplay"
 #define TX_POWER_LEVEL            4
+#define APP_BLE_OBSERVER_PRIO     2
 
 #define MIN_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
 #define MAX_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
@@ -26,10 +27,11 @@ typedef struct { uint8_t sk[32]; }       ble_gap_lesc_p256_sk_t;
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
 
-
 namespace ble_support {
 
-  static void ble_stack_init() {
+  static void ble_stack_init(nrf_sdh_ble_evt_handler_t ble_evt_handler, void *ctx) {
+    static auto local_handler = ble_evt_handler;
+
     APP_ERROR_CHECK(nrf_sdh_enable_request());
 
     // Configure the BLE stack using the default settings in sdk_config.h
@@ -43,7 +45,7 @@ namespace ble_support {
     sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
 
     // Register a handler for BLE events.
-    //NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
+    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, [](auto p_ble_evt, auto ctx) { local_handler(p_ble_evt, ctx); }, ctx);
   }
 
   static void gap_params_init() {
@@ -106,8 +108,8 @@ namespace ble_support {
   }
 
 
-  void init() {
-    ble_stack_init();
+  void init(nrf_sdh_ble_evt_handler_t ble_evt_handler, void *ctx) {
+    ble_stack_init(ble_evt_handler, ctx);
     gap_params_init();
     conn_params_init();
     pairing_init();

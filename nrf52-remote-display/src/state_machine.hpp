@@ -22,6 +22,11 @@ public:
     hfsm_root.react(event);
   }
 
+  void react(const ble_evt_t *p_ble_evt) {
+    NRF_LOG_INFO("BLE event: %d", p_ble_evt->header.evt_id);
+    hfsm_root.react(p_ble_evt);
+  }
+
 private:
   Context ctx;
   M::PeerRoot <start, idle, adv_with_whitelist, discoverable> hfsm_root;
