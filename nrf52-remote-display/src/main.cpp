@@ -11,7 +11,9 @@
 #include "ble_support_adv.hpp"
 
 static void pass_ble_events_to_fsm(const ble_evt_t *p_ble_evt, void *ctx) {
-  static_cast<state_machine*>(ctx)->react(p_ble_evt);
+  auto h = static_cast<ble_support::ble_observer_holder*>(ctx);
+  auto fsm = static_cast<state_machine*>(h->ctx);
+  fsm->react(p_ble_evt);
 }
 
 int main() {

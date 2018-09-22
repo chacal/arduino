@@ -27,10 +27,18 @@ typedef struct { uint8_t sk[32]; }       ble_gap_lesc_p256_sk_t;
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
 
+
 namespace ble_support {
 
+  static ble_observer_holder m_observer_holder;
+
+  static void on_ble_event(const ble_evt_t *p_ble_evt, void *ctx) {
+    m_observer_holder.handler(p_ble_evt, m_observer_holder.ctx);
+  }
+
   static void ble_stack_init(nrf_sdh_ble_evt_handler_t ble_evt_handler, void *ctx) {
-    static auto local_handler = ble_evt_handler;
+    m_observer_holder.handler = ble_evt_handler;
+    m_observer_holder.ctx     = ctx;
 
     APP_ERROR_CHECK(nrf_sdh_enable_request());
 
@@ -45,7 +53,7 @@ namespace ble_support {
     sd_ble_gap_tx_power_set(TX_POWER_LEVEL);
 
     // Register a handler for BLE events.
-    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, [](auto p_ble_evt, auto ctx) { local_handler(p_ble_evt, ctx); }, ctx);
+    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, on_ble_event, NULL);
   }
 
   static void gap_params_init() {
