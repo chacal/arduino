@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nrf_log.h>
+#include <ble.h>
 #include "common.hpp"
 #include "ble_support_adv.hpp"
 #include "util.hpp"
@@ -39,6 +40,10 @@ namespace states {
       } else {
         rendering::render_discoverable_state(context.disp, discoverable_time_left);
       }
+    }
+
+    virtual void react(const ble_evt_t *p_ble_evt, Control &control, Context &context) {
+      NRF_LOG_INFO("BLE event in discoverable: %d", p_ble_evt->header.evt_id);
     }
 
     using Base::react;
