@@ -27,6 +27,7 @@ namespace states {
 
     virtual void leave(Context &context) {
       discoverable_timer.stop();
+      ble_support::adv::stop();
     }
 
     virtual void react(const timer_elapsed &event, Control &control, Context &context) {
