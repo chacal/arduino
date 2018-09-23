@@ -84,9 +84,13 @@ namespace ble_support {
     cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
     cp_init.disconnect_on_fail             = false;
     cp_init.error_handler                  = [](uint32_t nrf_error) { APP_ERROR_HANDLER(nrf_error); };
-    cp_init.evt_handler                    = [](ble_conn_params_evt_t * p_evt) { NRF_LOG_INFO("Conn params evt: %d", p_evt->evt_type); };
+    cp_init.evt_handler                    = [](ble_conn_params_evt_t *p_evt) { NRF_LOG_INFO("Conn params evt: %d", p_evt->evt_type); };
 
     APP_ERROR_CHECK(ble_conn_params_init(&cp_init));
+  }
+
+  static void pm_evt_handler(pm_evt_t const *p_evt) {
+    NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
   }
 
   static void pairing_init() {
@@ -112,7 +116,7 @@ namespace ble_support {
     sec_param.kdist_peer.id  = 1;
 
     APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
-    //APP_ERROR_CHECK(pm_register(pm_evt_handler));
+    APP_ERROR_CHECK(pm_register(pm_evt_handler));
   }
 
 
