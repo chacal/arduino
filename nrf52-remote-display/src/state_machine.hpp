@@ -3,7 +3,7 @@
 #include "states/base.hpp"
 #include "states/idle.hpp"
 #include "states/start.hpp"
-#include "states/adv_with_whitelist.hpp"
+#include "states/connectable.hpp"
 #include "states/discoverable.hpp"
 #include "states/connected.hpp"
 #include "display.hpp"
@@ -35,7 +35,7 @@ private:
   M::Composite<base,
       start,
       idle,
-      adv_with_whitelist,
+      connectable,
       discoverable,
       connected
   >

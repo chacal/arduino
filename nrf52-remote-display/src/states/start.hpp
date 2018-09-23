@@ -8,7 +8,7 @@ using namespace fsm;
 
 namespace states {
   struct idle;
-  struct adv_with_whitelist;
+  struct connectable;
 
   struct start : Base {
     virtual void enter(Context &context) {
@@ -19,7 +19,7 @@ namespace states {
       if(pm_peer_count() == 0) {
         control.changeTo<idle>();
       } else {
-        control.changeTo<adv_with_whitelist>();
+        control.changeTo<connectable>();
       }
     }
   };

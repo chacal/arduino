@@ -10,7 +10,7 @@ using namespace fsm;
 namespace states {
   struct connected;
 
-  struct adv_with_whitelist : Base {
+  struct connectable : Base {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connectable");
       ble_support::adv::connectable_start();
