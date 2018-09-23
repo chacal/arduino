@@ -4,6 +4,7 @@
 #include <ble.h>
 #include <ble_gap.h>
 #include <ble_data_service.hpp>
+#include <peer_manager.h>
 #include "common.hpp"
 
 using namespace fsm;
@@ -15,6 +16,7 @@ namespace states {
   struct connected : Base {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
+      pm_conn_secure(context.conn_handle, false);  // Try to establish secure connection, this should invoke pairing on the remote side
     }
 
     virtual void leave(Context &context) {
