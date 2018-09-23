@@ -26,6 +26,7 @@
 typedef struct { uint8_t sk[32]; }       ble_gap_lesc_p256_sk_t;
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;    /* LESC private key */
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;    /* LESC public key */
+__ALIGN(4) static ble_gap_lesc_dhkey_t   m_lesc_dhkey; /* LESC DH Key */
 
 
 namespace ble_support {
@@ -34,6 +35,15 @@ namespace ble_support {
 
   static void on_ble_event(const ble_evt_t *p_ble_evt, void *ctx) {
     m_evt_handler(p_ble_evt);
+
+    switch (p_ble_evt->header.evt_id) {
+      case BLE_GAP_EVT_LESC_DHKEY_REQUEST: {
+        auto p = &p_ble_evt->evt.gap_evt.params.lesc_dhkey_request;
+        APP_ERROR_CHECK(ecc_p256_shared_secret_compute(&m_lesc_sk.sk[0], &p->p_pk_peer->pk[0], &m_lesc_dhkey.key[0]));
+        APP_ERROR_CHECK(sd_ble_gap_lesc_dhkey_reply(p_ble_evt->evt.gap_evt.conn_handle, &m_lesc_dhkey));
+        break;
+      }
+    }
   }
 
   static void ble_stack_init(const ble_evt_handler_t &ble_evt_handler) {
