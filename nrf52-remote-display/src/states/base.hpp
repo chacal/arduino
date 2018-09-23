@@ -21,9 +21,9 @@ namespace states {
           break;
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE: {
-          auto p = p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params;
+          auto p = &p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params;
           NRF_LOG_INFO("Connection params:\nConnection interval: min: %dms max: %dms\nSlave latency: %d Supervision timeout: %dms",
-                       p.min_conn_interval * 1.25, p.max_conn_interval * 1.25, p.slave_latency, p.conn_sup_timeout * 10)
+                       p->min_conn_interval * 1.25, p->max_conn_interval * 1.25, p->slave_latency, p->conn_sup_timeout * 10)
           break;
         }
 
@@ -34,15 +34,15 @@ namespace states {
         }
 
         case BLE_GAP_EVT_DATA_LENGTH_UPDATE: {
-          auto p = p_ble_evt->evt.gap_evt.params.data_length_update.effective_params;
-          NRF_LOG_INFO("Data length params: TX: %dB RX: %dB TX: %dus RX: %dus", p.max_tx_octets, p.max_rx_octets, p.max_tx_time_us,
-                       p.max_rx_time_us)
+          auto p = &p_ble_evt->evt.gap_evt.params.data_length_update.effective_params;
+          NRF_LOG_INFO("Data length params: TX: %dB RX: %dB TX: %dus RX: %dus", p->max_tx_octets, p->max_rx_octets, p->max_tx_time_us,
+                       p->max_rx_time_us)
           break;
         }
 
         case BLE_GAP_EVT_AUTH_STATUS: {
-          auto p = p_ble_evt->evt.gap_evt.params.auth_status;
-          NRF_LOG_DEBUG("Auth status: %d %d", p.auth_status, p.error_src);
+          auto p = &p_ble_evt->evt.gap_evt.params.auth_status;
+          NRF_LOG_DEBUG("Auth status: %d %d", p->auth_status, p->error_src);
           break;
         }
 
