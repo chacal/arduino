@@ -103,6 +103,10 @@ namespace ble_support {
   static void pm_evt_handler(pm_evt_t const *p_evt) {
     NRF_LOG_DEBUG("Peer Manager event: %d", p_evt->evt_id);
     switch (p_evt->evt_id) {
+      case PM_EVT_STORAGE_FULL:
+        NRF_LOG_INFO("Running GC for flash..");
+        APP_ERROR_CHECK(fds_gc());
+        break;
       case PM_EVT_CONN_SEC_CONFIG_REQ: {
         NRF_LOG_INFO("Allowing re-pairing");
         pm_conn_sec_config_t reply = { .allow_repairing = true };
