@@ -16,6 +16,10 @@ namespace states {
       ble_support::adv::connectable_start();
     }
 
+    virtual void leave(Context &context) {
+      ble_support::adv::stop();
+    }
+
     virtual void react(const ble_evt_t *p_ble_evt, Control &control, Context &context) {
       switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_CONNECTED:
