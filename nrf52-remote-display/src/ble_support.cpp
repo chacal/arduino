@@ -104,9 +104,24 @@ namespace ble_support {
     switch (p_evt->evt_id) {
       case PM_EVT_CONN_SEC_FAILED: {
         auto p = &p_evt->params.conn_sec_failed;
+        pm_conn_sec_status_t s;
+        pm_conn_sec_status_get(p_evt->conn_handle, &s);
         NRF_LOG_INFO("CONN_SEC_FAILED: error=%d src=%d procedure=%d", p->error, p->error_src, p->procedure)
+        NRF_LOG_INFO("Security status: connected=%d encrypted=%d mitm=%d bonded=%d", s.connected, s.encrypted, s.mitm_protected, s.bonded)
+        if(p->error == BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP) { // 0x85 == 133
+          // Assume remote end has removed pairing -> delete our bond and restart security
+          pm_peer_delete(p_evt->peer_id);
+        } else if (p_evt->params.conn_sec_failed.error == PM_CONN_SEC_ERROR_PIN_OR_KEY_MISSING) {  // 0x1006 == 4102
+          // We have lost the bond, log & disconnect
+          NRF_LOG_INFO("Bonding information not available for peer! Remove bond on the remote device and try again.")
+          sd_ble_gap_disconnect(p_evt->conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        }
         break;
       }
+      case PM_EVT_PEER_DELETE_SUCCEEDED:
+        // Restart connection security after peer has been deleted
+        pm_conn_secure(p_evt->peer_id, false);
+        break;
       default:
         break;
     }
