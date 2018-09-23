@@ -3,6 +3,7 @@
 #include <nrf_log.h>
 #include <ble.h>
 #include <ble_gap.h>
+#include <ble_data_service.hpp>
 #include "common.hpp"
 
 using namespace fsm;
@@ -25,6 +26,10 @@ namespace states {
       switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_DISCONNECTED:
           control.changeTo<start>();
+          break;
+
+        case BLE_GAP_EVT_PASSKEY_DISPLAY:
+          NRF_LOG_INFO("Passkey: %s", (uint32_t) p_ble_evt->evt.gap_evt.params.passkey_display.passkey);
           break;
       }
     }
