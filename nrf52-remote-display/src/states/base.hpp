@@ -42,7 +42,7 @@ namespace states {
 
         case BLE_GAP_EVT_AUTH_STATUS: {
           auto p = &p_ble_evt->evt.gap_evt.params.auth_status;
-          NRF_LOG_DEBUG("Auth status: %d %d", p->auth_status, p->error_src);
+          NRF_LOG_INFO("Auth status: %d Bonded: %d LESC: %d", p->auth_status, p->bonded, p->lesc);
           break;
         }
 
