@@ -100,7 +100,16 @@ namespace ble_support {
   }
 
   static void pm_evt_handler(pm_evt_t const *p_evt) {
-    NRF_LOG_DEBUG("Peer Manager event: %d\n", p_evt->evt_id);
+    NRF_LOG_INFO("Peer Manager event: %d", p_evt->evt_id);
+    switch (p_evt->evt_id) {
+      case PM_EVT_CONN_SEC_FAILED: {
+        auto p = &p_evt->params.conn_sec_failed;
+        NRF_LOG_INFO("CONN_SEC_FAILED: error=%d src=%d procedure=%d", p->error, p->error_src, p->procedure)
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   static void pairing_init() {
