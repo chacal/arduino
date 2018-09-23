@@ -46,7 +46,7 @@ namespace ble_data_service {
   }
 
   static void ble_service_init() {
-    NRF_LOG_INFO("BLE data service. Using %d byte RX buffer.", sizeof(m_rx_buffer));
+    NRF_LOG_DEBUG("BLE data service. Using %d byte RX buffer.", sizeof(m_rx_buffer));
     ble_uuid128_t base_uuid = DATA_SERVICE_BASE_UUID;
 
     APP_ERROR_CHECK(sd_ble_uuid_vs_add(&base_uuid, &m_ble_uuid.type));

@@ -22,7 +22,7 @@ namespace states {
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE: {
           auto p = &p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params;
-          NRF_LOG_INFO("Connection params:\nConnection interval: min: %dms max: %dms\nSlave latency: %d Supervision timeout: %dms",
+          NRF_LOG_DEBUG("Connection params:\nConnection interval: min: %dms max: %dms\nSlave latency: %d Supervision timeout: %dms",
                        p->min_conn_interval * 1.25, p->max_conn_interval * 1.25, p->slave_latency, p->conn_sup_timeout * 10)
           break;
         }
@@ -35,23 +35,26 @@ namespace states {
 
         case BLE_GAP_EVT_DATA_LENGTH_UPDATE: {
           auto p = &p_ble_evt->evt.gap_evt.params.data_length_update.effective_params;
-          NRF_LOG_INFO("Data length params: TX: %dB RX: %dB TX: %dus RX: %dus", p->max_tx_octets, p->max_rx_octets, p->max_tx_time_us,
+          NRF_LOG_DEBUG("Data length params: TX: %dB RX: %dB TX: %dus RX: %dus", p->max_tx_octets, p->max_rx_octets, p->max_tx_time_us,
                        p->max_rx_time_us)
           break;
         }
 
         case BLE_GAP_EVT_AUTH_STATUS: {
           auto p = &p_ble_evt->evt.gap_evt.params.auth_status;
-          NRF_LOG_INFO("Auth status: %d Bonded: %d LESC: %d", p->auth_status, p->bonded, p->lesc);
+          NRF_LOG_DEBUG("Auth: status=%d bonded=%d lesc=%d", p->auth_status, p->bonded, p->lesc);
+          if(p->auth_status != 0 || p->bonded != 1 || p->lesc != 1) {
+            NRF_LOG_WARNING("Unexpected auth status! status=%d bonded=%d lesc=%d", p->auth_status, p->bonded, p->lesc);
+          }
           break;
         }
 
         case BLE_GAP_EVT_CONN_SEC_UPDATE: {
           ble_gap_conn_sec_t m_conn_sec;
           if(sd_ble_gap_conn_sec_get(p_ble_evt->evt.gap_evt.conn_handle, &m_conn_sec) == NRF_SUCCESS) {
-            NRF_LOG_INFO("Conn security: Mode: %d, Level: %d, Key size: %d", m_conn_sec.sec_mode.sm, m_conn_sec.sec_mode.lv, m_conn_sec.encr_key_size);
+            NRF_LOG_DEBUG("Conn security: Mode: %d, Level: %d, Key size: %d", m_conn_sec.sec_mode.sm, m_conn_sec.sec_mode.lv, m_conn_sec.encr_key_size);
           } else {
-            NRF_LOG_INFO("Getting conn security failed.");
+            NRF_LOG_WARNING("Getting conn security failed.");
           }
         }
       }
