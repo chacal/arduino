@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+#include <vector>
 #include <ble.h>
 #include "config.hpp"
 
@@ -10,5 +12,8 @@
 #define DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN    MAX_BLE_MESSAGE_SIZE
 
 namespace ble_data_service {
-  void init(/*ble_data_service_rx_handler_t rx_handler*/);
+  using rx_data = const std::vector<uint8_t>;
+  using rx_data_handler = std::function<void(rx_data &received_data)>;
+
+  void init(const rx_data_handler & data_handler);
 }

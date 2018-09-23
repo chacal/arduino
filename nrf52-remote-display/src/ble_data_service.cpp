@@ -1,18 +1,21 @@
 #include <nrf_ble_qwr.h>
 #include <nrf_log.h>
+#include <nrf_sdh_ble.h>
 #include <app_error.h>
 
 #include "ble_data_service.hpp"
 
 
+NRF_BLE_QWR_DEF(m_qwr);
 static uint8_t                  m_rx_buffer[2 * DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN];
-static nrf_ble_qwr_t            m_qwr;
 static uint16_t                 m_service_handle;
 static ble_uuid_t               m_ble_uuid;
 static ble_gatts_char_handles_t m_rx_char_handles;
 
 
 namespace ble_data_service {
+
+  static rx_data_handler m_data_handler;
 
   //
   //  QWR module handlers, these are really not used
@@ -75,10 +78,31 @@ namespace ble_data_service {
     APP_ERROR_CHECK(nrf_ble_qwr_attr_register(&m_qwr, m_rx_char_handles.value_handle));
   }
 
+  static void on_ble_event(const ble_evt_t *p_ble_evt, void *ctx) {
+    switch (p_ble_evt->header.evt_id) {
+      case BLE_GAP_EVT_CONNECTED:
+        nrf_ble_qwr_conn_handle_assign(&m_qwr, p_ble_evt->evt.common_evt.conn_handle);
+        break;
 
-  void init(/*ble_data_service_rx_handler_t rx_handler*/) {
+      case BLE_GATTS_EVT_WRITE: {
+        auto p = &p_ble_evt->evt.gatts_evt.params.write;
+        if(p->op == BLE_GATTS_OP_WRITE_REQ || p->op == BLE_GATTS_OP_WRITE_CMD) {
+          m_data_handler({p->data, p->data + p->len});
+        } else if(p->op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) {
+          uint8_t  buf[DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN];
+          uint16_t len = sizeof(buf);
+          nrf_ble_qwr_value_get(&m_qwr, m_rx_char_handles.value_handle, buf, &len);
+          m_data_handler({buf, buf + len});
+        }
+      }
+    }
+  }
+
+  void init(const rx_data_handler &data_handler) {
+    m_data_handler = data_handler;
     qwr_init();
     ble_service_init();
     ble_characteristic_init();
+    NRF_SDH_BLE_OBSERVER(m_data_service_obs, NRF_BLE_QWR_BLE_OBSERVER_PRIO, on_ble_event, NULL);
   }
 }
