@@ -2,6 +2,7 @@
 
 #include <nrf_log.h>
 #include <peer_manager.h>
+#include <ble_gap.h>
 #include "common.hpp"
 
 using namespace fsm;
@@ -37,6 +38,21 @@ namespace states {
           NRF_LOG_INFO("Data length params: TX: %dB RX: %dB TX: %dus RX: %dus", p.max_tx_octets, p.max_rx_octets, p.max_tx_time_us,
                        p.max_rx_time_us)
           break;
+        }
+
+        case BLE_GAP_EVT_AUTH_STATUS: {
+          auto p = p_ble_evt->evt.gap_evt.params.auth_status;
+          NRF_LOG_DEBUG("Auth status: %d %d", p.auth_status, p.error_src);
+          break;
+        }
+
+        case BLE_GAP_EVT_CONN_SEC_UPDATE: {
+          ble_gap_conn_sec_t m_conn_sec;
+          if(sd_ble_gap_conn_sec_get(p_ble_evt->evt.gap_evt.conn_handle, &m_conn_sec) == NRF_SUCCESS) {
+            NRF_LOG_INFO("Conn security: Mode: %d, Level: %d, Key size: %d", m_conn_sec.sec_mode.sm, m_conn_sec.sec_mode.lv, m_conn_sec.encr_key_size);
+          } else {
+            NRF_LOG_INFO("Getting conn security failed.");
+          }
         }
       }
     }
