@@ -13,7 +13,7 @@ using font_size = named_type<uint8_t, struct font_size_param>;
 
 struct point {
 public:
-  point(uint8_t x, uint8_t y) : x{x}, y{y} {}
+  explicit point(uint8_t x, uint8_t y) : x{x}, y{y} {}
 
   uint8_t x = 0;
   uint8_t y = 0;
