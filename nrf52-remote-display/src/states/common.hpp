@@ -8,11 +8,11 @@ struct state_machine;
 namespace fsm {
 
   struct Context {
-    Context(state_machine *sm, const display &d) : disp(d) , fsm{sm} {}
+    Context(state_machine *sm, display &d) : disp(d) , fsm{sm} {}
 
     template<typename T>
     void react(const T &event);
-    const display &disp;
+    display &disp;
     uint16_t conn_handle;
 
   private:
