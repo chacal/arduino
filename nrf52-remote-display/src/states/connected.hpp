@@ -36,6 +36,8 @@ namespace states {
       }
     }
 
+    // This is called only after the connection has been secured as the RX characteristics has authorization that requires
+    // secure connection
     virtual void react(ble_data_service::rx_data &received_data, Control &control, Context &context) {
       NRF_LOG_INFO("Got %d bytes of data:", received_data.size())
       NRF_LOG_HEXDUMP_INFO(received_data.data(), received_data.size())
