@@ -3,6 +3,7 @@
 #include <nrf_log.h>
 #include <nrf_log_ctrl.h>
 #include <app_timer.h>
+#include <app_scheduler.h>
 #include "power_manager.hpp"
 #include "display.hpp"
 #include "state_machine.hpp"
@@ -10,11 +11,13 @@
 #include "ble_data_service.hpp"
 #include "ble_support_adv.hpp"
 
+#define APP_SCHEDULER_QUEUE_SIZE 20
 
 int main() {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   NRF_LOG_INFO("Starting nrf52-remote-display..")
+  APP_SCHED_INIT(APP_TIMER_SCHED_EVENT_DATA_SIZE, APP_SCHEDULER_QUEUE_SIZE);
   APP_ERROR_CHECK(app_timer_init());
 
   display       d;
@@ -28,6 +31,7 @@ int main() {
   ble_support::adv::init();
 
   for (;;) {
+    app_sched_execute();
     if (fsm.update()) {
       power_manager::manage();
     }
