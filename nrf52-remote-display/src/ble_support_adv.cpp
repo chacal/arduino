@@ -5,7 +5,7 @@
 #include "ble_data_service.hpp"
 #include "config.hpp"
 
-#define APP_ADV_INTERVAL                MSEC_TO_UNITS(50, UNIT_0_625_MS)
+#define APP_ADV_INTERVAL                MSEC_TO_UNITS(250, UNIT_0_625_MS)
 #define REMEMBERED_PEER_COUNT           BLE_GAP_WHITELIST_ADDR_MAX_COUNT
 
 static ble_uuid_t           m_adv_uuids[] = {{DATA_SERVICE_SERVICE_UUID, DATA_SERVICE_UUID_TYPE}};
