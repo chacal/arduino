@@ -17,11 +17,13 @@ namespace states {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
       pm_conn_secure(context.conn_handle, false);  // Try to establish secure connection, this should invoke pairing on the remote side
+      context.disp.on();
     }
 
     virtual void leave(Context &context) {
       NRF_LOG_INFO("Disconnected");
       context.conn_handle = BLE_CONN_HANDLE_INVALID;
+      context.disp.off();
     }
 
     virtual void react(const ble_evt_t *p_ble_evt, Control &control, Context &context) {
