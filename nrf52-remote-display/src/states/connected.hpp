@@ -1,11 +1,16 @@
 #pragma once
 
+#include <memory>
 #include <nrf_log.h>
 #include <ble.h>
 #include <ble_gap.h>
 #include <ble_data_service.hpp>
 #include <peer_manager.h>
+#include "status_bar.hpp"
 #include "common.hpp"
+
+#define RSSI_REPORT_CHANGE_THRESHOLD    3    //dBm
+#define RSSI_REPORT_SKIP_COUNT         10
 
 using namespace fsm;
 
@@ -18,10 +23,13 @@ namespace states {
       NRF_LOG_INFO("Connected");
       pm_conn_secure(context.conn_handle, false);  // Try to establish secure connection, this should invoke pairing on the remote side
       context.disp.on();
+      sb = std::make_unique<status_bar>(context.disp);
+      sd_ble_gap_rssi_start(context.conn_handle, RSSI_REPORT_CHANGE_THRESHOLD, RSSI_REPORT_SKIP_COUNT);
     }
 
     virtual void leave(Context &context) {
       NRF_LOG_INFO("Disconnected");
+      sd_ble_gap_rssi_stop(context.conn_handle);
       context.conn_handle = BLE_CONN_HANDLE_INVALID;
       context.disp.off();
     }
@@ -35,6 +43,11 @@ namespace states {
         case BLE_GAP_EVT_PASSKEY_DISPLAY:
           NRF_LOG_INFO("Passkey: %s", (uint32_t) p_ble_evt->evt.gap_evt.params.passkey_display.passkey);
           break;
+
+        case BLE_GAP_EVT_RSSI_CHANGED:
+          auto rssi = p_ble_evt->evt.gap_evt.params.rssi_changed.rssi;
+          sb->update_rssi(rssi);
+          break;
       }
     }
 
@@ -46,5 +59,8 @@ namespace states {
     }
 
     using Base::react;
+
+  private:
+    std::unique_ptr<status_bar> sb;
   };
 }

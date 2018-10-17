@@ -55,8 +55,23 @@ void display::clear() {
   u8g2_ClearBuffer(&u8g2);
 }
 
+void display::clear_area(const point &upper_left, const width &w, const height &h) {
+  auto color = u8g2_GetDrawColor(&u8g2);
+  u8g2_SetDrawColor(&u8g2, 0);
+  draw_box(upper_left, w, h);
+  u8g2_SetDrawColor(&u8g2, color);
+}
+
 void display::draw_line(const point &start, const point &end) {
   u8g2_DrawLine(&u8g2, start.x, start.y, end.x, end.y);
+}
+
+void display::draw_box(const point &upper_left, const width &w, const height &h) {
+  u8g2_DrawBox(&u8g2, upper_left.x, upper_left.y, w.get(), h.get());
+}
+
+void display::draw_frame(const point &upper_left, const width &w, const height &h) {
+  u8g2_DrawFrame(&u8g2, upper_left.x, upper_left.y, w.get(), h.get());
 }
 
 void display::render() {

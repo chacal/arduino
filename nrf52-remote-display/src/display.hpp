@@ -10,6 +10,8 @@ extern "C" {
 }
 
 using font_size = named_type<uint8_t, struct font_size_param>;
+using height = named_type<uint8_t, struct height_param>;
+using width = named_type<uint8_t, struct width_param>;
 
 struct point {
 public:
@@ -32,9 +34,15 @@ public:
 
   void draw_line(const point &start, const point &end);
 
+  void draw_box(const point &upper_left, const width &, const height &);
+
+  void draw_frame(const point &upper_left, const width &, const height &);
+
   void render();
 
   void clear();
+
+  void clear_area(const point &upper_left, const width &, const height &);
 
   uint8_t centered_x(const std::string &, const font_size &);
 

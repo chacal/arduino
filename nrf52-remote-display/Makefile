@@ -91,6 +91,7 @@ SRC_FILES += \
   $(SRC_DIR)/rendering.cpp \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/countdown_timer.cpp \
+  $(SRC_DIR)/status_bar.cpp \
   $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
   $(SDK_ROOT)/components/drivers_nrf/spi_master/nrf_drv_spi.c \
 
