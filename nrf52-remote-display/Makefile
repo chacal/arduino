@@ -246,7 +246,7 @@ CFLAGS += -DBOARD_CUSTOM
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mthumb -mabi=aapcs
-CFLAGS += -Wall -O3 -g3
+CFLAGS += -Wall
 # keep every function in separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
@@ -257,6 +257,7 @@ CFLAGS += -DDEBUG
 CXXFLAGS += -std=c++17 -Wno-register
 CXXFLAGS += -fno-threadsafe-statics
 CXXFLAGS += -DDEBUG
+CXXFLAGS += $(OPT)
 
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
