@@ -1,7 +1,5 @@
 #include "status_bar.hpp"
 
-#define STATUS_BAR_WIDTH  128
-#define STATUS_BAR_HEIGHT   4
 #define RSSI_TOP_LEFT_Y    60
 #define RSSI_MARK_SIZE      4
 

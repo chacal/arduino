@@ -5,6 +5,9 @@
 #include "nrf_u8g2_adapter.hpp"
 #include "named_type.hpp"
 
+#define SCREEN_WIDTH   128
+#define SCREEN_HEIGHT   64
+
 extern "C" {
 #include <u8g2.h>
 }

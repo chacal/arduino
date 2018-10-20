@@ -1,7 +1,6 @@
 #include "display.hpp"
 
 #define CONTRAST       230
-#define SCREEN_WIDTH   128
 
 display::display() {
   u8g2_Setup_st7565_nhd_c12864_f(&u8g2, U8G2_R0, adapter.u8x8_byte_nrf52_hw_spi, adapter.u8x8_gpio_and_delay_nrf52);
