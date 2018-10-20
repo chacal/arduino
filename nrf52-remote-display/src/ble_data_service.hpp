@@ -9,7 +9,7 @@
 #define DATA_SERVICE_UUID_TYPE                    BLE_UUID_TYPE_VENDOR_BEGIN
 #define DATA_SERVICE_SERVICE_UUID                 0x0001     // Service UUID = 0f6e000190d549408bd338b3f27649a2
 #define DATA_SERVICE_RX_CHARACTERISTIC_UUID       0x0002     // Char UUID    = 0f6e000290d549408bd338b3f27649a2
-#define DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN    MAX_BLE_MESSAGE_SIZE
+#define DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN    500        // Max length for JSON input
 
 namespace ble_data_service {
   using rx_data = const std::vector<uint8_t>;
