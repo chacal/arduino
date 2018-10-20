@@ -67,8 +67,9 @@ namespace states {
     virtual void react(const commands::display_command_seq &commands, Control &control, Context &context) {
       NRF_LOG_DEBUG("Received %d commands", commands.size())
       for (auto &cmd : commands) {
-        std::visit(display_command_handler{}, cmd);
+        std::visit(display_command_handler{context.display_list}, cmd);
       }
+      context.display_list.render(context.disp);
     }
 
     using Base::react;

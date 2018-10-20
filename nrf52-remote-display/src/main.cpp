@@ -20,10 +20,11 @@ int main() {
   APP_SCHED_INIT(APP_TIMER_SCHED_EVENT_DATA_SIZE, APP_SCHEDULER_QUEUE_SIZE);
   APP_ERROR_CHECK(app_timer_init());
 
-  display       d;
-  state_machine fsm(d);
-  auto          ble_evt_handler = [&](const ble_evt_t *p_ble_evt) { fsm.react(p_ble_evt); };
-  auto          rx_data_handler = [&](const ble_data_service::rx_data &received_data) { fsm.react(received_data); };
+  display                 d;
+  rendering::display_list dl;
+  state_machine           fsm(d, dl);
+  auto                    ble_evt_handler = [&](const ble_evt_t *p_ble_evt) { fsm.react(p_ble_evt); };
+  auto                    rx_data_handler = [&](const ble_data_service::rx_data &received_data) { fsm.react(received_data); };
 
   power_manager::init();
   ble_support::init(ble_evt_handler);

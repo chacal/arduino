@@ -13,7 +13,7 @@ using namespace states;
 
 class state_machine {
 public:
-  state_machine(display &d) : ctx{this, d}, hfsm_root{ctx} {}
+  state_machine(display &d, rendering::display_list &dl) : ctx{this, d, dl}, hfsm_root{ctx} {}
 
   bool update() {
     return hfsm_root.update();
