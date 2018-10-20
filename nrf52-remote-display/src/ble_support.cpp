@@ -15,9 +15,9 @@
 #define TX_POWER_LEVEL            4
 #define APP_BLE_OBSERVER_PRIO     2
 
-#define MIN_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
-#define MAX_CONN_INTERVAL         MSEC_TO_UNITS(20, UNIT_1_25_MS)
-#define SLAVE_LATENCY             12
+#define MIN_CONN_INTERVAL         MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
+#define MAX_CONN_INTERVAL         MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
+#define SLAVE_LATENCY             4
 #define CONN_SUP_TIMEOUT          MSEC_TO_UNITS(4000, UNIT_10_MS)
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1000)                    /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
