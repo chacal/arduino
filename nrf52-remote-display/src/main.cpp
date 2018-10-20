@@ -23,7 +23,7 @@ int main() {
   display       d;
   state_machine fsm(d);
   auto          ble_evt_handler = [&](const ble_evt_t *p_ble_evt) { fsm.react(p_ble_evt); };
-  auto          rx_data_handler = [&](ble_data_service::rx_data &received_data) { fsm.react(received_data); };
+  auto          rx_data_handler = [&](const ble_data_service::rx_data &received_data) { fsm.react(received_data); };
 
   power_manager::init();
   ble_support::init(ble_evt_handler);

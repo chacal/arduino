@@ -1,11 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <variant>
 #include <nrf_log.h>
 #include <ble.h>
 #include <ble_gap.h>
-#include <ble_data_service.hpp>
 #include <peer_manager.h>
+#include "display_command_handler.hpp"
+#include "ble_data_service.hpp"
+#include "cmd_protocol.hpp"
 #include "status_bar.hpp"
 #include "common.hpp"
 
@@ -53,9 +56,19 @@ namespace states {
 
     // This is called only after the connection has been secured as the RX characteristics has authorization that requires
     // secure connection
-    virtual void react(ble_data_service::rx_data &received_data, Control &control, Context &context) {
-      NRF_LOG_INFO("Got %d bytes of data:", received_data.size())
-      NRF_LOG_HEXDUMP_INFO(received_data.data(), received_data.size())
+    virtual void react(const ble_data_service::rx_data &received_data, Control &control, Context &context) {
+      NRF_LOG_DEBUG("Got %d bytes of data", received_data.len)
+      auto cmd_seq = commands::parse(received_data);
+      if (cmd_seq) {
+        context.react(*cmd_seq);
+      }
+    }
+
+    virtual void react(const commands::display_command_seq &commands, Control &control, Context &context) {
+      NRF_LOG_DEBUG("Received %d commands", commands.size())
+      for (auto &cmd : commands) {
+        std::visit(display_command_handler{}, cmd);
+      }
     }
 
     using Base::react;

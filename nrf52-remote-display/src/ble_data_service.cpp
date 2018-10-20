@@ -87,12 +87,12 @@ namespace ble_data_service {
       case BLE_GATTS_EVT_WRITE: {
         auto p = &p_ble_evt->evt.gatts_evt.params.write;
         if(p->op == BLE_GATTS_OP_WRITE_REQ || p->op == BLE_GATTS_OP_WRITE_CMD) {
-          m_data_handler({p->data, p->data + p->len});
+          m_data_handler({p->data, p->len});
         } else if(p->op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) {
           uint8_t  buf[DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN];
           uint16_t len = sizeof(buf);
           nrf_ble_qwr_value_get(&m_qwr, m_rx_char_handles.value_handle, buf, &len);
-          m_data_handler({buf, buf + len});
+          m_data_handler({buf, len});
         }
       }
     }

@@ -12,8 +12,12 @@
 #define DATA_SERVICE_RX_CHARACTERISTIC_MAX_LEN    500        // Max length for JSON input
 
 namespace ble_data_service {
-  using rx_data = const std::vector<uint8_t>;
-  using rx_data_handler = std::function<void(rx_data &received_data)>;
+  struct rx_data {
+    const uint8_t *data;
+    uint16_t      len;
+  };
 
-  void init(const rx_data_handler & data_handler);
+  using rx_data_handler = std::function<void(const rx_data &received_data)>;
+
+  void init(const rx_data_handler &data_handler);
 }
