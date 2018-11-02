@@ -298,16 +298,15 @@ $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
 
 # Flash the program
 flash_app: default
-	@echo Flashing: $(OUTPUT_FILE).hex
-	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $(OUTPUT_FILE).hex
+	$(call flash,$(OUTPUT_FILE).hex)
 
 flash_softdevice:
 	@echo Flashing Soft Device..
-	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $(SOFTDEVICE_HEX)
+	$(call flash,$(SOFTDEVICE_HEX))
 
 flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..
-	$(GDB_TARGET) -ex load -ex compare-sections -ex kill -ex quit $<
+	$(call flash,$<)
 
 flash: flash_app flash_dfu_settings
 
@@ -315,7 +314,7 @@ dfu_pkg: default
 	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 erase:
-	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
+	$(call erase)
 
 $(OUTPUT_DIRECTORY)/.clean_linked_binaries: $(PROJ_DIR)/$(LINKER_SCRIPT)
 	@echo Cleaning linked binaries..

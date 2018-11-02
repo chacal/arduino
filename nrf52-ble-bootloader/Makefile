@@ -286,15 +286,14 @@ $(OUTPUT_DIRECTORY)/bootloader_and_softdevice.hex: default
 	$(MERGEHEX) -m $(SOFTDEVICE_HEX) $(OUTPUT_FILE).hex -o $@
 
 flash_bootloader_with_softdevice: $(OUTPUT_DIRECTORY)/bootloader_and_softdevice.hex
-	@echo Flashing: $<
-	$(GDB_TARGET) -ex load -ex kill -ex quit $<
+	@echo Flashing bootloader and softdevice..
+	$(call flash,$<)
 
 flash_bootloader: default
-	@echo Flashing: $(OUTPUT_FILE).hex
-	$(GDB_TARGET) -ex load -ex kill -ex quit $(OUTPUT_FILE).hex
+	$(call flash,$(OUTPUT_FILE).hex)
 
 erase:
-	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
+	$(call erase)
 
 $(OUTPUT_DIRECTORY)/.clean_linked_binaries: $(PROJ_DIR)/$(LINKER_SCRIPT)
 	@echo Cleaning linked binaries..

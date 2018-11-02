@@ -1,9 +1,11 @@
 REMOTE_HOST         := pannu
-REMOTE_ARDUINO_ROOT := /mnt/hgfs/Arduino
+LOCAL_HOME          := /Users/jihartik
+REMOTE_HOME         := /mnt/hgfs/jihartik
 BMP_DEV             := /dev/cu.usbmodemD6DC8FD1
 
-REMOTE_PROJECT_DIR  := $(REMOTE_ARDUINO_ROOT)/$(PROJECT_DIR_NAME)
-REMOTE_CMD          := ssh $(REMOTE_HOST) -C cd "$(REMOTE_PROJECT_DIR)"\;
+to_remote            = $(subst $(LOCAL_HOME),$(REMOTE_HOME),$(1))
+
+REMOTE_CMD          := ssh $(REMOTE_HOST) -C cd "'$(call to_remote,$(PROJECT_DIR_NAME))'"\;
 
 CMSIS_CONFIG_TOOL   := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
 
@@ -12,3 +14,16 @@ GDB_TARGET           = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon s
 
 NRFUTIL             := $(REMOTE_CMD) nrfutil
 MERGEHEX            := mergehex
+NRFJPROG            := $(REMOTE_CMD) nrfjprog
+
+define flash
+    $(eval HEX := $(call to_remote,$(1)))
+	@echo Flashing: $(HEX)
+	$(NRFJPROG) -f nrf52 --program $(HEX) --sectorerase --verify --fast --reset
+endef
+
+define erase
+	@echo Erasing flash..
+	$(NRFJPROG) -f nrf52 -e
+endef
+
