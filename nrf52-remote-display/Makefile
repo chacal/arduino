@@ -31,11 +31,13 @@ HFSM_PATH          := $(HOME)/Documents/dev/HFSM
 SRC_FILES += \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_uart.c \
+  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_rtt.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_default_backends.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_frontend.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_str_formatter.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
+  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/components/libraries/util/app_error.c \
   $(SDK_ROOT)/components/libraries/util/app_error_weak.c \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
