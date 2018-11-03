@@ -1,7 +1,6 @@
 PROJECT_NAME       := nrf52840-test
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
 DFU_APP_VERSION_STR:= 1.0.0
-PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
@@ -17,6 +16,7 @@ SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
+DFU_FAMILY         := NRF52840
 DFU_HW_VERSION     := 52
 # S140 v6.1.0, see https://github.com/NordicSemiconductor/pc-nrfutil#commands
 DFU_SOFT_DEVICE_ID := 0xAE
@@ -267,7 +267,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
-	$(NRFUTIL) settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+	$(NRFUTIL) settings generate --family $(DFU_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
 flash_app: default
