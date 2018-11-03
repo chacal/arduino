@@ -283,7 +283,7 @@ flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 
 flash: flash_app flash_dfu_settings
 
-dfu_pkg: default
+dfu_pkg: default $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 erase:
