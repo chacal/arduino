@@ -1,5 +1,5 @@
 PROJECT_NAME       := nrf52-ble-bootloader
-PROJECT_DIR_NAME   := $(shell basename "$(dir $(strip $(MAKEFILE_LIST)))")
+PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
@@ -277,7 +277,7 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 # Make default (=first) target -> needs to be before including Makefile.common
 default: clean_linked_binaries
-	@$(MAKE) -j8 $(PLATFORM)_xxaa
+	@$(MAKE) -j12 $(PLATFORM)_xxaa
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
