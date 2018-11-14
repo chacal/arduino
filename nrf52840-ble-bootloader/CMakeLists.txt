@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(nrf52840-test)
+project(nrf52840-ble-bootloader)
 
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
