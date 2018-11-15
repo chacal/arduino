@@ -5,6 +5,8 @@ GROUP(-lgcc -lc -lnosys)
 
 MEMORY
 {
+  /* Settings for a debug (=logging) version of the bootloader */
+  /* FLASH (rx) : ORIGIN = 0xF3000, LENGTH = 0xB000 */
   FLASH (rx) : ORIGIN = 0xf8000, LENGTH = 0x6000
   RAM (rwx) :  ORIGIN = 0x200057b8, LENGTH = 0x3a848
   mbr_params_page (r) : ORIGIN = 0x000FE000, LENGTH = 0x1000
