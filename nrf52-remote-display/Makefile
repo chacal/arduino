@@ -296,7 +296,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 $(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
-	$(NRFUTIL) settings generate --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+	$(NRFUTIL) settings generate --no-backup --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 # Flash the program
 flash_app: default
