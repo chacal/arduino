@@ -81,6 +81,7 @@
 
 #define DEAD_BEEF                       0xDEADBEEF                         /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 #define TX_POWER_LEVEL                  8     // Max power, +8dBm
+#define DCDC_STATE                      NRF_POWER_DCDC_ENABLE
 
 #if defined(USE_UICR_FOR_MAJ_MIN_VALUES)
 #define MAJ_VAL_OFFSET_IN_BEACON_INFO   18                                 /**< Position of the MSB of the Major Value in m_beacon_info array. */
@@ -238,6 +239,9 @@ static void ble_stack_init(void)
 
     // Enable BLE stack.
     err_code = nrf_sdh_ble_enable(&ram_start);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = sd_power_dcdc_mode_set(DCDC_STATE);
     APP_ERROR_CHECK(err_code);
 }
 
