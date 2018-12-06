@@ -1,9 +1,8 @@
 #include <openthread/thread.h>
-#include "nrf_log_ctrl.h"
-#include "nrf_log.h"
-#include "nrf_log_default_backends.h"
-
-#include "thread_utils.h"
+#include <nrf_log_ctrl.h>
+#include <nrf_log.h>
+#include <nrf_log_default_backends.h>
+#include <thread_utils.h>
 
 static void thread_state_changed_callback(uint32_t flags, void *p_context) {
   NRF_LOG_INFO("State changed! Flags: 0x%08x Current role: %d",
