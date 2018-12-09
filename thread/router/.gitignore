@@ -1,0 +1,4 @@
+build/
+cmake-build-debug/
+.idea/
+src/thread_credentials.h
