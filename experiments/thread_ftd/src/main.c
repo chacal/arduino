@@ -14,7 +14,7 @@ do {                                  \
 } while (false);
 
 #define MAX_IP6_ADDRESS_COUNT        6
-#define LOG_IP6_ADDRESSES         false
+#define LOG_IP6_ADDRESSES         true
 #define TX_POWER                     8  // dBm
 
 static otNetifAddress                       ip6_addresses[MAX_IP6_ADDRESS_COUNT];
