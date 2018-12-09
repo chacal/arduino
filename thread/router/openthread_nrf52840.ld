@@ -5,12 +5,49 @@ GROUP(-lgcc -lc -lnosys)
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 0x100000
-  RAM (rwx) :  ORIGIN = 0x20000000, LENGTH = 0x40000
+  FLASH (rx) : ORIGIN = 0x1000, LENGTH = 0xF3000
+  RAM (rwx) :  ORIGIN = 0x20005000, LENGTH = 0x3B000
+
+  mbr_params_page (r) : ORIGIN = 0x000FE000, LENGTH = 0x1000
+  uicr_mbr_params_page (r) : ORIGIN = 0x10001018, LENGTH = 0x4
+
+  /** Location of bootloader setting in flash. */
+  bootloader_settings_page (r) : ORIGIN = 0x000FF000, LENGTH = 0x1000
+  uicr_bootloader_start_address (r) : ORIGIN = 0x10001014, LENGTH = 0x4
+
+  /** Location of OpenThread settings in flash. */
+  OPENTHREAD_SETTINGS (rw) : ORIGIN = 0x000F4000, LENGTH = 0x4000
 }
 
-FLASH_PAGE_SIZE       = 4096;
-FLASH_DATA_PAGES_USED = 4;
+SECTIONS
+{
+  .mbr_params_page(NOLOAD) :
+  {
+    PROVIDE(__start_mbr_params_page = .);
+    KEEP(*(SORT(.mbr_params_page*)))
+    PROVIDE(__stop_mbr_params_page = .);
+  } > mbr_params_page
+  .uicr_mbr_params_page :
+  {
+    PROVIDE(__start_uicr_mbr_params_page = .);
+    KEEP(*(SORT(.uicr_mbr_params_page*)))
+    PROVIDE(__stop_uicr_mbr_params_page = .);
+  } > uicr_mbr_params_page
+
+  /* Place the bootloader settings page in flash. */
+  .bootloader_settings_page(NOLOAD) :
+  {
+    PROVIDE(__start_bootloader_settings_page = .);
+    KEEP(*(SORT(.bootloader_settings_page*)))
+    PROVIDE(__stop_bootloader_settings_page = .);
+  } > bootloader_settings_page
+  .uicr_bootloader_start_address :
+  {
+    PROVIDE(__start_uicr_bootloader_start_address = .);
+    KEEP(*(SORT(.uicr_bootloader_start_address*)))
+    PROVIDE(__stop_uicr_bootloader_start_address = .);
+  } > uicr_bootloader_start_address
+}
 
 SECTIONS
 {
@@ -131,8 +168,8 @@ SECTIONS
 
 SECTIONS
 {
-    __stop_ot_flash_data = (ORIGIN(FLASH) + LENGTH(FLASH));
-    __start_ot_flash_data = (__stop_ot_flash_data - (FLASH_PAGE_SIZE * FLASH_DATA_PAGES_USED));
+    __stop_ot_flash_data = (ORIGIN(OPENTHREAD_SETTINGS) + LENGTH(OPENTHREAD_SETTINGS));
+    __start_ot_flash_data = ORIGIN(OPENTHREAD_SETTINGS);
 
     /* Assure that code does not overlap flash data area.*/
     ASSERT((__start_ot_flash_data >= __etext + SIZEOF(.data)), "Error: Code overlaps flash data area.")

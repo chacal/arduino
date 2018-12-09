@@ -1,5 +1,6 @@
-PROJECT_NAME       := thread_ftd
+PROJECT_NAME       := thread_router
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
+DFU_APP_VERSION_STR:= 1.0.0
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
@@ -13,6 +14,10 @@ TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
+
+DFU_FAMILY         := NRF52840
+DFU_HW_VERSION     := 52
+DFU_PRIVATE_KEY    := private.key
 
 SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52840.S \
@@ -148,11 +153,21 @@ default: clean_linked_binaries
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
+$(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
+	$(NRFUTIL) settings generate --family $(DFU_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
+
+dfu_pkg: default $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req 0x00 --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+
+flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+	@echo Flashing bootloader settings..
+	$(call flash,$<)
+
 # Flash the program
 flash_app: default
 	$(call flash,$(OUTPUT_FILE).hex)
 
-flash: flash_app
+flash: flash_app flash_dfu_settings
 
 erase:
 	$(call erase)
