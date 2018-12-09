@@ -15,6 +15,7 @@ do {                                  \
 
 #define MAX_IP6_ADDRESS_COUNT        6
 #define LOG_IP6_ADDRESSES         false
+#define TX_POWER                     8  // dBm
 
 static otNetifAddress                       ip6_addresses[MAX_IP6_ADDRESS_COUNT];
 static uint8_t                              ip6_identity[24];
@@ -76,6 +77,7 @@ static void thread_instance_init(void) {
   ASSERT_OT(otThreadSetNetworkName(ot, THREAD_NETWORK_NAME));
   ASSERT_OT(otLinkSetChannel(ot, THREAD_CHANNEL));
   ASSERT_OT(otIp6SetEnabled(ot, true));
+  ASSERT_OT(otPlatRadioSetTransmitPower(ot, TX_POWER));
   ASSERT_OT(otThreadSetEnabled(ot, true));
 
   NRF_LOG_INFO("802.15.4 Channel: %d", otLinkGetChannel(ot));
@@ -85,6 +87,9 @@ static void thread_instance_init(void) {
   NRF_LOG_INFO("802.15.4 Network/Master Key:");
   NRF_LOG_HEXDUMP_INFO(otThreadGetMasterKey(ot)->m8, OT_MASTER_KEY_SIZE);
   NRF_LOG_INFO("rx-on-when-idle:  %s", otThreadGetLinkMode(ot).mRxOnWhenIdle ? "enabled" : "disabled");
+  int8_t tx_power = 0;
+  ASSERT_OT(otPlatRadioGetTransmitPower(ot, &tx_power))
+  NRF_LOG_INFO("TX Power: %d dBm", tx_power);
 
   thread_cli_init();
   thread_state_changed_callback_set(thread_state_changed_callback);
