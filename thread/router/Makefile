@@ -48,6 +48,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
   $(SDK_ROOT)/components/thread/utils/thread_utils.c \
   $(SRC_DIR)/main.c \
+  $(SRC_DIR)/thread.c \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
