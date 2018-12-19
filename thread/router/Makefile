@@ -246,7 +246,11 @@ flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 flash_app: default
 	$(call flash,$(OUTPUT_FILE).hex)
 
-flash: flash_app flash_dfu_settings
+$(OUTPUT_DIRECTORY)/app_and_dfu_settings.hex: default $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+	$(MERGEHEX) -m $(OUTPUT_DIRECTORY)/bootloader_settings.hex $(OUTPUT_FILE).hex -o $@
+
+flash: $(OUTPUT_DIRECTORY)/app_and_dfu_settings.hex
+	$(call flash,$<)
 
 erase:
 	$(call erase)
