@@ -52,8 +52,46 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
   $(SDK_ROOT)/components/thread/utils/thread_utils.c \
+  $(SDK_ROOT)/components/libraries/mem_manager/mem_manager.c \
+  $(SDK_ROOT)/components/libraries/timer/app_timer.c \
+  $(SDK_ROOT)/components/libraries/sha256/sha256.c \
+  $(SDK_ROOT)/components/libraries/crc32/crc32.c \
+  $(SDK_ROOT)/components/libraries/fstorage/nrf_fstorage.c \
+  $(SDK_ROOT)/components/libraries/fstorage/nrf_fstorage_nvmc.c \
+  $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
+  $(SDK_ROOT)/components/iot/coap/coap.c \
+  $(SDK_ROOT)/components/iot/coap/coap_block.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_init.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_shared.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_ecc.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_hash.c \
+  $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_ecdsa.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/nrf_sw/nrf_sw_backend_hash.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_settings.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_flash.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_req_handler.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_validation.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_ver_validation.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_handling_error.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_utils.c \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu/dfu-cc.pb.c \
+  $(SDK_ROOT)/components/iot/background_dfu/background_dfu_state.c \
+  $(SDK_ROOT)/components/iot/background_dfu/background_dfu_block.c \
+  $(SDK_ROOT)/components/iot/background_dfu/background_dfu_operation.c \
+  $(SDK_ROOT)/components/iot/background_dfu/transport/coap/coap_dfu.c \
+  $(SDK_ROOT)/components/iot/coap/coap_message.c \
+  $(SDK_ROOT)/components/iot/coap/coap_option.c \
+  $(SDK_ROOT)/components/iot/coap/coap_queue.c \
+  $(SDK_ROOT)/components/iot/coap/coap_resource.c \
+  $(SDK_ROOT)/components/iot/coap/coap_transport_ot.c \
+  $(SDK_ROOT)/external/nano-pb/pb_common.c \
+  $(SDK_ROOT)/external/nano-pb/pb_decode.c \
   $(SRC_DIR)/main.c \
   $(SRC_DIR)/thread.c \
+  $(SRC_DIR)/dfu_public_key.c \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
@@ -87,6 +125,31 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/button \
   $(SDK_ROOT)/integration/nrfx/legacy \
   $(SDK_ROOT)/components/libraries/util \
+  $(SDK_ROOT)/components/libraries/sha256 \
+  $(SDK_ROOT)/components/libraries/crc32 \
+  $(SDK_ROOT)/components/libraries/fstorage \
+  $(SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
+  $(SDK_ROOT)/components/libraries/mem_manager \
+  $(SDK_ROOT)/components/libraries/bootloader \
+  $(SDK_ROOT)/components/libraries/bootloader/dfu \
+  $(SDK_ROOT)/components/libraries/crypto \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310 \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl \
+  $(SDK_ROOT)/components/libraries/crypto/backend/mbedtls \
+  $(SDK_ROOT)/components/libraries/crypto/backend/oberon \
+  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc \
+  $(SDK_ROOT)/components/libraries/crypto/backend/nrf_sw \
+  $(SDK_ROOT)/components/libraries/crypto/backend/nrf_hw \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cifra \
+  $(SDK_ROOT)/components/iot/coap \
+  $(SDK_ROOT)/components/iot/common \
+  $(SDK_ROOT)/components/iot/background_dfu \
+  $(SDK_ROOT)/components/iot/background_dfu/transport \
+  $(SDK_ROOT)/components/iot/background_dfu/transport/coap \
+  $(SDK_ROOT)/external/nrf_tls \
+  $(SDK_ROOT)/external/nano-pb \
+  $(SDK_ROOT)/external/micro-ecc/micro-ecc \
+
 
 LIB_FILES += \
   $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a \
@@ -95,6 +158,7 @@ LIB_FILES += \
   $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a \
   $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a \
   $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a \
+  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
   $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
 
 # Optimization flags
@@ -119,6 +183,13 @@ CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
 CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -D__STACK_SIZE=8192
+CFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
+CFLAGS += -DNRF_DFU_NO_TRANSPORT
+CFLAGS += -DuECC_ENABLE_VLI_API=0
+CFLAGS += -DuECC_OPTIMIZATION_LEVEL=3
+CFLAGS += -DuECC_SQUARE_FUNC=0
+CFLAGS += -DuECC_SUPPORT_COMPRESSED_POINT=0
+CFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
@@ -135,6 +206,14 @@ ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DUART0_ENABLED=0
 ASMFLAGS += -D__HEAP_SIZE=0
 ASMFLAGS += -D__STACK_SIZE=8192
+ASMFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
+ASMFLAGS += -DNRF_DFU_NO_TRANSPORT
+ASMFLAGS += -DuECC_ENABLE_VLI_API=0
+ASMFLAGS += -DuECC_OPTIMIZATION_LEVEL=3
+ASMFLAGS += -DuECC_SQUARE_FUNC=0
+ASMFLAGS += -DuECC_SUPPORT_COMPRESSED_POINT=0
+ASMFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
+
 
 # Linker flags
 LDFLAGS += $(OPT)

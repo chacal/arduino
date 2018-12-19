@@ -46,6 +46,26 @@
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
+// <h> Application
+
+//==========================================================
+// <s> DFU_RESOURCE_PREFIX - A common prefix for DFU resources.
+#ifndef DFU_RESOURCE_PREFIX
+#define DFU_RESOURCE_PREFIX "dfu"
+#endif
+
+// <o> DFU_UDP_PORT - UDP port number on which the DFU client will listen  <0-65535>
+
+
+// <i>
+
+#ifndef DFU_UDP_PORT
+#define DFU_UDP_PORT 5683
+#endif
+
+// </h>
+//==========================================================
+
 // <h> nRF_BLE 
 
 //==========================================================
@@ -1025,7 +1045,7 @@
 // <e> NRF_CRYPTO_BACKEND_MICRO_ECC_ENABLED - Enable the micro-ecc backend.
 //==========================================================
 #ifndef NRF_CRYPTO_BACKEND_MICRO_ECC_ENABLED
-#define NRF_CRYPTO_BACKEND_MICRO_ECC_ENABLED 0
+#define NRF_CRYPTO_BACKEND_MICRO_ECC_ENABLED 1
 #endif
 // <q> NRF_CRYPTO_BACKEND_MICRO_ECC_ECC_SECP192R1_ENABLED  - Enable secp192r1 (NIST 192-bit) curve
  
@@ -1088,7 +1108,7 @@
 // <i> The nRF SW cryptography backend (only used in bootloader context).
 //==========================================================
 #ifndef NRF_CRYPTO_BACKEND_NRF_SW_ENABLED
-#define NRF_CRYPTO_BACKEND_NRF_SW_ENABLED 0
+#define NRF_CRYPTO_BACKEND_NRF_SW_ENABLED 1
 #endif
 // <q> NRF_CRYPTO_BACKEND_NRF_SW_HASH_SHA256_ENABLED  - nRF SW hash backend support for SHA-256
  
@@ -1194,30 +1214,252 @@
 // </h> 
 //==========================================================
 
-// <h> nRF_DFU 
+// <h> nRF_DFU
 
 //==========================================================
-// <h> ble_dfu - Device Firmware Update
+// <h> nrf_dfu - Device Firmware Upgrade
 
 //==========================================================
-// <q> BLE_DFU_ENABLED  - Enable DFU Service.
- 
+// <h> DFU transport
 
-#ifndef BLE_DFU_ENABLED
-#define BLE_DFU_ENABLED 0
+//==========================================================
+// <e> NRF_DFU_TRANSPORT_BLE - BLE transport settings
+//==========================================================
+#ifndef NRF_DFU_TRANSPORT_BLE
+#define NRF_DFU_TRANSPORT_BLE 0
+#endif
+// <q> NRF_DFU_BLE_SKIP_SD_INIT  - Skip softdevice and interrupt vector table initialization.
+
+
+#ifndef NRF_DFU_BLE_SKIP_SD_INIT
+#define NRF_DFU_BLE_SKIP_SD_INIT 0
 #endif
 
-// <q> NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS  - Buttonless DFU supports bonds.
- 
-
-#ifndef NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS
-#define NRF_DFU_BLE_BUTTONLESS_SUPPORTS_BONDS 0
+// <s> NRF_DFU_BLE_ADV_NAME - Default advertising name.
+#ifndef NRF_DFU_BLE_ADV_NAME
+#define NRF_DFU_BLE_ADV_NAME "DfuTarg"
 #endif
 
-// </h> 
+// <o> NRF_DFU_BLE_ADV_INTERVAL - Advertising interval (in units of 0.625 ms)
+#ifndef NRF_DFU_BLE_ADV_INTERVAL
+#define NRF_DFU_BLE_ADV_INTERVAL 40
+#endif
+
+// <h> BLE DFU security
+
+//==========================================================
+// <q> NRF_DFU_BLE_REQUIRES_BONDS  - Require bond with peer.
+
+
+#ifndef NRF_DFU_BLE_REQUIRES_BONDS
+#define NRF_DFU_BLE_REQUIRES_BONDS 0
+#endif
+
+// </h>
 //==========================================================
 
-// </h> 
+// <h> BLE DFU connection
+
+//==========================================================
+// <o> NRF_DFU_BLE_MIN_CONN_INTERVAL - Minimum connection interval (units).
+// <i> Minimum GAP connection interval, in 1.25 ms units.
+
+#ifndef NRF_DFU_BLE_MIN_CONN_INTERVAL
+#define NRF_DFU_BLE_MIN_CONN_INTERVAL 12
+#endif
+
+// <o> NRF_DFU_BLE_MAX_CONN_INTERVAL - Maximum connection interval (units).
+// <i> Maximum GAP connection interval, in 1.25 ms units.
+
+#ifndef NRF_DFU_BLE_MAX_CONN_INTERVAL
+#define NRF_DFU_BLE_MAX_CONN_INTERVAL 12
+#endif
+
+// <o> NRF_DFU_BLE_CONN_SUP_TIMEOUT_MS - Supervision timeout (ms).
+// <i> GAP connection supervision timeout, in milliseconds.
+
+#ifndef NRF_DFU_BLE_CONN_SUP_TIMEOUT_MS
+#define NRF_DFU_BLE_CONN_SUP_TIMEOUT_MS 6000
+#endif
+
+// </h>
+//==========================================================
+
+// <h> BLE DFU buffers
+
+//==========================================================
+// <e> NRF_DFU_BLE_BUFFERS_OVERRIDE
+
+// <i> Check this option to override the default number of buffers.
+//==========================================================
+#ifndef NRF_DFU_BLE_BUFFERS_OVERRIDE
+#define NRF_DFU_BLE_BUFFERS_OVERRIDE 0
+#endif
+// <o> NRF_DFU_BLE_BUFFERS - Number of buffers in the BLE transport.
+// <i> Number of buffers to store incoming data while it is being written to flash.
+// <i> Reduce this value to save RAM. If this value is too low, the DFU process will fail.
+
+#ifndef NRF_DFU_BLE_BUFFERS
+#define NRF_DFU_BLE_BUFFERS 8
+#endif
+
+// </e>
+
+// </h>
+//==========================================================
+
+// </e>
+
+// </h>
+//==========================================================
+
+// <h> DFU protocol
+
+//==========================================================
+// <q> NRF_DFU_PROTOCOL_FW_VERSION_MSG  - Firmware version message support.
+
+
+// <i> Firmware version message support.
+// <i> If disabled, firmware version requests will return NRF_DFU_RES_CODE_OP_CODE_NOT_SUPPORTED.
+
+#ifndef NRF_DFU_PROTOCOL_FW_VERSION_MSG
+#define NRF_DFU_PROTOCOL_FW_VERSION_MSG 1
+#endif
+
+// <q> NRF_DFU_PROTOCOL_VERSION_MSG  - Protocol version message support.
+
+
+// <i> Protocol version message support.
+// <i> If disabled, protocol version requests will return NRF_DFU_RES_CODE_OP_CODE_NOT_SUPPORTED.
+
+#ifndef NRF_DFU_PROTOCOL_VERSION_MSG
+#define NRF_DFU_PROTOCOL_VERSION_MSG 1
+#endif
+
+// </h>
+//==========================================================
+
+// <h> DFU security
+
+//==========================================================
+// <q> NRF_DFU_APP_DOWNGRADE_PREVENTION  - Check the firmware version and SoftDevice requirements of application (and SoftDevice) updates.
+
+
+// <i> Whether to check the incoming version against the version of the existing app and/or
+// <i> the incoming SoftDevice requirements against the existing SoftDevice.
+// <i> This applies to application updates, and possibly to SoftDevice updates.
+// <i> Disabling this causes the checks to always ignore the incoming firmware version and
+// <i> to ignore the SoftDevice requirements if the first requirement is 0.
+// <i> This does not apply the bootloader updates. If the bootloader depends on the SoftDevice
+// <i> e.g. for BLE transport, this does not apply to SoftDevice updates.
+// <i> See @ref lib_bootloader_dfu_validation for more information.
+// <i> When signed updates are required, version checking should always be enabled.
+
+#ifndef NRF_DFU_APP_DOWNGRADE_PREVENTION
+#define NRF_DFU_APP_DOWNGRADE_PREVENTION 1
+#endif
+
+// <q> NRF_DFU_FORCE_DUAL_BANK_APP_UPDATES  - Accept only dual-bank application updates.
+
+
+// <i> If not enabled then if there is not enough space to perform dual-bank update
+// <i> application is deleted and single-bank update is performed. In case it is considered
+// <i> security concern user can prefer to discard update request rather than overwrite
+// <i> current application.
+
+#ifndef NRF_DFU_FORCE_DUAL_BANK_APP_UPDATES
+#define NRF_DFU_FORCE_DUAL_BANK_APP_UPDATES 1
+#endif
+
+// <o> NRF_DFU_HW_VERSION - Device hardware version.
+// <i> This is used to determine if given update is targeting the device.
+// <i> It is checked against the hw_version value in the init packet
+
+#ifndef NRF_DFU_HW_VERSION
+#define NRF_DFU_HW_VERSION 52
+#endif
+
+// <q> NRF_DFU_REQUIRE_SIGNED_APP_UPDATE  - Require a valid signature to update the application or SoftDevice.
+
+
+#ifndef NRF_DFU_REQUIRE_SIGNED_APP_UPDATE
+#define NRF_DFU_REQUIRE_SIGNED_APP_UPDATE 1
+#endif
+
+// <q> NRF_DFU_SINGLE_BANK_APP_UPDATES  - Place the application and the SoftDevice directly where they are supposed to be.
+
+
+// <i> Note that this creates security concerns when signing and  version checks
+// <i> are enabled. An attacker will be able to delete (but not replace)
+// <i> the current app or SoftDevice without knowing the signature key.
+
+#ifndef NRF_DFU_SINGLE_BANK_APP_UPDATES
+#define NRF_DFU_SINGLE_BANK_APP_UPDATES 0
+#endif
+
+// </h>
+//==========================================================
+
+// <h> Misc DFU settings
+
+//==========================================================
+// <o> NRF_DFU_APP_DATA_AREA_SIZE - The size (in bytes) of the flash area reserved for application data.
+// <i> This area is found at the end of the application area, next to the start of
+// <i> the bootloader. This area will not be erased by the bootloader during a
+// <i> firmware upgrade. The size must be a multiple of the flash page size.
+
+#ifndef NRF_DFU_APP_DATA_AREA_SIZE
+#define NRF_DFU_APP_DATA_AREA_SIZE 12288
+#endif
+
+// <q> NRF_DFU_SAVE_PROGRESS_IN_FLASH  - Save DFU progress in flash.
+
+
+// <i> Save DFU progress to flash so that it can be resumed if interrupted, instead of being restarted.
+// <i> Keep this setting disabled to maximize transfer speed and minimize flash wear.
+// <i> The init packet is always saved in flash, regardless of this setting.
+
+#ifndef NRF_DFU_SAVE_PROGRESS_IN_FLASH
+#define NRF_DFU_SAVE_PROGRESS_IN_FLASH 1
+#endif
+
+// <q> NRF_DFU_SETTINGS_ALLOW_UPDATE_FROM_APP  - Whether to allow the app to receive firmware updates for the bootloader to activate.
+
+
+// <i> Enable this to allow the app to instruct the bootloader to activate firmware.
+// <i> The bootloader will perform only a cursory check on the firmware (CRC).
+
+#ifndef NRF_DFU_SETTINGS_ALLOW_UPDATE_FROM_APP
+#define NRF_DFU_SETTINGS_ALLOW_UPDATE_FROM_APP 1
+#endif
+
+// <q> NRF_DFU_SETTINGS_IN_APP  - Specifies that this code is in the app, not the bootloader, so some settings are off-limits.
+
+
+// <i> Enable this to disable writing to areas of the settings that are protected
+// <i> by the bootlader. If this is not enabled in the app, certain settings write
+// <i> operations will cause HardFaults or will be ignored.
+
+#ifndef NRF_DFU_SETTINGS_IN_APP
+#define NRF_DFU_SETTINGS_IN_APP 1
+#endif
+
+// <q> NRF_DFU_SUPPORTS_EXTERNAL_APP  - Support for external app.
+
+
+// <i> This provides support for external app.
+
+#ifndef NRF_DFU_SUPPORTS_EXTERNAL_APP
+#define NRF_DFU_SUPPORTS_EXTERNAL_APP 0
+#endif
+
+// </h>
+//==========================================================
+
+// </h>
+//==========================================================
+
+// </h>
 //==========================================================
 
 // <h> nRF_Drivers 
@@ -5849,6 +6091,351 @@
 // </h> 
 //==========================================================
 
+// <h> nRF_IoT
+
+//==========================================================
+// <h> background_dfu - Background DFU library.
+
+//==========================================================
+// <o> BACKGROUND_DFU_DEFAULT_BLOCK_SIZE - Block size used by background DFU.  <1-4096>
+
+
+#ifndef BACKGROUND_DFU_DEFAULT_BLOCK_SIZE
+#define BACKGROUND_DFU_DEFAULT_BLOCK_SIZE 64
+#endif
+
+// <o> BACKGROUND_DFU_BLOCKS_PER_BUFFER - Maximum number of blocks that can be kept in RAM during DFU.  <1-4096>
+
+
+#ifndef BACKGROUND_DFU_BLOCKS_PER_BUFFER
+#define BACKGROUND_DFU_BLOCKS_PER_BUFFER 64
+#endif
+
+// <o> BACKGROUND_DFU_CONFIG_LOG_LEVEL  - Default Severity level
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
+
+#ifndef BACKGROUND_DFU_CONFIG_LOG_LEVEL
+#define BACKGROUND_DFU_CONFIG_LOG_LEVEL 3
+#endif
+
+// <o> BACKGROUND_DFU_CONFIG_INFO_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef BACKGROUND_DFU_CONFIG_INFO_COLOR
+#define BACKGROUND_DFU_CONFIG_INFO_COLOR 0
+#endif
+
+// <o> BACKGROUND_DFU_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef BACKGROUND_DFU_CONFIG_DEBUG_COLOR
+#define BACKGROUND_DFU_CONFIG_DEBUG_COLOR 0
+#endif
+
+// </h>
+//==========================================================
+
+// <h> ble_6lowpan - 6LoWPAN over BLE and Internet Protocol Support Profile library
+
+//==========================================================
+// <q> BLE_6LOWPAN_DISABLE_API_PARAM_CHECK  - Enable or disable API parameter check.
+
+
+// <i> API parameter checks are added to ensure right parameters are passed to the module. These checks are useful during development phase but be redundant once application is developed. Disabling this can result in some code saving.
+
+#ifndef BLE_6LOWPAN_DISABLE_API_PARAM_CHECK
+#define BLE_6LOWPAN_DISABLE_API_PARAM_CHECK 0
+#endif
+
+// <e> IOT_BLE_6LOWPAN_CONFIG_LOG_ENABLED - Enables logging in the module.
+//==========================================================
+#ifndef IOT_BLE_6LOWPAN_CONFIG_LOG_ENABLED
+#define IOT_BLE_6LOWPAN_CONFIG_LOG_ENABLED 0
+#endif
+// <o> IOT_BLE_6LOWPAN_CONFIG_LOG_LEVEL  - Default Severity level
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
+
+#ifndef IOT_BLE_6LOWPAN_CONFIG_LOG_LEVEL
+#define IOT_BLE_6LOWPAN_CONFIG_LOG_LEVEL 3
+#endif
+
+// <o> IOT_BLE_6LOWPAN_CONFIG_INFO_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef IOT_BLE_6LOWPAN_CONFIG_INFO_COLOR
+#define IOT_BLE_6LOWPAN_CONFIG_INFO_COLOR 0
+#endif
+
+// <o> IOT_BLE_6LOWPAN_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef IOT_BLE_6LOWPAN_CONFIG_DEBUG_COLOR
+#define IOT_BLE_6LOWPAN_CONFIG_DEBUG_COLOR 0
+#endif
+
+// </e>
+
+// <q> BLE_6LOWPAN_LEGACY_MODE  - Enable legacy mode of IID derivation from Bluetooth Device Address and Link Layer address size determination. The legacy mode is not compatible with the RFC7668 sepcification. For the Linux Kernel versions higher or equal to 4.12 this define has to be set to 0, otherwise to 1.
+
+
+#ifndef BLE_6LOWPAN_LEGACY_MODE
+#define BLE_6LOWPAN_LEGACY_MODE 1
+#endif
+
+// </h>
+//==========================================================
+
+// <h> coap_config - Nordic's smartCoAP library - config definitions
+
+//==========================================================
+// <q> COAP_DISABLE_DTLS_API  - Disable CoAPs API
+
+
+// <i>
+
+#ifndef COAP_DISABLE_DTLS_API
+#define COAP_DISABLE_DTLS_API 1
+#endif
+
+// <o> COAP_ACK_RANDOM_FACTOR - Random factor to calculate the initial time-out value for a Confirmable message.  <0-65535>
+
+
+// <i> COAP_MAX_TRANSMISSION_SPAN / COAP_MAX_RETRANSMIT_COUNT / COAP_ACK_TIMEOUT
+
+#ifndef COAP_ACK_RANDOM_FACTOR
+#define COAP_ACK_RANDOM_FACTOR 1
+#endif
+
+// <o> COAP_ACK_TIMEOUT - Minimum spacing before another retransmission.  <0-65535>
+
+
+// <i> Max value should not exceed COAP_MAX_TRANSMISSION_SPAN / COAP_MAX_RETRANSMIT_COUNT.
+
+#ifndef COAP_ACK_TIMEOUT
+#define COAP_ACK_TIMEOUT 5
+#endif
+
+// <q> COAP_DISABLE_API_PARAM_CHECK  - Enable or disable API parameter check.
+
+
+// <i> API parameter checks are added to ensure right parameters are passed to the module. These checks are useful during development phase but be redundant once application is developed. Disabling this can result in some code saving.
+
+#ifndef COAP_DISABLE_API_PARAM_CHECK
+#define COAP_DISABLE_API_PARAM_CHECK 0
+#endif
+
+// <e> IOT_COAP_CONFIG_LOG_ENABLED - Enables logging in the module.
+//==========================================================
+#ifndef IOT_COAP_CONFIG_LOG_ENABLED
+#define IOT_COAP_CONFIG_LOG_ENABLED 1
+#endif
+// <o> IOT_COAP_CONFIG_LOG_LEVEL  - Default Severity level
+
+// <0=> Off
+// <1=> Error
+// <2=> Warning
+// <3=> Info
+// <4=> Debug
+
+#ifndef IOT_COAP_CONFIG_LOG_LEVEL
+#define IOT_COAP_CONFIG_LOG_LEVEL 3
+#endif
+
+// <o> IOT_COAP_CONFIG_INFO_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef IOT_COAP_CONFIG_INFO_COLOR
+#define IOT_COAP_CONFIG_INFO_COLOR 0
+#endif
+
+// <o> IOT_COAP_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
+
+// <0=> Default
+// <1=> Black
+// <2=> Red
+// <3=> Green
+// <4=> Yellow
+// <5=> Blue
+// <6=> Magenta
+// <7=> Cyan
+// <8=> White
+
+#ifndef IOT_COAP_CONFIG_DEBUG_COLOR
+#define IOT_COAP_CONFIG_DEBUG_COLOR 0
+#endif
+
+// </e>
+
+// <q> COAP_ENABLE_OBSERVE_CLIENT  - Enable CoAP observe client role.
+
+
+// <i> If enabled, the coap_observe module has to be included. It will enable the module with a table to store observable resources, and provide access to functions to register and unregister observable resources. The observable resources list is used to match incomming notifications to an application callback function.
+
+#ifndef COAP_ENABLE_OBSERVE_CLIENT
+#define COAP_ENABLE_OBSERVE_CLIENT 0
+#endif
+
+// <q> COAP_ENABLE_OBSERVE_SERVER  - Enable CoAP observe server role.
+
+
+// <i> If enabled the coap_observe module has to be included. It will enable the module with a table to store observers, and provide access to functions to register and unregister observers. The list can be traversed in order to send notifications to the observers.
+
+#ifndef COAP_ENABLE_OBSERVE_SERVER
+#define COAP_ENABLE_OBSERVE_SERVER 0
+#endif
+
+// <o> COAP_MAX_NUMBER_OF_OPTIONS - The maximum size of a smartCoAP message excluding the mandatory CoAP header.  <1-65535>
+
+
+#ifndef COAP_MAX_NUMBER_OF_OPTIONS
+#define COAP_MAX_NUMBER_OF_OPTIONS 8
+#endif
+
+// <o> COAP_MAX_RETRANSMIT_COUNT - Maximum number of transmit attempts for a Confirmable messages.  <0-255>
+
+
+#ifndef COAP_MAX_RETRANSMIT_COUNT
+#define COAP_MAX_RETRANSMIT_COUNT 6
+#endif
+
+// <o> COAP_MAX_TRANSMISSION_SPAN - Maximum time from the first transmission of a Confirmable message to its last retransmission.  <0-65535>
+
+
+#ifndef COAP_MAX_TRANSMISSION_SPAN
+#define COAP_MAX_TRANSMISSION_SPAN 30
+#endif
+
+// <o> COAP_MESSAGE_DATA_MAX_SIZE - The maximum size of a smartCoAP message excluding the mandatory CoAP header.  <1-65535>
+
+
+#ifndef COAP_MESSAGE_DATA_MAX_SIZE
+#define COAP_MESSAGE_DATA_MAX_SIZE 256
+#endif
+
+// <o> COAP_MESSAGE_QUEUE_SIZE - Maximum number of smartCoAP messages that can be in transmission at a time.  <1-65535>
+
+
+// <i> smartCoAP uses the Memory Manager that is also used by the underlying transport protocol. Therefore, if you increase this value, you should also increase the number of buffers. Depending on the COAP_MESSAGE_DATA_MAX_SIZE + 4 byte CoAP header, you must increase either MEMORY_MANAGER_SMALL_BLOCK_COUNT or MEMORY_MANAGER_MEDIUM_BLOCK_COUNT to ensure that there are additional buffers for the CoAP message queue. Which macro must be increased, depends on the size of the buffer that is sufficient for the CoAP message.
+
+#ifndef COAP_MESSAGE_QUEUE_SIZE
+#define COAP_MESSAGE_QUEUE_SIZE 4
+#endif
+
+// <o> COAP_OBSERVE_MAX_NUM_OBSERVABLES - Maximum number of CoAP observable resources that a client can have active at any point of time.  <0-255>
+
+
+// <i> The maximum number of observable resources to be registered by a client. For each observable resource added, it will increase the memory consumption of one coap_observable_t struct.
+
+#ifndef COAP_OBSERVE_MAX_NUM_OBSERVABLES
+#define COAP_OBSERVE_MAX_NUM_OBSERVABLES 0
+#endif
+
+// <o> COAP_OBSERVE_MAX_NUM_OBSERVERS - Maximum number of CoAP observers that a server can have active at any point of time.  <0-255>
+
+
+// <i> The maximum number of observers to be registered by a server. For each observer added, it will increase the memory consumption of one coap_observer_t struct.
+
+#ifndef COAP_OBSERVE_MAX_NUM_OBSERVERS
+#define COAP_OBSERVE_MAX_NUM_OBSERVERS 0
+#endif
+
+// <o> COAP_PORT_COUNT - Number of local ports used by CoAP.
+
+
+// <i> The max number of client/server ports used by the application. One socket will be created for each port.
+
+#ifndef COAP_PORT_COUNT
+#define COAP_PORT_COUNT 1
+#endif
+
+// <o> COAP_RESOURCE_MAX_DEPTH - Maximum number of CoAP resource levels.  <1-255>
+
+
+// <i> The maximum number of resource depth levels uCoAP will use. The number will be used when adding resource to the resource structure, or when traversing the resources for a matching resource name given in a request. Each level added will increase the stack usage runtime with 4 bytes.
+
+#ifndef COAP_RESOURCE_MAX_DEPTH
+#define COAP_RESOURCE_MAX_DEPTH 5
+#endif
+
+// <o> COAP_RESOURCE_MAX_NAME_LEN - Maximum length of CoAP resource verbose name.  <1-65535>
+
+
+// <i> The maximum length of resource name that can be supplied from the application.
+
+#ifndef COAP_RESOURCE_MAX_NAME_LEN
+#define COAP_RESOURCE_MAX_NAME_LEN 19
+#endif
+
+// <o> COAP_VERSION - CoAP version number.  <0-3>
+
+
+// <i> The version of CoAP which all CoAP messages will be populated with.
+
+#ifndef COAP_VERSION
+#define COAP_VERSION 1
+#endif
+
+// </h>
+//==========================================================
+
+// </h>
+//==========================================================
+
 // <h> nRF_Libraries 
 
 //==========================================================
@@ -5869,7 +6456,7 @@
 // <e> APP_SCHEDULER_ENABLED - app_scheduler - Events scheduler
 //==========================================================
 #ifndef APP_SCHEDULER_ENABLED
-#define APP_SCHEDULER_ENABLED 0
+#define APP_SCHEDULER_ENABLED 1
 #endif
 // <q> APP_SCHEDULER_WITH_PAUSE  - Enabling pause feature
  
@@ -5935,7 +6522,7 @@
 // <e> APP_TIMER_ENABLED - app_timer - Application timer functionality
 //==========================================================
 #ifndef APP_TIMER_ENABLED
-#define APP_TIMER_ENABLED 0
+#define APP_TIMER_ENABLED 1
 #endif
 // <o> APP_TIMER_CONFIG_RTC_FREQUENCY  - Configure RTC prescaler.
  
@@ -6363,7 +6950,7 @@
  
 
 #ifndef CRC32_ENABLED
-#define CRC32_ENABLED 0
+#define CRC32_ENABLED 1
 #endif
 
 // <q> ECC_ENABLED  - ecc - Elliptic Curve Cryptography Library
@@ -6598,48 +7185,48 @@
 // <e> MEM_MANAGER_ENABLED - mem_manager - Dynamic memory allocator
 //==========================================================
 #ifndef MEM_MANAGER_ENABLED
-#define MEM_MANAGER_ENABLED 0
+#define MEM_MANAGER_ENABLED 1
 #endif
 // <o> MEMORY_MANAGER_SMALL_BLOCK_COUNT - Size of each memory blocks identified as 'small' block.  <0-255> 
 
 
 #ifndef MEMORY_MANAGER_SMALL_BLOCK_COUNT
-#define MEMORY_MANAGER_SMALL_BLOCK_COUNT 1
+#define MEMORY_MANAGER_SMALL_BLOCK_COUNT 8
 #endif
 
-// <o> MEMORY_MANAGER_SMALL_BLOCK_SIZE -  Size of each memory blocks identified as 'small' block. 
+// <o> MEMORY_MANAGER_SMALL_BLOCK_SIZE -  Size of each memory blocks identified as 'small' block.
 // <i>  Size of each memory blocks identified as 'small' block. Memory block are recommended to be word-sized.
 
 #ifndef MEMORY_MANAGER_SMALL_BLOCK_SIZE
-#define MEMORY_MANAGER_SMALL_BLOCK_SIZE 32
+#define MEMORY_MANAGER_SMALL_BLOCK_SIZE 128
 #endif
 
-// <o> MEMORY_MANAGER_MEDIUM_BLOCK_COUNT - Size of each memory blocks identified as 'medium' block.  <0-255> 
+// <o> MEMORY_MANAGER_MEDIUM_BLOCK_COUNT - Size of each memory blocks identified as 'medium' block.  <0-255>
 
 
 #ifndef MEMORY_MANAGER_MEDIUM_BLOCK_COUNT
-#define MEMORY_MANAGER_MEDIUM_BLOCK_COUNT 0
+#define MEMORY_MANAGER_MEDIUM_BLOCK_COUNT 4
 #endif
 
-// <o> MEMORY_MANAGER_MEDIUM_BLOCK_SIZE -  Size of each memory blocks identified as 'medium' block. 
+// <o> MEMORY_MANAGER_MEDIUM_BLOCK_SIZE -  Size of each memory blocks identified as 'medium' block.
 // <i>  Size of each memory blocks identified as 'medium' block. Memory block are recommended to be word-sized.
 
 #ifndef MEMORY_MANAGER_MEDIUM_BLOCK_SIZE
 #define MEMORY_MANAGER_MEDIUM_BLOCK_SIZE 256
 #endif
 
-// <o> MEMORY_MANAGER_LARGE_BLOCK_COUNT - Size of each memory blocks identified as 'large' block.  <0-255> 
+// <o> MEMORY_MANAGER_LARGE_BLOCK_COUNT - Size of each memory blocks identified as 'large' block.  <0-255>
 
 
 #ifndef MEMORY_MANAGER_LARGE_BLOCK_COUNT
-#define MEMORY_MANAGER_LARGE_BLOCK_COUNT 0
+#define MEMORY_MANAGER_LARGE_BLOCK_COUNT 2
 #endif
 
-// <o> MEMORY_MANAGER_LARGE_BLOCK_SIZE -  Size of each memory blocks identified as 'large' block. 
+// <o> MEMORY_MANAGER_LARGE_BLOCK_SIZE -  Size of each memory blocks identified as 'large' block.
 // <i>  Size of each memory blocks identified as 'large' block. Memory block are recommended to be word-sized.
 
 #ifndef MEMORY_MANAGER_LARGE_BLOCK_SIZE
-#define MEMORY_MANAGER_LARGE_BLOCK_SIZE 256
+#define MEMORY_MANAGER_LARGE_BLOCK_SIZE 1024
 #endif
 
 // <o> MEMORY_MANAGER_XLARGE_BLOCK_COUNT - Size of each memory blocks identified as 'extra large' block.  <0-255> 
@@ -6898,7 +7485,7 @@
 // <e> NRF_FSTORAGE_ENABLED - nrf_fstorage - Flash abstraction library
 //==========================================================
 #ifndef NRF_FSTORAGE_ENABLED
-#define NRF_FSTORAGE_ENABLED 0
+#define NRF_FSTORAGE_ENABLED 1
 #endif
 // <h> nrf_fstorage - Common settings
 
@@ -7492,7 +8079,7 @@
 // <4=> Debug 
 
 #ifndef NRF_LOG_DEFAULT_LEVEL
-#define NRF_LOG_DEFAULT_LEVEL 3
+#define NRF_LOG_DEFAULT_LEVEL 4
 #endif
 
 // <q> NRF_LOG_DEFERRED  - Enable deffered logger.
