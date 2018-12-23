@@ -150,14 +150,29 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/nano-pb \
   $(SDK_ROOT)/external/micro-ecc/micro-ecc \
 
+#
+# Original Nordic SDK Openthread libraries
+#
+#LIB_FILES += \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-diag.a \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a \
+#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a \
+#  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
+#  $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
 
+
+#
+# Self compiled more minimal libraries, configured with DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
+#
 LIB_FILES += \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-diag.a \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-ftd.a \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a \
-  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a \
+  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-diag.a \
+  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-ftd.a \
+  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-platform-utils.a \
+  $(PROJ_DIR)/openthread/nrf52840/lib/libmbedcrypto.a \
+  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-nrf52840-sdk.a \
   $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
   $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
 

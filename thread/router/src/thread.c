@@ -92,6 +92,6 @@ void thread_initialize() {
   ASSERT_OT(otPlatRadioGetTransmitPower(ot, &tx_power))
   NRF_LOG_INFO("TX Power: %d dBm", tx_power);
 
-  thread_cli_init();
+  //thread_cli_init();
   thread_state_changed_callback_set(thread_state_changed_callback);
 }
