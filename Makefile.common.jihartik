@@ -19,7 +19,7 @@ NRFJPROG            := $(REMOTE_CMD) nrfjprog
 define flash
     $(eval HEX := $(call to_remote,$(1)))
 	@echo Flashing: $(HEX)
-	$(NRFJPROG) -f nrf52 --program $(HEX) --sectorerase --verify --fast --reset
+	$(NRFJPROG) -f nrf52 --program $(HEX) --sectorerase --reset
 endef
 
 define erase
