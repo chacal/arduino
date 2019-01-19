@@ -167,6 +167,8 @@ INC_FOLDERS += \
 #
 # Self compiled more minimal libraries, configured with DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
 #
+# NOTE! Includes are still used from the Nordic SDK!
+#
 LIB_FILES += \
   $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-diag.a \
   $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-ftd.a \
