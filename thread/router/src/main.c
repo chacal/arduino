@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   APP_ERROR_CHECK(nrf_mem_init());
   APP_ERROR_CHECK(app_timer_init());
 
-  NRF_LOG_INFO("Starting Thread Router..")
+  NRF_LOG_INFO("Starting Thread Router " APP_VERSION "..")
 
   while (true) {
     thread_initialize();
