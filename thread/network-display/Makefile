@@ -89,7 +89,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/iot/coap/coap_transport_ot.c \
   $(SDK_ROOT)/external/nano-pb/pb_common.c \
   $(SDK_ROOT)/external/nano-pb/pb_decode.c \
-  $(SRC_DIR)/main.c \
+  $(SRC_DIR)/main.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
@@ -209,6 +209,8 @@ CFLAGS += -DAPP_VERSION='"$(DFU_APP_VERSION_STR)"'
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
+CXXFLAGS += -std=c++17 -Wno-register
+CXXFLAGS += -fno-threadsafe-statics
 
 # Assembler flags common to all targets
 ASMFLAGS += -g3

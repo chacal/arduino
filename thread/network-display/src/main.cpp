@@ -3,7 +3,7 @@
 #include <nrf_log_default_backends.h>
 
 int main(int argc, char *argv[]) {
-  APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+  APP_ERROR_CHECK(NRF_LOG_INIT(nullptr));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
 
 
