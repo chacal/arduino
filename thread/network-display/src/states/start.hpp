@@ -9,10 +9,13 @@ extern "C" {
 }
 
 #include "common.hpp"
+#include "named_type.hpp"
 
 using namespace fsm;
 
 namespace states {
+  struct connected;
+  using thread_role = named_type<otDeviceRole, struct thread_role_param>;
 
   struct start : Base {
     virtual void enter(Context &context) {
@@ -20,10 +23,18 @@ namespace states {
       APP_ERROR_CHECK(app_timer_init());
 
       NRF_LOG_INFO("Start: Initializing OpenThread");
-      otInstance *ot = thread::initialize();
+      auto       role_handler = [&](otDeviceRole role) { context.react(thread_role(role)); };
+      otInstance *ot          = thread::initialize(role_handler);
 
       NRF_LOG_INFO("Start: Initializing DFU");
       APP_ERROR_CHECK(coap_dfu_init(ot));
+    }
+
+    virtual void react(const thread_role &role, Control &control, Context &context) {
+      if (role.get() == OT_DEVICE_ROLE_CHILD) {
+        NRF_LOG_INFO("Joined network as child.")
+        control.changeTo<connected>();
+      }
     }
   };
 }

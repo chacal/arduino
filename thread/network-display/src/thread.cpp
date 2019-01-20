@@ -17,8 +17,9 @@ extern "C" {
 
 namespace thread {
 
-  static otNetifAddress ip6_addresses[MAX_IP6_ADDRESS_COUNT];
-  static uint8_t        ip6_identity[24];
+  static otNetifAddress                ip6_addresses[MAX_IP6_ADDRESS_COUNT];
+  static uint8_t                       ip6_identity[24];
+  static thread_role_handler_t m_thread_role_handler;
 
   static otSemanticallyOpaqueIidGeneratorData data = {
       .mInterfaceId = (unsigned char *) "wpan0",
@@ -49,11 +50,13 @@ namespace thread {
   }
 
   static void thread_state_changed_callback(uint32_t flags, void *p_context) {
-    NRF_LOG_INFO("State changed! Flags: 0x%08x Current role: %d", flags, otThreadGetDeviceRole(static_cast<otInstance *>(p_context)));
+    otDeviceRole role = otThreadGetDeviceRole(static_cast<otInstance *>(p_context));
+    NRF_LOG_INFO("State changed! Flags: 0x%08x Current role: %d", flags, role);
     if ((flags & OT_CHANGED_THREAD_NETDATA) != 0) {
       otIp6SlaacUpdate(thread_ot_instance_get(), ip6_addresses, MAX_IP6_ADDRESS_COUNT, otIp6CreateSemanticallyOpaqueIid, &data);
       print_addresses();
     }
+    m_thread_role_handler(role);
   }
 
   static void initialize_ip6_identity() {
@@ -66,7 +69,8 @@ namespace thread {
     memcpy(ip6_identity + 5 * reg_size, (void *) &NRF_FICR->IR[3], reg_size);
   }
 
-  otInstance* initialize() {
+  otInstance *initialize(const thread_role_handler_t &role_handler) {
+    m_thread_role_handler = role_handler;
     initialize_ip6_identity();
 
     otExtendedPanId xPanId    = {.m8 = THREAD_XPANID};

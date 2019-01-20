@@ -1,4 +1,6 @@
 #pragma once
+
+#include <functional>
 #include <openthread/thread.h>
 
 #define ASSERT_OT(expr)               \
@@ -8,7 +10,10 @@ do {                                  \
 } while (false);
 
 namespace thread {
-  otInstance* initialize();
+  using thread_role_handler_t = std::function<void(otDeviceRole role)>;
+
+  otInstance *initialize(const thread_role_handler_t&);
+
   void run();
 }
 

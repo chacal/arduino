@@ -1,6 +1,7 @@
 #pragma once
 
 #include "states/start.hpp"
+#include "states/connected.hpp"
 
 using namespace fsm;
 using namespace states;
@@ -19,8 +20,8 @@ public:
   }
 
 private:
-  Context             ctx;
-  M::PeerRoot <start> hfsm_root;
+  Context                        ctx;
+  M::PeerRoot <start, connected> hfsm_root;
 };
 
 
