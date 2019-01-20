@@ -20,7 +20,6 @@ namespace states {
   struct start : Base {
     virtual void enter(Context &context) {
       APP_ERROR_CHECK(nrf_mem_init());
-      APP_ERROR_CHECK(app_timer_init());
 
       NRF_LOG_INFO("Start: Initializing OpenThread");
       auto       role_handler = [&](otDeviceRole role) { context.react(thread_role(role)); };
@@ -36,5 +35,7 @@ namespace states {
         control.changeTo<connected>();
       }
     }
+
+    using Base::react;
   };
 }

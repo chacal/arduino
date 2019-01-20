@@ -9,6 +9,7 @@
 int main(int argc, char *argv[]) {
   APP_ERROR_CHECK(NRF_LOG_INIT(nullptr));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
+  APP_ERROR_CHECK(app_timer_init());  // Needs to be initialized before FSM as some states use app_timer in their constructors
 
   NRF_LOG_INFO("Starting Network Display "
                    APP_VERSION
