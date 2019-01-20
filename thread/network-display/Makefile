@@ -202,8 +202,6 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
-CFLAGS += -D__HEAP_SIZE=0
-CFLAGS += -D__STACK_SIZE=8192
 CFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
 CFLAGS += -DNRF_DFU_NO_TRANSPORT
 CFLAGS += -DuECC_ENABLE_VLI_API=0
@@ -230,8 +228,6 @@ ASMFLAGS += -DFLOAT_ABI_HARD
 ASMFLAGS += -D$(PLATFORM)
 ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DUART0_ENABLED=0
-ASMFLAGS += -D__HEAP_SIZE=0
-ASMFLAGS += -D__STACK_SIZE=8192
 ASMFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
 ASMFLAGS += -DNRF_DFU_NO_TRANSPORT
 ASMFLAGS += -DuECC_ENABLE_VLI_API=0
