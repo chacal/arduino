@@ -90,6 +90,7 @@ SRC_FILES += \
   $(SDK_ROOT)/external/nano-pb/pb_common.c \
   $(SDK_ROOT)/external/nano-pb/pb_decode.c \
   $(SRC_DIR)/main.cpp \
+  $(SRC_DIR)/thread.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
