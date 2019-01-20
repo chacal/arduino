@@ -1,5 +1,4 @@
 #include "thread_credentials.h"
-#include <openthread/thread.h>
 #include <openthread/ip6.h>
 #include <nrf_log_ctrl.h>
 #include <nrf_log.h>
@@ -67,7 +66,7 @@ namespace thread {
     memcpy(ip6_identity + 5 * reg_size, (void *) &NRF_FICR->IR[3], reg_size);
   }
 
-  void initialize() {
+  otInstance* initialize() {
     initialize_ip6_identity();
 
     otExtendedPanId xPanId    = {.m8 = THREAD_XPANID};
@@ -106,6 +105,8 @@ namespace thread {
 
     //thread_cli_init();
     thread_state_changed_callback_set(thread_state_changed_callback);
+
+    return ot;
   }
 
   void run() {

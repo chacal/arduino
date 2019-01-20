@@ -1,4 +1,5 @@
 #pragma once
+#include <openthread/thread.h>
 
 #define ASSERT_OT(expr)               \
 do {                                  \
@@ -7,7 +8,7 @@ do {                                  \
 } while (false);
 
 namespace thread {
-  void initialize();
+  otInstance* initialize();
   void run();
 }
 
