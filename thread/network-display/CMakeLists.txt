@@ -4,6 +4,7 @@ project(network-display)
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0")
+set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")
 
 add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_PCA10056)
@@ -62,6 +63,7 @@ include_directories("${SDK_ROOT}/components/iot/background_dfu/transport/coap")
 include_directories("${SDK_ROOT}/external/nrf_tls")
 include_directories("${SDK_ROOT}/external/nano-pb")
 include_directories("${SDK_ROOT}/external/micro-ecc/micro-ecc")
+include_directories("${HFSM_ROOT}/include")
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
 

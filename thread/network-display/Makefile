@@ -13,6 +13,8 @@ SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
+HFSM_PATH          := $(HOME)/Documents/dev/HFSM
+
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
 DFU_FAMILY         := NRF52840
@@ -94,6 +96,7 @@ SRC_FILES += \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
+  $(SRC_DIR)/states \
   $(SDK_ROOT)/external/fprintf \
   $(PROJ_DIR) \
   $(SDK_ROOT)/components/thread/utils \
@@ -148,6 +151,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/nrf_tls \
   $(SDK_ROOT)/external/nano-pb \
   $(SDK_ROOT)/external/micro-ecc/micro-ecc \
+  $(HFSM_PATH)/include \
 
 #
 # Original Nordic SDK Openthread libraries
@@ -176,6 +180,7 @@ LIB_FILES += \
   $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-nrf52840-sdk.a \
   $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
   $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
+   -lstdc++
 
 # Optimization flags
 OPT = -O3 -g3
