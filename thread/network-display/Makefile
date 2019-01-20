@@ -206,11 +206,13 @@ CFLAGS += -DuECC_SQUARE_FUNC=0
 CFLAGS += -DuECC_SUPPORT_COMPRESSED_POINT=0
 CFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 CFLAGS += -DAPP_VERSION='"$(DFU_APP_VERSION_STR)"'
+CFLAGS += -DDEBUG
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
 CXXFLAGS += -std=c++17 -Wno-register
 CXXFLAGS += -fno-threadsafe-statics
+CXXFLAGS += -DDEBUG
 
 # Assembler flags common to all targets
 ASMFLAGS += -g3
