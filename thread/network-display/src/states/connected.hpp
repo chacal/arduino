@@ -29,7 +29,7 @@ namespace states {
 
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(timer_ticked{}); }};
-    coap_service coap;
+    coap_service::coap_service coap;
   };
 }
 
