@@ -97,6 +97,7 @@ SRC_FILES += \
   $(SRC_DIR)/periodic_timer.cpp \
   $(SRC_DIR)/coap_service.cpp \
   $(SRC_DIR)/coap_helpers.cpp \
+  $(SRC_DIR)/cmd_protocol.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \

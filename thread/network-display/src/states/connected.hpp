@@ -3,7 +3,8 @@
 #include <nrf_log.h>
 #include "periodic_timer.hpp"
 #include "common.hpp"
-#include "../coap_service.hpp"
+#include "coap_service.hpp"
+#include "cmd_protocol.hpp"
 
 #define COAP_TICK_PERIOD    std::chrono::seconds(1)
 
@@ -18,12 +19,30 @@ namespace states {
       NRF_LOG_INFO("Connected");
       coap_tick_timer.start(&context);
 
-      auto on_display_post = [&](const coap_service::post_data &data) { NRF_LOG_INFO("Got %d bytes of POST data.", data.len)};
+      auto on_display_post = [&](const coap_service::post_data &data) { context.react(data); };
       coap_service::initialize({on_display_post});
     }
 
     virtual void react(const timer_ticked &event, Control &control, Context &context) {
       coap_time_tick();
+    }
+
+    virtual void react(const coap_service::post_data &data, Control &control, Context &context) {
+      NRF_LOG_DEBUG("Got %d bytes of data", data.len)
+      auto cmd_seq = commands::parse(data);
+      if (cmd_seq) {
+        context.react(*cmd_seq);
+      }
+    }
+
+    virtual void react(const commands::display_command_seq &commands, Control &control, Context &context) {
+      NRF_LOG_DEBUG("Received %d commands", commands.size())
+/*
+      for (auto &cmd : commands) {
+        std::visit(display_command_handler{context.display_list}, cmd);
+      }
+      context.display_list.render(context.disp);
+*/
     }
 
     using Base::react;
