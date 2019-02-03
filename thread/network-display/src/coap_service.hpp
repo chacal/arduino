@@ -1,21 +1,24 @@
 #pragma once
 
+#include <functional>
 #include <coap_api.h>
 
 namespace coap_service {
 
-  class coap_service {
-  public:
-    void initialize();
-
-  private:
-    coap_resource_t api_resource     = {};
-    coap_resource_t display_resource = {};
-
-    void initialize_api_resource();
-
-    void initialize_display_resource();
+  struct post_data {
+    const uint8_t *data;
+    uint16_t      len;
   };
+
+  using post_handler = std::function<void(const post_data &)>;
+
+  struct request_handler {
+    request_handler &operator=(const request_handler &other) = default;
+
+    post_handler on_display_post;
+  };
+
+  void initialize(const request_handler &);
 }
 
 

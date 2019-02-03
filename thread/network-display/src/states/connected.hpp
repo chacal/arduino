@@ -17,7 +17,9 @@ namespace states {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
       coap_tick_timer.start(&context);
-      coap.initialize();
+
+      auto on_display_post = [&](const coap_service::post_data &data) { NRF_LOG_INFO("Got %d bytes of POST data.", data.len)};
+      coap_service::initialize({on_display_post});
     }
 
     virtual void react(const timer_ticked &event, Control &control, Context &context) {
@@ -29,7 +31,6 @@ namespace states {
 
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(timer_ticked{}); }};
-    coap_service::coap_service coap;
   };
 }
 
