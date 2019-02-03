@@ -95,6 +95,8 @@ SRC_FILES += \
   $(SRC_DIR)/thread.cpp \
   $(SRC_DIR)/dfu_public_key.c \
   $(SRC_DIR)/periodic_timer.cpp \
+  $(SRC_DIR)/coap_service.cpp \
+  $(SRC_DIR)/coap_helpers.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
