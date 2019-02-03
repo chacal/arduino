@@ -170,7 +170,7 @@ INC_FOLDERS += \
 
 
 #
-# Self compiled more minimal libraries, configured with DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
+# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
