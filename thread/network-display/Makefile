@@ -13,6 +13,9 @@ SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
+U8G2_PATH          := $(HOME)/arduino/u8g2
+U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
+
 HFSM_PATH          := $(HOME)/Documents/dev/HFSM
 
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
@@ -80,6 +83,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_handling_error.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_utils.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/dfu-cc.pb.c \
+  $(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
+  $(SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_spi.c \
   $(SDK_ROOT)/components/iot/background_dfu/background_dfu_state.c \
   $(SDK_ROOT)/components/iot/background_dfu/background_dfu_block.c \
   $(SDK_ROOT)/components/iot/background_dfu/background_dfu_operation.c \
@@ -91,6 +97,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/iot/coap/coap_transport_ot.c \
   $(SDK_ROOT)/external/nano-pb/pb_common.c \
   $(SDK_ROOT)/external/nano-pb/pb_decode.c \
+  $(U8G2_SOURCES) \
   $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/thread.cpp \
   $(SRC_DIR)/dfu_public_key.c \
@@ -98,6 +105,9 @@ SRC_FILES += \
   $(SRC_DIR)/coap_service.cpp \
   $(SRC_DIR)/coap_helpers.cpp \
   $(SRC_DIR)/cmd_protocol.cpp \
+  $(SRC_DIR)/display.cpp \
+  $(SRC_DIR)/nrf_u8g2_adapter.cpp \
+  $(SRC_DIR)/power_manager.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
@@ -137,6 +147,8 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/fstorage \
   $(SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
   $(SDK_ROOT)/components/libraries/mem_manager \
+  $(SDK_ROOT)/components/libraries/mutex \
+  $(SDK_ROOT)/components/libraries/pwr_mgmt \
   $(SDK_ROOT)/components/libraries/bootloader \
   $(SDK_ROOT)/components/libraries/bootloader/dfu \
   $(SDK_ROOT)/components/libraries/crypto \
@@ -156,6 +168,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/nrf_tls \
   $(SDK_ROOT)/external/nano-pb \
   $(SDK_ROOT)/external/micro-ecc/micro-ecc \
+  $(U8G2_PATH)/csrc \
   $(HFSM_PATH)/include \
 
 #

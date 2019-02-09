@@ -5546,7 +5546,7 @@
 // <e> SPI_ENABLED - nrf_drv_spi - SPI/SPIM peripheral driver - legacy layer
 //==========================================================
 #ifndef SPI_ENABLED
-#define SPI_ENABLED 0
+#define SPI_ENABLED 1
 #endif
 // <o> SPI_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
  
@@ -5578,7 +5578,7 @@
 // <e> SPI0_ENABLED - Enable SPI0 instance
 //==========================================================
 #ifndef SPI0_ENABLED
-#define SPI0_ENABLED 0
+#define SPI0_ENABLED 1
 #endif
 // <q> SPI0_USE_EASY_DMA  - Use EasyDMA
  
@@ -7556,7 +7556,7 @@
 // <e> NRF_PWR_MGMT_ENABLED - nrf_pwr_mgmt - Power management module
 //==========================================================
 #ifndef NRF_PWR_MGMT_ENABLED
-#define NRF_PWR_MGMT_ENABLED 0
+#define NRF_PWR_MGMT_ENABLED 1
 #endif
 // <e> NRF_PWR_MGMT_CONFIG_DEBUG_PIN_ENABLED - Enables pin debug in the module.
 
@@ -7664,7 +7664,7 @@
  
 
 #ifndef NRF_PWR_MGMT_CONFIG_USE_SCHEDULER
-#define NRF_PWR_MGMT_CONFIG_USE_SCHEDULER 0
+#define NRF_PWR_MGMT_CONFIG_USE_SCHEDULER 1
 #endif
 
 // <o> NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - The number of priorities for module handlers. 
@@ -7694,7 +7694,7 @@
  
 
 #ifndef NRF_SECTION_ITER_ENABLED
-#define NRF_SECTION_ITER_ENABLED 0
+#define NRF_SECTION_ITER_ENABLED 1
 #endif
 
 // <q> NRF_SORTLIST_ENABLED  - nrf_sortlist - Sorted list
