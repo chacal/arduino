@@ -19,6 +19,7 @@ namespace states {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
       coap_tick_timer.start(&context);
+      context.disp.on();
 
       auto on_coap_post = [&](const coap_service::post_data &coap_data) { context.react(coap_data); };
       coap_service::initialize({on_coap_post});
