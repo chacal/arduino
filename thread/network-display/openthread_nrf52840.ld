@@ -15,6 +15,9 @@ MEMORY
   bootloader_settings_page (r) : ORIGIN = 0x000FF000, LENGTH = 0x1000
   uicr_bootloader_start_address (r) : ORIGIN = 0x10001014, LENGTH = 0x4
 
+  /** Location of regout0 setting in flash. */
+  uicr_regout0 (r) : ORIGIN = 0x10001304, LENGTH = 0x4
+
   /** Location of OpenThread settings in flash. */
   OPENTHREAD_SETTINGS (rw) : ORIGIN = 0x000F4000, LENGTH = 0x4000
 }
@@ -47,6 +50,12 @@ SECTIONS
     KEEP(*(SORT(.uicr_bootloader_start_address*)))
     PROVIDE(__stop_uicr_bootloader_start_address = .);
   } > uicr_bootloader_start_address
+  .uicr_regout0 :
+  {
+    PROVIDE(__start_uicr_regout0 = .);
+    KEEP(*(SORT(.uicr_regout0*)))
+    PROVIDE(__stop_uicr_regout0 = .);
+  } > uicr_regout0
 }
 
 SECTIONS
