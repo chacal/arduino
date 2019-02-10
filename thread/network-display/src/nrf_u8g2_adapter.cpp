@@ -5,11 +5,11 @@
 #include "nrf_u8g2_adapter.hpp"
 #include "power_manager.hpp"
 
-#define SCK_PIN         11   // Display PIN 1
-#define MOSI_PIN        12   // Display PIN 2
-#define DC_PIN          13   // Display PIN 4
-#define RESET_PIN        6   // Display PIN 5
-#define CS_PIN           7   // Display PIN 6
+#define SCK_PIN         24   // Display PIN 1
+#define MOSI_PIN        13   // Display PIN 2
+#define DC_PIN           2   // Display PIN 4
+#define RESET_PIN       18   // Display PIN 5
+#define CS_PIN           5   // Display PIN 6
 
 #define SPI_INSTANCE     0
 
