@@ -56,6 +56,7 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c\
   $(SDK_ROOT)/components/thread/utils/thread_utils.c \
   $(SDK_ROOT)/components/libraries/mem_manager/mem_manager.c \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
@@ -108,6 +109,8 @@ SRC_FILES += \
   $(SRC_DIR)/display.cpp \
   $(SRC_DIR)/nrf_u8g2_adapter.cpp \
   $(SRC_DIR)/power_manager.cpp \
+  $(SRC_DIR)/display_command_handler.cpp \
+  $(SRC_DIR)/rendering.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \

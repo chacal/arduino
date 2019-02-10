@@ -2,6 +2,7 @@
 
 #include <hfsm/machine_single.hpp>
 #include <new>
+#include <rendering.hpp>
 
 struct state_machine;
 
@@ -12,6 +13,9 @@ namespace fsm {
 
     template<typename T>
     void react(const T &event);
+
+    display                 disp;
+    rendering::display_list display_list;
 
   private:
     state_machine *fsm;

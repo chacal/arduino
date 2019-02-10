@@ -5,6 +5,7 @@
 #include "common.hpp"
 #include "coap_service.hpp"
 #include "cmd_protocol.hpp"
+#include "display_command_handler.hpp"
 
 #define COAP_TICK_PERIOD    std::chrono::seconds(1)
 
@@ -37,12 +38,10 @@ namespace states {
 
     virtual void react(const commands::display_command_seq &commands, Control &control, Context &context) {
       NRF_LOG_DEBUG("Received %d commands", commands.size())
-/*
       for (auto &cmd : commands) {
         std::visit(display_command_handler{context.display_list}, cmd);
       }
       context.display_list.render(context.disp);
-*/
     }
 
     using Base::react;
