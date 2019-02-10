@@ -11,6 +11,7 @@ extern "C" {
 #include "common.hpp"
 #include "named_type.hpp"
 #include "power_manager.hpp"
+#include "vcc.hpp"
 
 using namespace fsm;
 
@@ -22,6 +23,7 @@ namespace states {
     virtual void enter(Context &context) {
       APP_ERROR_CHECK(nrf_mem_init());
       power_manager::init();
+      vcc::init();
 
       NRF_LOG_INFO("Start: Initializing OpenThread");
       auto       role_handler = [&](otDeviceRole role) { context.react(thread_role(role)); };
