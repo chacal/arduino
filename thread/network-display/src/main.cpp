@@ -3,10 +3,12 @@
 #include <nrf_log.h>
 #include <nrf_log_default_backends.h>
 #include <app_scheduler.h>
+#include <nrf_power.h>
 #include "thread.hpp"
 #include "state_machine.hpp"
 
 int main(int argc, char *argv[]) {
+  nrf_power_dcdcen_set(true);
   APP_ERROR_CHECK(NRF_LOG_INIT(nullptr));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   APP_ERROR_CHECK(app_timer_init());  // Needs to be initialized before FSM as some states use app_timer in their constructors
