@@ -12,8 +12,8 @@ extern "C" {
 
 #define MAX_IP6_ADDRESS_COUNT        6
 #define LOG_IP6_ADDRESSES         true
-#define TX_POWER                     8  // dBm
-#define SED_POLL_PERIOD_MS         500
+#define TX_POWER                    -4  // dBm
+#define SED_POLL_PERIOD_MS        5000
 
 namespace thread {
 
