@@ -14,7 +14,7 @@ using namespace fsm;
 namespace states {
 
   struct connected : Base {
-    struct timer_ticked {};
+    struct coap_timer_ticked {};
 
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
@@ -25,7 +25,7 @@ namespace states {
       coap_service::initialize({on_coap_post});
     }
 
-    virtual void react(const timer_ticked &event, Control &control, Context &context) {
+    virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {
       coap_time_tick();
     }
 
@@ -49,7 +49,7 @@ namespace states {
 
 
   private:
-    periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(timer_ticked{}); }};
+    periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
   };
 }
 
