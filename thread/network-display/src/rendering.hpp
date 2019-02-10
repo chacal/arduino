@@ -19,6 +19,8 @@ namespace rendering {
 
     void render(display &);
 
+    const uint8_t max_length = DISPLAY_LIST_LENGTH;
+
   private:
     // std::monostate represents an empty place in the display list
     using display_list_command_internal = std::variant<std::monostate, commands::str_cmd, commands::line_cmd>;
