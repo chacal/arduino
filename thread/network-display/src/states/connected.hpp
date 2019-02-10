@@ -20,8 +20,8 @@ namespace states {
       NRF_LOG_INFO("Connected");
       coap_tick_timer.start(&context);
 
-      auto on_display_post = [&](const coap_service::post_data &data) { context.react(data); };
-      coap_service::initialize({on_display_post});
+      auto on_coap_post = [&](const coap_service::post_data &coap_data) { context.react(coap_data); };
+      coap_service::initialize({on_coap_post});
     }
 
     virtual void react(const timer_ticked &event, Control &control, Context &context) {
