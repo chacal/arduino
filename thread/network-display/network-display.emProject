@@ -30,6 +30,12 @@
       filter="*.h;*.hpp;*.c;*.cpp"
       path="src"
       recurse="Yes" />
+    <folder
+      Name="components"
+      exclude=""
+      filter="*.c"
+      path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components"
+      recurse="Yes" />
   </project>
   <configuration
     Name="Debug"
