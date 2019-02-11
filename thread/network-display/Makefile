@@ -113,6 +113,7 @@ SRC_FILES += \
   $(SRC_DIR)/display_command_handler.cpp \
   $(SRC_DIR)/rendering.cpp \
   $(SRC_DIR)/vcc.cpp \
+  $(SRC_DIR)/util.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \

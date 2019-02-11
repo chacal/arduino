@@ -25,7 +25,10 @@ namespace states {
       context.disp.on();
 
       auto on_coap_post = [&](const coap_service::post_data &coap_data) { context.react(coap_data); };
-      coap_service::initialize({on_coap_post});
+      coap_service::initialize({
+                                   on_coap_post,
+                                   &util::get_status_json
+                               });
     }
 
     virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {

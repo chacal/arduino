@@ -11,11 +11,13 @@ namespace coap_service {
   };
 
   using post_handler = std::function<void(const post_data &)>;
+  using get_handler = std::function<std::string()>;
 
   struct request_handler {
     request_handler &operator=(const request_handler &other) = default;
 
     post_handler on_display_post;
+    get_handler on_status_get;
   };
 
   void initialize(const request_handler &);
