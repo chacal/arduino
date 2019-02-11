@@ -1,7 +1,7 @@
 #include <nrfx_saadc.h>
 #include "vcc.hpp"
 
-#define R1   3400     // kΩ, adjusted to match measured results
+#define R1   3300     // kΩ
 #define R2    910     // kΩ
 
 static void on_adc_event(nrfx_saadc_evt_t const *event) {}
