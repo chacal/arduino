@@ -4,13 +4,11 @@
 
 using namespace ArduinoJson;
 
-static StaticJsonBuffer<200> jsonBuffer;
-
-
 namespace util {
 
   std::string get_status_json() {
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonBuffer<100> jsonBuffer;
+    JsonObject            &root = jsonBuffer.createObject();
     root["vcc"] = vcc::measure();
     std::string output;
     root.printTo(output);
