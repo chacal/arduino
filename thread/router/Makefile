@@ -256,7 +256,7 @@ $(OUTPUT_DIRECTORY)/bootloader_settings.hex: build_app
 	$(NRFUTIL) settings generate --family $(DFU_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
 dfu_pkg: build_app
-	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req 0x00 --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req 0x00 --key-file $(DFU_PRIVATE_KEY) $(PROJECT_NAME)_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..
