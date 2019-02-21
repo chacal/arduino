@@ -1,6 +1,6 @@
 PROJECT_NAME       := thread_router
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.0.0
+DFU_APP_VERSION_STR:= 1.1.0
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
@@ -165,7 +165,7 @@ INC_FOLDERS += \
 
 
 #
-# Self compiled more minimal libraries, configured with DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
+# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 DISABLE_SPI=1 (Own openthread fork commit 17227a1da942..)
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
