@@ -160,6 +160,19 @@ namespace thread {
     return power;
   }
 
+  void set_poll_period(milliseconds poll_period) {
+    otInstance *ot = thread_ot_instance_get();
+    ASSERT(ot != nullptr);
+    NRF_LOG_DEBUG("Setting poll period to %dms", poll_period.count());
+    otLinkSetPollPeriod(ot, static_cast<uint32_t>(poll_period.count()));
+  }
+
+  milliseconds get_poll_period() {
+    otInstance *ot = thread_ot_instance_get();
+    ASSERT(ot != nullptr);
+    return milliseconds(otLinkGetPollPeriod(ot));
+  }
+
   void run() {
     thread_process();
     thread_sleep();

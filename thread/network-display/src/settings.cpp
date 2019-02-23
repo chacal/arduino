@@ -26,12 +26,21 @@ namespace settings {
         NRF_LOG_ERROR("Tx power must be an integer!");
       }
     }
+
+    if (settings.containsKey("pollPeriod")) {
+      if (settings["pollPeriod"].is<uint32_t>()) {
+        thread::set_poll_period(milliseconds(settings["pollPeriod"]));
+      } else {
+        NRF_LOG_ERROR("Poll period must be an integer!");
+      }
+    }
   }
 
   std::string get_as_json() {
     StaticJsonBuffer<300> jsonBuffer;
     JsonObject            &root = jsonBuffer.createObject();
     root["txPower"] = thread::get_tx_power();
+    root["pollPeriod"] = thread::get_poll_period().count();
 
     std::string output;
     root.printTo(output);

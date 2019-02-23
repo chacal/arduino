@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <tuple>
+#include <chrono>
 #include <openthread/thread.h>
 
 #define ASSERT_OT(expr)               \
@@ -9,6 +10,8 @@ do {                                  \
   otError ot_err = expr;              \
   ASSERT(ot_err == OT_ERROR_NONE);    \
 } while (false);
+
+using namespace std::chrono;
 
 namespace thread {
   using thread_role_handler_t = std::function<void(otDeviceRole role)>;
@@ -27,5 +30,7 @@ namespace thread {
   parent_info get_parent_info();
   void set_tx_power(int8_t power);
   int8_t get_tx_power();
+  void set_poll_period(milliseconds poll_period);
+  milliseconds get_poll_period();
 }
 
