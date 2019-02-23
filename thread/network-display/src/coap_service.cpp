@@ -11,6 +11,7 @@ namespace coap_service {
   static coap_resource_t m_api_resource     = {};
   static coap_resource_t m_display_resource = {};
   static coap_resource_t m_status_resource  = {};
+  static coap_resource_t m_settings_resource  = {};
 
   static void on_display_post(coap_resource_t *p_resource, coap_message_t *p_request) {
     coap_message_t *p_response;
@@ -41,6 +42,19 @@ namespace coap_service {
     coap_helpers::send_and_delete(p_response);
   }
 
+  static void on_settings_post(coap_resource_t *p_resource, coap_message_t *p_request) {
+    coap_message_t *p_response;
+
+    if (coap_helpers::has_content_type(p_request, COAP_CT_MASK_APP_JSON)) {
+      m_request_handler.on_settings_post({p_request->p_payload, p_request->payload_len});
+      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_204_CHANGED);
+    } else {
+      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
+    }
+
+    coap_helpers::send_and_delete(p_response);
+  }
+
   void initialize_api_resource() {
     coap_helpers::create_resource(m_api_resource, "api");
   }
@@ -61,14 +75,24 @@ namespace coap_service {
     m_status_resource.callback        = on_status_get;
   }
 
+  void initialize_settings_resource() {
+    coap_helpers::create_resource(m_settings_resource, "settings");
+
+    m_settings_resource.permission      = COAP_PERM_POST;
+    m_settings_resource.ct_support_mask = COAP_CT_MASK_APP_JSON;
+    m_settings_resource.callback        = on_settings_post;
+  }
+
   void initialize(const request_handler &handler) {
     m_request_handler = handler;
     initialize_api_resource();
     initialize_display_resource();
     initialize_status_resource();
+    initialize_settings_resource();
 
     APP_ERROR_CHECK(coap_resource_child_add(&m_api_resource, &m_display_resource));
     APP_ERROR_CHECK(coap_resource_child_add(&m_api_resource, &m_status_resource));
+    APP_ERROR_CHECK(coap_resource_child_add(&m_api_resource, &m_settings_resource));
     coap_helpers::add_resource_to_root(m_api_resource);
   }
 

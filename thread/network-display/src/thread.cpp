@@ -141,6 +141,17 @@ namespace thread {
     };
   }
 
+  void set_tx_power(int8_t power) {
+    otInstance *ot = thread_ot_instance_get();
+    ASSERT(ot != nullptr);
+    if (power >= -20 && power <= 8) {
+      NRF_LOG_DEBUG("Setting TX power to %ddBm", power);
+      ASSERT_OT(otPlatRadioSetTransmitPower(ot, power));
+    } else {
+      NRF_LOG_ERROR("Invalid TX power! %ddBm", power)
+    }
+  }
+
   void run() {
     thread_process();
     thread_sleep();

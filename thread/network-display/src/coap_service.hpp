@@ -17,6 +17,7 @@ namespace coap_service {
     request_handler &operator=(const request_handler &other) = default;
 
     post_handler on_display_post;
+    post_handler on_settings_post;
     get_handler on_status_get;
   };
 

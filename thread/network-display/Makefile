@@ -114,6 +114,7 @@ SRC_FILES += \
   $(SRC_DIR)/rendering.cpp \
   $(SRC_DIR)/vcc.cpp \
   $(SRC_DIR)/util.cpp \
+  $(SRC_DIR)/settings.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
