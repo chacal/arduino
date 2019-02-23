@@ -1,5 +1,6 @@
 #include "thread_credentials.h"
 #include <openthread/ip6.h>
+#include <openthread/child_supervision.h>
 #include <nrf_log_ctrl.h>
 #include <nrf_log.h>
 #include <nrf_log_default_backends.h>
@@ -10,10 +11,12 @@ extern "C" {
 #include <thread_utils.h>
 }
 
-#define MAX_IP6_ADDRESS_COUNT        6
-#define LOG_IP6_ADDRESSES         true
-#define TX_POWER                    -4  // dBm
-#define SED_POLL_PERIOD_MS        5000
+#define MAX_IP6_ADDRESS_COUNT                  6
+#define LOG_IP6_ADDRESSES                   true
+#define TX_POWER                              -4  // dBm
+#define SED_POLL_PERIOD_MS                  5000
+#define CHILD_TIMEOUT_S                       60
+#define CHILD_SUPERVISION_CHECK_TIMEOUT_S     60
 
 namespace thread {
 
@@ -93,6 +96,8 @@ namespace thread {
     ASSERT_OT(otPlatRadioSetTransmitPower(ot, TX_POWER));
     ASSERT_OT(otThreadSetEnabled(ot, true));
     otLinkSetPollPeriod(ot, SED_POLL_PERIOD_MS);
+    otThreadSetChildTimeout(ot, CHILD_TIMEOUT_S);
+    otChildSupervisionSetCheckTimeout(ot, CHILD_SUPERVISION_CHECK_TIMEOUT_S);
 
     NRF_LOG_INFO("802.15.4 Channel: %d", otLinkGetChannel(ot));
     NRF_LOG_INFO("802.15.4 PAN ID:  0x%04x", otLinkGetPanId(ot));
@@ -106,6 +111,10 @@ namespace thread {
     ASSERT_OT(otPlatRadioGetTransmitPower(ot, &tx_power))
     NRF_LOG_INFO("TX Power: %d dBm", tx_power);
     NRF_LOG_INFO("SED Poll Period: %d ms", otLinkGetPollPeriod(ot));
+
+    NRF_LOG_INFO("Child timeout: %d s", otThreadGetChildTimeout(ot));
+    NRF_LOG_INFO("Child supervision interval: %d s", otChildSupervisionGetInterval(ot));
+    NRF_LOG_INFO("Child supervision check timeout: %d s", otChildSupervisionGetCheckTimeout(ot));
 
     //thread_cli_init();
     thread_state_changed_callback_set(thread_state_changed_callback);
