@@ -192,7 +192,7 @@ INC_FOLDERS += \
 #  -lstdc++
 
 #
-# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 DISABLE_SPI=1 (Openthread git commit 41d8e4a73b4de..)
+# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 DISABLE_SPI=1 (Own openthread fork commit 17227a1da942..)
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
