@@ -118,8 +118,27 @@ namespace thread {
 
     //thread_cli_init();
     thread_state_changed_callback_set(thread_state_changed_callback);
-
     return ot;
+  }
+
+  parent_info get_parent_info() {
+    otInstance *ot = thread_ot_instance_get();
+    ASSERT(ot != nullptr);
+
+    int8_t avg_rssi, latest_rssi;
+    otThreadGetParentAverageRssi(ot, &avg_rssi);
+    otThreadGetParentLastRssi(ot, &latest_rssi);
+
+    otRouterInfo parentInfo;
+    otThreadGetParentInfo(ot, &parentInfo);
+
+    return {
+      parentInfo.mRloc16,
+      parentInfo.mLinkQualityIn,
+      parentInfo.mLinkQualityOut,
+      avg_rssi,
+      latest_rssi
+    };
   }
 
   void run() {
