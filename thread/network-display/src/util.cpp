@@ -29,10 +29,10 @@ namespace util {
     auto       parent_info = thread::get_parent_info();
     JsonObject &parent     = root.createNestedObject("parent");
     parent["rloc16"]      = "0x" + n2hexstr(parent_info.rloc16);
-    parent["link_q_in"]   = parent_info.link_quality_in;
-    parent["link_q_out"]  = parent_info.link_quality_out;
-    parent["avg_rssi"]    = parent_info.avg_rssi;
-    parent["latest_rssi"] = parent_info.latest_rssi;
+    parent["linkQualityIn"]   = parent_info.link_quality_in;
+    parent["linkQualityOut"]  = parent_info.link_quality_out;
+    parent["avgRssi"]    = parent_info.avg_rssi;
+    parent["latestRssi"] = parent_info.latest_rssi;
 
     std::string output;
     root.printTo(output);
