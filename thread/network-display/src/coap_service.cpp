@@ -8,74 +8,25 @@
 namespace coap_service {
 
   static request_handler m_request_handler;
-  static coap_resource_t m_api_resource     = {};
-  static coap_resource_t m_display_resource = {};
-  static coap_resource_t m_status_resource  = {};
-  static coap_resource_t m_settings_resource  = {};
+  static coap_resource_t m_api_resource      = {};
+  static coap_resource_t m_display_resource  = {};
+  static coap_resource_t m_status_resource   = {};
+  static coap_resource_t m_settings_resource = {};
+
 
   static void on_display_post(coap_resource_t *p_resource, coap_message_t *p_request) {
-    coap_message_t *p_response;
-
-    if (coap_helpers::has_content_type(p_request, COAP_CT_MASK_APP_JSON)) {
-      m_request_handler.on_display_post({p_request->p_payload, p_request->payload_len});
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_204_CHANGED);
-    } else {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
-    }
-
-    coap_helpers::send_and_delete(p_response);
+    coap_helpers::handle_json_post(p_resource, p_request, m_request_handler.on_display_post);
   }
 
   static void on_status_get(coap_resource_t *p_resource, coap_message_t *p_request) {
-    coap_message_t      *p_response;
-    coap_content_type_t content_type;
-    uint32_t            err_code = coap_message_ct_match_select(&content_type, p_request, p_resource);
-
-    if (err_code == NRF_SUCCESS && content_type == COAP_CT_APP_JSON) {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_205_CONTENT);
-      auto response_content = m_request_handler.on_status_get();
-      coap_message_payload_set(p_response, (void *) (response_content.c_str()), response_content.length());
-    } else {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
-    }
-
-    coap_helpers::send_and_delete(p_response);
-  }
-
-  static void on_settings_post(coap_resource_t *p_resource, coap_message_t *p_request) {
-    coap_message_t *p_response;
-
-    if (coap_helpers::has_content_type(p_request, COAP_CT_MASK_APP_JSON)) {
-      m_request_handler.on_settings_post({p_request->p_payload, p_request->payload_len});
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_204_CHANGED);
-    } else {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
-    }
-
-    coap_helpers::send_and_delete(p_response);
-  }
-
-  static void on_settings_get(coap_resource_t *p_resource, coap_message_t *p_request) {
-    coap_message_t      *p_response;
-    coap_content_type_t content_type;
-    uint32_t            err_code = coap_message_ct_match_select(&content_type, p_request, p_resource);
-
-    if (err_code == NRF_SUCCESS && content_type == COAP_CT_APP_JSON) {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_205_CONTENT);
-      auto response_content = m_request_handler.on_settings_get();
-      coap_message_payload_set(p_response, (void *) (response_content.c_str()), response_content.length());
-    } else {
-      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
-    }
-
-    coap_helpers::send_and_delete(p_response);
+    coap_helpers::handle_json_get(p_resource, p_request, m_request_handler.on_status_get);
   }
 
   static void on_settings_request(coap_resource_t *p_resource, coap_message_t *p_request) {
-    if(p_request->header.code == COAP_CODE_GET) {
-      on_settings_get(p_resource, p_request);
+    if (p_request->header.code == COAP_CODE_GET) {
+      coap_helpers::handle_json_get(p_resource, p_request, m_request_handler.on_settings_get);
     } else {
-      on_settings_post(p_resource, p_request);
+      coap_helpers::handle_json_post(p_resource, p_request, m_request_handler.on_settings_post);
     }
   }
 
