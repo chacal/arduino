@@ -22,9 +22,9 @@ namespace states {
       coap_tick_timer.start(&context);
       context.disp.on();
 
-      auto on_coap_post = [&](const coap_service::post_data &coap_data) { context.react(coap_data); };
+      auto on_display_post = [&](auto coap_data) { handle_display_post(coap_data, context); };
       coap_service::initialize({
-                                   on_coap_post,
+                                   on_display_post,
                                    &settings::get_as_json,
                                    &settings::update,
                                    &util::get_status_json,
@@ -35,27 +35,23 @@ namespace states {
       coap_time_tick();
     }
 
-    virtual void react(const coap_service::post_data &data, Control &control, Context &context) {
-      NRF_LOG_DEBUG("Got %d bytes of data", data.len)
-      auto cmd_seq = commands::parse(data);
-      if (cmd_seq) {
-        context.react(*cmd_seq);
-      }
-    }
-
-    virtual void react(const commands::display_command_seq &commands, Control &control, Context &context) {
-      NRF_LOG_DEBUG("Received %d commands", commands.size())
-      for (auto &cmd : commands) {
-        std::visit(display_command_handler{context.display_list}, cmd);
-      }
-      context.display_list.render(context.disp);
-    }
-
     using Base::react;
 
 
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
+
+    void handle_display_post(const coap_service::post_data &coap_data, Context &context) {
+      NRF_LOG_DEBUG("Got %d bytes of data", coap_data.len)
+      auto cmd_seq = commands::parse(coap_data);
+      if (cmd_seq) {
+        NRF_LOG_DEBUG("Received %d commands", cmd_seq->size())
+        for (auto &cmd : *cmd_seq) {
+          std::visit(display_command_handler{context.display_list}, cmd);
+        }
+        context.display_list.render(context.disp);
+      }
+    }
   };
 }
 
