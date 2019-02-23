@@ -25,6 +25,7 @@ namespace states {
       auto on_coap_post = [&](const coap_service::post_data &coap_data) { context.react(coap_data); };
       coap_service::initialize({
                                    on_coap_post,
+                                   &settings::get_as_json,
                                    &settings::update,
                                    &util::get_status_json,
                                });

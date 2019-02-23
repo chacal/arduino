@@ -55,6 +55,30 @@ namespace coap_service {
     coap_helpers::send_and_delete(p_response);
   }
 
+  static void on_settings_get(coap_resource_t *p_resource, coap_message_t *p_request) {
+    coap_message_t      *p_response;
+    coap_content_type_t content_type;
+    uint32_t            err_code = coap_message_ct_match_select(&content_type, p_request, p_resource);
+
+    if (err_code == NRF_SUCCESS && content_type == COAP_CT_APP_JSON) {
+      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_205_CONTENT);
+      auto response_content = m_request_handler.on_settings_get();
+      coap_message_payload_set(p_response, (void *) (response_content.c_str()), response_content.length());
+    } else {
+      p_response = coap_helpers::create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
+    }
+
+    coap_helpers::send_and_delete(p_response);
+  }
+
+  static void on_settings_request(coap_resource_t *p_resource, coap_message_t *p_request) {
+    if(p_request->header.code == COAP_CODE_GET) {
+      on_settings_get(p_resource, p_request);
+    } else {
+      on_settings_post(p_resource, p_request);
+    }
+  }
+
   void initialize_api_resource() {
     coap_helpers::create_resource(m_api_resource, "api");
   }
@@ -78,9 +102,9 @@ namespace coap_service {
   void initialize_settings_resource() {
     coap_helpers::create_resource(m_settings_resource, "settings");
 
-    m_settings_resource.permission      = COAP_PERM_POST;
+    m_settings_resource.permission      = COAP_PERM_POST | COAP_PERM_GET;
     m_settings_resource.ct_support_mask = COAP_CT_MASK_APP_JSON;
-    m_settings_resource.callback        = on_settings_post;
+    m_settings_resource.callback        = on_settings_request;
   }
 
   void initialize(const request_handler &handler) {

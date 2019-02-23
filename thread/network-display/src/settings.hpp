@@ -4,4 +4,6 @@
 
 namespace settings {
   void update(const coap_service::post_data &coap_data);
+
+  std::string get_as_json();
 }

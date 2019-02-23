@@ -152,6 +152,14 @@ namespace thread {
     }
   }
 
+  int8_t get_tx_power() {
+    otInstance *ot = thread_ot_instance_get();
+    ASSERT(ot != nullptr);
+    int8_t power;
+    ASSERT_OT(otPlatRadioGetTransmitPower(ot, &power));
+    return power;
+  }
+
   void run() {
     thread_process();
     thread_sleep();

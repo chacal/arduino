@@ -27,4 +27,14 @@ namespace settings {
       }
     }
   }
+
+  std::string get_as_json() {
+    StaticJsonBuffer<300> jsonBuffer;
+    JsonObject            &root = jsonBuffer.createObject();
+    root["txPower"] = thread::get_tx_power();
+
+    std::string output;
+    root.printTo(output);
+    return output;
+  }
 }

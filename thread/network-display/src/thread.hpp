@@ -26,5 +26,6 @@ namespace thread {
 
   parent_info get_parent_info();
   void set_tx_power(int8_t power);
+  int8_t get_tx_power();
 }
 
