@@ -4,3 +4,5 @@ CMakeListsPrivate.txt
 .travis.yml
 .clang_complete
 .gcc-flags.json
+u8g2/
+cmake-build-debug/
