@@ -55,6 +55,8 @@ SRC_FILES += \
   $(SRC_DIR)/pir_sensor.c \
   $(SRC_DIR)/current_sensor.c \
   $(SRC_DIR)/random.c \
+  $(SRC_DIR)/ntc_thermistor.c \
+  $(SRC_DIR)/ntc_thermometer_sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
@@ -199,7 +201,8 @@ INC_FOLDERS += \
 
 # Libraries common to all targets
 LIB_FILES += \
-  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a
+  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
+   -lm
 
 # Optimization flags
 OPT = -O3 -g3
