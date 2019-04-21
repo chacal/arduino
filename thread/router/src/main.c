@@ -7,8 +7,27 @@
 #include <openthread/platform/alarm-milli.h>
 #include <app_timer.h>
 #include <mem_manager.h>
+#include <nrfx_gpiote.h>
 
 #include "thread.h"
+
+#define USE_ANTENNA_SWITCH     true
+#define USE_EXTERNAL_ANTENNA   true
+
+void configure_antenna() {
+  if (USE_ANTENNA_SWITCH) {
+    nrfx_gpiote_init();
+    nrfx_gpiote_out_config_t high_config = NRFX_GPIOTE_CONFIG_OUT_SIMPLE(true);
+    nrfx_gpiote_out_config_t low_config  = NRFX_GPIOTE_CONFIG_OUT_SIMPLE(false);
+    if (USE_EXTERNAL_ANTENNA) {
+      nrfx_gpiote_out_init(24, &low_config);
+      nrfx_gpiote_out_init(25, &high_config);
+    } else {
+      nrfx_gpiote_out_init(25, &low_config);
+      nrfx_gpiote_out_init(24, &high_config);
+    }
+  }
+}
 
 int main(int argc, char *argv[]) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
@@ -16,6 +35,7 @@ int main(int argc, char *argv[]) {
 
   APP_ERROR_CHECK(nrf_mem_init());
   APP_ERROR_CHECK(app_timer_init());
+  configure_antenna();
 
   NRF_LOG_INFO("Starting Thread Router " APP_VERSION "..")
 

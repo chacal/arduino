@@ -3,7 +3,8 @@ LOCAL_HOME          := /Users/jihartik
 REMOTE_HOME         := /mnt/hgfs/jihartik
 BMP_DEV             := /dev/cu.usbmodemD6DC8FD1
 
-to_remote            = $(subst $(LOCAL_HOME),$(REMOTE_HOME),$(1))
+to_remote            = $(1)
+#to_remote            = $(subst $(LOCAL_HOME),$(REMOTE_HOME),$(1))
 
 REMOTE_CMD          := ssh $(REMOTE_HOST) -C cd "'$(call to_remote,$(PROJECT_DIR_NAME))'"\;
 
@@ -12,14 +13,18 @@ CMSIS_CONFIG_TOOL   := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuratio
 GDB                  = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
 GDB_TARGET           = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
 
-NRFUTIL             := $(REMOTE_CMD) nrfutil
-MERGEHEX            := mergehex
-NRFJPROG            := $(REMOTE_CMD) nrfjprog
+NRFUTIL             := /usr/local/bin/nrfutil
+#NRFUTIL             := $(REMOTE_CMD) nrfutil
+
+NRFJPROG            := /usr/local/bin/nrfjprog
+#NRFJPROG            := $(REMOTE_CMD) nrfjprog
+
+MERGEHEX            := /usr/local/bin/mergehex
 
 define flash
     $(eval HEX := $(call to_remote,$(1)))
 	@echo Flashing: $(HEX)
-	$(NRFJPROG) -f nrf52 --program $(HEX) --sectorerase --reset
+	$(NRFJPROG) -f nrf52 --sectorerase --program $(HEX) --verify --reset
 endef
 
 define erase

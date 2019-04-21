@@ -1,6 +1,6 @@
 PROJECT_NAME       := thread_router
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.0.0
+DFU_APP_VERSION_STR:= 1.1.0
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
@@ -47,6 +47,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/hal/nrf_nvmc.c \
   $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -165,7 +166,7 @@ INC_FOLDERS += \
 
 
 #
-# Self compiled more minimal libraries, configured with DNS_CLIENT=1 (Openthread git commit 41d8e4a73b4de..)
+# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 DISABLE_SPI=1 (Own openthread fork commit 17227a1da942..)
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
@@ -244,31 +245,33 @@ LDFLAGS += --specs=nano.specs -lc -lnosys -lm -lstdc++
 .PHONY: $(TARGETS) default all clean flash erase
 
 # Make default (=first) target -> needs to be before including Makefile.common
-default: clean_linked_binaries
-	@$(MAKE) -j12 $(PLATFORM)
+default: $(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-$(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
+build_app: clean_linked_binaries
+	@$(MAKE) -j12 $(PLATFORM)
+
+$(OUTPUT_DIRECTORY)/bootloader_settings.hex: build_app
 	$(NRFUTIL) settings generate --family $(DFU_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
-dfu_pkg: default
-	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req 0x00 --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+dfu_pkg: build_app
+	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req 0x00 --key-file $(DFU_PRIVATE_KEY) $(PROJECT_NAME)_dfu_package_$(DFU_APP_VERSION_STR).zip
 
 flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..
 	$(call flash,$<)
 
 # Flash the program
-flash_app: default
+flash_app: build_app
 	$(call flash,$(OUTPUT_FILE).hex)
 
-$(OUTPUT_DIRECTORY)/app_and_dfu_settings.hex: default $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex: build_app $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	$(MERGEHEX) -m $(OUTPUT_DIRECTORY)/bootloader_settings.hex $(OUTPUT_FILE).hex -o $@
 
-flash: $(OUTPUT_DIRECTORY)/app_and_dfu_settings.hex
-	$(call flash,$<)
+flash: default
+	$(call flash,$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex)
 
 erase:
 	$(call erase)
