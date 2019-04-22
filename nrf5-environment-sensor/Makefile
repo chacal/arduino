@@ -1,6 +1,6 @@
 PROJECT_NAME       := nrf5-environment-sensor
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.7.0
+DFU_APP_VERSION_STR:= 1.8.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832
 
@@ -24,6 +24,7 @@ DFU_PRIVATE_KEY    := private.key
 
 # Source files common to all targets
 SRC_FILES += \
+  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_rtt.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_backend_uart.c \
   $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_default_backends.c \
@@ -54,6 +55,8 @@ SRC_FILES += \
   $(SRC_DIR)/pir_sensor.c \
   $(SRC_DIR)/current_sensor.c \
   $(SRC_DIR)/random.c \
+  $(SRC_DIR)/ntc_thermistor.c \
+  $(SRC_DIR)/ntc_thermometer_sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
@@ -69,6 +72,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
   $(SDK_ROOT)/components/libraries/crc32/crc32.c \
+  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
+  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
+  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 
 
 SRC_FILES += \
@@ -195,7 +201,8 @@ INC_FOLDERS += \
 
 # Libraries common to all targets
 LIB_FILES += \
-  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a
+  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
+   -lm
 
 # Optimization flags
 OPT = -O3 -g3
@@ -251,18 +258,26 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 .PHONY: $(TARGETS) default all clean flash erase
 
 # Make default (=first) target -> needs to be before including Makefile.common
-default: clean_linked_binaries
-	@$(MAKE) -j12 $(PLATFORM)_xxaa
+default: $(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-$(OUTPUT_DIRECTORY)/bootloader_settings.hex: default
+build_app: clean_linked_binaries
+	@$(MAKE) -j12 $(TARGETS)
+
+$(OUTPUT_DIRECTORY)/bootloader_settings.hex: build_app
 	$(NRFUTIL) settings generate --no-backup --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
 
+dfu_pkg: build_app
+	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+
 # Flash the program
-flash_app: default
+flash_app: build_app
 	$(call flash,$(OUTPUT_FILE).hex)
+
+$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex: build_app $(OUTPUT_DIRECTORY)/bootloader_settings.hex
+	$(MERGEHEX) -m $(OUTPUT_DIRECTORY)/bootloader_settings.hex $(OUTPUT_FILE).hex -o $@
 
 flash_softdevice:
 	@echo Flashing Soft Device..
@@ -272,10 +287,8 @@ flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
 	@echo Flashing bootloader settings..
 	$(call flash,$<)
 
-flash: flash_app flash_dfu_settings
-
-dfu_pkg: default
-	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
+flash: default
+	$(call flash,$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex)
 
 erase:
 	$(call erase)

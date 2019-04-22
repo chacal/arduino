@@ -2,8 +2,6 @@
 #include <app_error.h>
 #include <app_timer.h>
 
-#define APP_TIMER_PRESCALER 0
-
 static vcc_measurement_cb_t m_measurement_cb;
 
 
@@ -48,11 +46,11 @@ static void adc_init() {
 #include <nrf_drv_saadc.h>
 #include "sdk_config.h"
 
-static uint8_t m_adc_channel = 0;
+#define ADC_CHANNEL       0   // ADC channel to use
 
 static void sample_vcc(void *ctx) {
   nrf_saadc_value_t value;
-  nrf_drv_saadc_sample_convert(m_adc_channel, &value);
+  nrf_drv_saadc_sample_convert(ADC_CHANNEL, &value);
   uint16_t vcc = (uint16_t) (value / (float) 4095 * 6 * 0.6 * 1000);  // ADC value (12-bit) * prescale (1/6) * 0.6V reference * mV
   m_measurement_cb(vcc);
 }
@@ -65,7 +63,7 @@ static void adc_init() {
 
   nrf_saadc_channel_config_t channel_config = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_VDD);
   channel_config.burst = NRF_SAADC_BURST_ENABLED;
-  APP_ERROR_CHECK(nrf_drv_saadc_channel_init(m_adc_channel, &channel_config));
+  APP_ERROR_CHECK(nrf_drv_saadc_channel_init(ADC_CHANNEL, &channel_config));
 }
 
 #endif
