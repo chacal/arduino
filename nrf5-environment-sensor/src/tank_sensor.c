@@ -19,7 +19,7 @@
 
 #define DIVIDER_INPUT_PIN      NRF_SAADC_INPUT_AIN0     // == Pin P0.02, tank level is measured from this pin
 #define DIVIDER_DRIVE_PIN                         3     // This set to HIGH when measuring tank level
-#define DIVIDER_GND_RESISTOR                   970     // Resistor from DIVIDER_INPUT_PIN to GND
+#define DIVIDER_GND_RESISTOR                    970     // Resistor from DIVIDER_INPUT_PIN to GND
 #define ADC_CHANNEL                               1     // ADC channel to use, must be different than VCC measurement channel
 
 
@@ -58,6 +58,11 @@ static void on_tank_level_measurement_timer(void *ctx) {
   double  R                     = adc_measure_divider_resistance();
   uint8_t tank_level_percentage = (uint8_t) fmin((100 * R / TANK_FULL_RESISTANCE), 100);  // Cap max tank value to 100%
   m_sensor_data.tank_level_percentage = tank_level_percentage;
+  /*
+  NRF_LOG_INFO("R: "
+                   NRF_LOG_FLOAT_MARKER
+                   " Tank level: %d", NRF_LOG_FLOAT(R), m_sensor_data.tank_level_percentage);
+                   */
   update_advertisement_data();
 }
 
