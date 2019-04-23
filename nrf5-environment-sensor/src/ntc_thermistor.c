@@ -47,7 +47,7 @@ static void on_measurement_timer(void *ctx) {
 void ntc_init(uint32_t measurement_interval_ms, ntc_measurement_cb_t callback) {
   m_measurement_cb = callback;
 
-  adc_utils_init(ADC_CHANNEL, DIVIDER_INPUT_PIN, DIVIDER_DRIVE_PIN, DIVIDER_GND_RESISTOR, true);
+  adc_utils_init(ADC_CHANNEL, DIVIDER_INPUT_PIN, DIVIDER_DRIVE_PIN, DIVIDER_GND_RESISTOR, true, true);
 
   app_timer_create(&m_measurement_timer, APP_TIMER_MODE_REPEATED, on_measurement_timer);
   app_timer_start(m_measurement_timer, APP_TIMER_TICKS(measurement_interval_ms), NULL);
