@@ -2,7 +2,7 @@
 
 #define APP_BLE_CFG_TAG                           1
 
-#define DEFAULT_ADV_INTERVAL                      MSEC_TO_UNITS(5000, UNIT_0_625_MS)
+#define DEFAULT_ADV_INTERVAL                      MSEC_TO_UNITS(10000, UNIT_0_625_MS)
 #define ADV_TIMEOUT                               0
 
 #define MIN_CONN_INTERVAL                         MSEC_TO_UNITS(100, UNIT_1_25_MS)
