@@ -53,15 +53,7 @@ static void setup_dcdc() {
 #endif
 }
 
-
-int main(void) {
-  APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
-  NRF_LOG_DEFAULT_BACKENDS_INIT();
-  APP_ERROR_CHECK(app_timer_init());
-
-  ble_dfu_trigger_service_init(STR(DEVICE_NAME), on_dfu_triggered);
-  setup_dcdc();
-
+static void start_selected_sensor() {
 #if SENSOR_TYPE == SENSOR_TYPE_BME280
   environmental_sensor_start();
 #elif SENSOR_TYPE == SENSOR_TYPE_PIR
@@ -75,6 +67,16 @@ int main(void) {
 #else
 #error Unknown sensor type!
 #endif
+}
+
+int main(void) {
+  APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
+  NRF_LOG_DEFAULT_BACKENDS_INIT();
+  APP_ERROR_CHECK(app_timer_init());
+
+  ble_dfu_trigger_service_init(STR(DEVICE_NAME), on_dfu_triggered);
+  setup_dcdc();
+  start_selected_sensor();
 
   for (;;) {
     power_manage();
