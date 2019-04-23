@@ -13,17 +13,18 @@
 #include "current_sensor.h"
 #include "ntc_thermometer_sensor.h"
 #include "tank_sensor.h"
+#include "dcdc_selector.h"
 
 #define SENSOR_TYPE_BME280       1
 #define SENSOR_TYPE_PIR          2
 #define SENSOR_TYPE_INA226       3
 #define SENSOR_TYPE_NTC          4
 #define SENSOR_TYPE_TANK_LEVEL   5
-#define DCDC_STATE               NRF_POWER_DCDC_DISABLE
 
 
-#define DEVICE_NAME         "W100"
-#define SENSOR_TYPE         SENSOR_TYPE_TANK_LEVEL  // Remember also to check the PIR sensor pins in pir_sensor.c!
+#define DEVICE_NAME         W100
+#define DCDC_MODE           DCDC_MODE_BY_DEVICE_NAME   // Either DCDC_MODE_DISABLED, DCDC_MODE_ENABLED or DCDC_MODE_BY_DEVICE_NAME
+#define SENSOR_TYPE         SENSOR_TYPE_TANK_LEVEL     // Remember also to check the PIR sensor pins in pir_sensor.c!
 
 
 static void on_dfu_triggered() {
@@ -42,14 +43,24 @@ static void power_manage(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+static void setup_dcdc() {
+#if DCDC_MODE == DCDC_MODE_DISABLED
+  dcdc_init(NRF_POWER_DCDC_DISABLE);
+#elif DCDC_MODE == DCDC_MODE_ENABLED
+  dcdc_init(NRF_POWER_DCDC_ENABLE);
+#else
+  dcdc_init(DCDC_MODE_FOR_NAME(DEVICE_NAME));
+#endif
+}
+
 
 int main(void) {
   APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
   APP_ERROR_CHECK(app_timer_init());
 
-  ble_dfu_trigger_service_init(DEVICE_NAME, on_dfu_triggered);
-  APP_ERROR_CHECK(sd_power_dcdc_mode_set(DCDC_STATE));
+  ble_dfu_trigger_service_init(STR(DEVICE_NAME), on_dfu_triggered);
+  setup_dcdc();
 
 #if SENSOR_TYPE == SENSOR_TYPE_BME280
   environmental_sensor_start();
