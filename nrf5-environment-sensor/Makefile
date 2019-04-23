@@ -58,6 +58,7 @@ SRC_FILES += \
   $(SRC_DIR)/ntc_thermistor.c \
   $(SRC_DIR)/ntc_thermometer_sensor.c \
   $(SRC_DIR)/adc_utils.c \
+  $(SRC_DIR)/tank_sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \

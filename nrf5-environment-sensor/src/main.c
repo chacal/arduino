@@ -12,16 +12,18 @@
 #include "pir_sensor.h"
 #include "current_sensor.h"
 #include "ntc_thermometer_sensor.h"
+#include "tank_sensor.h"
 
-#define SENSOR_TYPE_BME280  1
-#define SENSOR_TYPE_PIR     2
-#define SENSOR_TYPE_INA226  3
-#define SENSOR_TYPE_NTC     4
-#define DCDC_STATE          NRF_POWER_DCDC_DISABLE
+#define SENSOR_TYPE_BME280       1
+#define SENSOR_TYPE_PIR          2
+#define SENSOR_TYPE_INA226       3
+#define SENSOR_TYPE_NTC          4
+#define SENSOR_TYPE_TANK_LEVEL   5
+#define DCDC_STATE               NRF_POWER_DCDC_DISABLE
 
 
-#define DEVICE_NAME         "T100"
-#define SENSOR_TYPE         SENSOR_TYPE_NTC  // Remember also to check the PIR sensor pins in pir_sensor.c!
+#define DEVICE_NAME         "W100"
+#define SENSOR_TYPE         SENSOR_TYPE_TANK_LEVEL  // Remember also to check the PIR sensor pins in pir_sensor.c!
 
 
 static void on_dfu_triggered() {
@@ -57,6 +59,8 @@ int main(void) {
   current_sensor_start();
 #elif SENSOR_TYPE == SENSOR_TYPE_NTC
   ntc_thermometer_sensor_start();
+#elif SENSOR_TYPE == SENSOR_TYPE_TANK_LEVEL
+  tank_sensor_start();
 #else
 #error Unknown sensor type!
 #endif
