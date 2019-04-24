@@ -2,9 +2,9 @@ PROJECT_NAME       := nrf5-environment-sensor
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
 DFU_APP_VERSION_STR:= 1.8.0
 PLATFORM_FAMILY    := NRF52
-PLATFORM           := NRF52832
+PLATFORM           := NRF52832_XXAA
 
-TARGETS            := $(PLATFORM)_xxaa
+TARGETS            := $(PLATFORM)
 OUTPUT_DIRECTORY   := build
 LINKER_SCRIPT      := gcc_nrf52_s132.ld
 
@@ -57,6 +57,8 @@ SRC_FILES += \
   $(SRC_DIR)/random.c \
   $(SRC_DIR)/ntc_thermistor.c \
   $(SRC_DIR)/ntc_thermometer_sensor.c \
+  $(SRC_DIR)/adc_utils.c \
+  $(SRC_DIR)/tank_sensor.c \
   $(SDK_ROOT)/components/ble/common/ble_advdata.c \
   $(SDK_ROOT)/components/drivers_nrf/hal/nrf_saadc.c \
   $(SDK_ROOT)/components/drivers_nrf/saadc/nrf_drv_saadc.c \
