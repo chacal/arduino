@@ -12,6 +12,7 @@
       arm_target_device_name="nRF52840_xxAA"
       arm_target_interface_type="SWD"
       build_always_rebuild="Yes"
+      debug_initial_breakpoint=""
       debug_leave_target_running="No"
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
@@ -23,6 +24,7 @@
       project_directory=""
       project_type="Externally Built Executable" />
     <folder Name="src" exclude="" filter="" path="src" recurse="Yes" />
+    <configuration Name="Debug" debug_initial_breakpoint="" />
   </project>
   <configuration
     Name="Debug"

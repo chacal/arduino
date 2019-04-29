@@ -16,6 +16,9 @@ SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 EPD2IN9_PATH       := $(PROJ_DIR)/src/epd2in9
 EPD2IN9_SOURCE     := $(wildcard $(EPD2IN9_PATH)/*.cpp)
 
+U8G2_PATH          := $(HOME)/arduino/u8g2
+U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
+
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
 SRC_FILES += \
@@ -52,7 +55,9 @@ SRC_FILES += \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
   $(SRC_DIR)/main.cpp \
+  $(SRC_DIR)/EInkDisplay.cpp \
   $(EPD2IN9_SOURCE) \
+  $(U8G2_SOURCES) \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
@@ -184,12 +189,14 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/nfc/ndef/conn_hand_parser/ac_rec_parser \
   $(SDK_ROOT)/components/libraries/stack_guard \
   $(SDK_ROOT)/components/libraries/log/src \
+  $(U8G2_PATH)/csrc \
 
 LIB_FILES += \
   -lstdc++ \
 
-# Optimization flags
+# Optimization flags, don't use -O3 if using SES debugger
 OPT = -O3 -g3
+#OPT = -g3
 # Uncomment the line below to enable link time optimization
 #OPT += -flto
 

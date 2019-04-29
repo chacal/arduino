@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_15.2.0")
+set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
 
 add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_CUSTOM)
@@ -138,6 +139,7 @@ include_directories("${SDK_ROOT}/components/libraries/usbd")
 include_directories("${SDK_ROOT}/components/nfc/ndef/conn_hand_parser/ac_rec_parser")
 include_directories("${SDK_ROOT}/components/libraries/stack_guard")
 include_directories("${SDK_ROOT}/components/libraries/log/src")
+include_directories("${U8G2_ROOT}/csrc")
 
 
 file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
