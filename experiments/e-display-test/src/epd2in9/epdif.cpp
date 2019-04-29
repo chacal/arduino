@@ -24,8 +24,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+#include <nrf_gpio.h>
+#include <nrf_delay.h>
+#include <nrfx_spim.h>
 #include "epdif.h"
+
+nrfx_spim_t m_spim_instance = NRFX_SPIM_INSTANCE(0);
 
 EpdIf::EpdIf() {
 };
@@ -34,32 +38,39 @@ EpdIf::~EpdIf() {
 };
 
 void EpdIf::DigitalWrite(int pin, int value) {
-//    digitalWrite(pin, value);
+  if (value > 0) {
+    nrf_gpio_pin_set((uint32_t) pin);
+  } else {
+    nrf_gpio_pin_clear((uint32_t) pin);
+  }
 }
 
 int EpdIf::DigitalRead(int pin) {
-//    return digitalRead(pin);
+  return (int) nrf_gpio_pin_read((uint32_t) pin);
 }
 
 void EpdIf::DelayMs(unsigned int delaytime) {
-//    delay(delaytime);
+  nrf_delay_ms(delaytime);
 }
 
 void EpdIf::SpiTransfer(unsigned char data) {
-//    digitalWrite(CS_PIN, LOW);
-//    SPI.transfer(data);
-//    digitalWrite(CS_PIN, HIGH);
+  nrfx_spim_xfer_desc_t tx = NRFX_SPIM_XFER_TX(&data, 1);
+  APP_ERROR_CHECK(nrfx_spim_xfer(&m_spim_instance, &tx, 0));
 }
 
 int EpdIf::IfInit(void) {
-/*
-    pinMode(CS_PIN, OUTPUT);
-    pinMode(RST_PIN, OUTPUT);
-    pinMode(DC_PIN, OUTPUT);
-    pinMode(BUSY_PIN, INPUT); 
-    SPI.begin();
-    SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-*/
-    return 0;
+  nrf_gpio_cfg_output(RST_PIN);
+  nrf_gpio_cfg_output(DC_PIN);
+  nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_PULLDOWN);
+
+  nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG;
+  config.sck_pin   = SPI_SCK_PIN;
+  config.mosi_pin  = SPI_MOSI_PIN;
+  config.miso_pin  = SPI_MISO_PIN;
+  config.ss_pin    = SPI_CS_PIN;
+  config.frequency = NRF_SPIM_FREQ_2M;
+
+  APP_ERROR_CHECK(nrfx_spim_init(&m_spim_instance, &config, nullptr, nullptr));
+  return 0;
 }
 

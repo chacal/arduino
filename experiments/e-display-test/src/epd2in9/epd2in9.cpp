@@ -36,7 +36,7 @@ Epd::~Epd() {
 Epd::Epd() {
     reset_pin = RST_PIN;
     dc_pin = DC_PIN;
-    cs_pin = CS_PIN;
+    cs_pin = SPI_CS_PIN;
     busy_pin = BUSY_PIN;
     width = EPD_WIDTH;
     height = EPD_HEIGHT;
@@ -105,7 +105,7 @@ void Epd::Reset(void) {
     DigitalWrite(reset_pin, LOW);                //module reset    
     DelayMs(200);
     DigitalWrite(reset_pin, HIGH);
-    DelayMs(200);    
+    DelayMs(200);
 }
 
 /**
