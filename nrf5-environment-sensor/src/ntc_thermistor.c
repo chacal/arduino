@@ -18,7 +18,7 @@
 #define DIVIDER_GND_RESISTOR                 160000     // nRF's internal resistor ladder's resistance, 160k. See PS, page 390
 #define ADC_CHANNEL                               1     // ADC channel to use, must be different than VCC measurement channel
 
-#define THERMISTOR_RESISTANCE              100000.0     // NTC thermistor nominal value
+#define THERMISTOR_RESISTANCE               10000.0     // NTC thermistor nominal value
 #define THERMISTOR_BETA_COEF                   3950     // From thermistor's datasheet
 #define THERMISTOR_NOMINAL_TEMP                  25     // From thermistor's datasheet (25°C)
 

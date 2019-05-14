@@ -22,9 +22,9 @@
 #define SENSOR_TYPE_TANK_LEVEL   5
 
 
-#define DEVICE_NAME         S217
+#define DEVICE_NAME         T100
 #define DCDC_MODE           DCDC_MODE_BY_DEVICE_NAME   // Either DCDC_MODE_DISABLED, DCDC_MODE_ENABLED or DCDC_MODE_BY_DEVICE_NAME
-#define SENSOR_TYPE         SENSOR_TYPE_BME280         // Remember also to check the PIR sensor pins in pir_sensor.c!
+#define SENSOR_TYPE         SENSOR_TYPE_NTC         // Remember also to check the PIR sensor pins in pir_sensor.c!
 
 
 static void on_dfu_triggered() {
