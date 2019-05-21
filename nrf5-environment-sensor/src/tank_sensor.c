@@ -19,7 +19,7 @@
 
 #define DIVIDER_INPUT_PIN      NRF_SAADC_INPUT_AIN0     // == Pin P0.02, tank level is measured from this pin
 #define DIVIDER_DRIVE_PIN                         3     // This set to HIGH when measuring tank level
-#define DIVIDER_GND_RESISTOR                    970     // Resistor from DIVIDER_INPUT_PIN to GND
+#define DIVIDER_GND_RESISTOR                   1000     // Resistor from DIVIDER_INPUT_PIN to GND
 #define ADC_CHANNEL                               1     // ADC channel to use, must be different than VCC measurement channel
 
 
