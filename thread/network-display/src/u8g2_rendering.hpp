@@ -8,15 +8,15 @@ extern "C" {
 }
 
 using font_size = named_type<uint8_t, struct font_size_param>;
-using height = named_type<uint8_t, struct height_param>;
-using width = named_type<uint8_t, struct width_param>;
+using height = named_type<uint16_t , struct height_param>;
+using width = named_type<uint16_t , struct width_param>;
 
 struct point {
 public:
-  explicit point(uint8_t x, uint8_t y) : x{x}, y{y} {}
+  explicit point(uint16_t x, uint16_t y) : x{x}, y{y} {}
 
-  uint8_t x = 0;
-  uint8_t y = 0;
+  uint16_t x = 0;
+  uint16_t y = 0;
 };
 
 

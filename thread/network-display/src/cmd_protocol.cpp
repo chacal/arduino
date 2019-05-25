@@ -17,15 +17,15 @@ namespace commands {
       case 's':
         return {str_cmd{
             obj.get<uint8_t>("i"),
-            point(obj.get<uint8_t>("x"), obj.get<uint8_t>("y")),
+            point(obj.get<uint16_t>("x"), obj.get<uint16_t>("y")),
             font_size(obj.get<uint8_t>("font")),
             obj.get<char *>("msg")
         }};
       case 'l':
         return {line_cmd{
             obj.get<uint8_t>("i"),
-            point(obj.get<uint8_t>("x1"), obj.get<uint8_t>("y1")),
-            point(obj.get<uint8_t>("x2"), obj.get<uint8_t>("y2")),
+            point(obj.get<uint16_t>("x1"), obj.get<uint16_t>("y1")),
+            point(obj.get<uint16_t>("x2"), obj.get<uint16_t>("y2")),
         }};
       case 'c':
         return {clear_cmd{}};
