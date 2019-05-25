@@ -30,12 +30,6 @@
       filter="*.h;*.hpp;*.c;*.cpp"
       path="src"
       recurse="Yes" />
-    <folder
-      Name="components"
-      exclude=""
-      filter="*.c"
-      path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components"
-      recurse="Yes" />
   </project>
   <configuration
     Name="Debug"
@@ -66,11 +60,5 @@
       project_directory="../router"
       project_type="Externally Built Executable" />
     <folder Name="src" exclude="" filter="*.c;*.h" path="src" recurse="Yes" />
-    <folder
-      Name="components"
-      exclude=""
-      filter="*.c"
-      path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components"
-      recurse="Yes" />
   </project>
 </solution>
