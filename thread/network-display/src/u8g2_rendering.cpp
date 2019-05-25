@@ -14,13 +14,13 @@ const uint8_t *font_for_size(const font_size &size) {
   } else if (size.get() <= 24) {
     return u8g2_font_helvB24_tr;
   } else if (size.get() <= 25) {
-    return u8g2_font_fub25_tn;
+    return u8g2_font_fub25_tr;
   } else if (size.get() <= 30) {
-    return u8g2_font_fub30_tn;
+    return u8g2_font_fub30_tr;
   } else if (size.get() <= 35) {
-    return u8g2_font_fub35_tn;
+    return u8g2_font_fub35_tr;
   } else {
-    return u8g2_font_fub42_tn;
+    return u8g2_font_fub42_tr;
   }
 }
 
