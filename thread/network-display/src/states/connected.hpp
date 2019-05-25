@@ -20,7 +20,7 @@ namespace states {
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
       coap_tick_timer.start(&context);
-      context.disp.on();
+      context.disp->on();
 
       auto on_display_post = [&](auto coap_data) { handle_display_post(coap_data, context); };
       coap_service::initialize({
@@ -49,9 +49,8 @@ namespace states {
         for (auto &cmd : *cmd_seq) {
           std::visit(display_command_handler{context.display_list}, cmd);
         }
-        context.display_list.render(context.disp);
+        context.display_list.render(*context.disp);
       }
     }
   };
 }
-

@@ -107,7 +107,7 @@ SRC_FILES += \
   $(SRC_DIR)/coap_service.cpp \
   $(SRC_DIR)/coap_helpers.cpp \
   $(SRC_DIR)/cmd_protocol.cpp \
-  $(SRC_DIR)/display.cpp \
+  $(SRC_DIR)/nokia_display.cpp \
   $(SRC_DIR)/nrf_u8g2_adapter.cpp \
   $(SRC_DIR)/power_manager.cpp \
   $(SRC_DIR)/display_command_handler.cpp \
@@ -115,10 +115,16 @@ SRC_FILES += \
   $(SRC_DIR)/vcc.cpp \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/settings.cpp \
+  $(SRC_DIR)/u8g2_rendering.cpp \
+  $(SRC_DIR)/eink_display/epd_2in9/epd_2in9.cpp \
+  $(SRC_DIR)/eink_display/eink_display.cpp \
+  $(SRC_DIR)/eink_display/epd_interface.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
   $(SRC_DIR)/states \
+  $(SRC_DIR)/eink_display \
+  $(SRC_DIR)/eink_display/epd_2in9 \
   $(SDK_ROOT)/external/fprintf \
   $(PROJ_DIR) \
   $(SDK_ROOT)/components/thread/utils \

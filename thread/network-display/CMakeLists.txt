@@ -12,6 +12,8 @@ add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_PCA10056)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src/eink_display")
+include_directories("${PROJECT_SOURCE_DIR}/src/eink_display/epd_2in9")
 include_directories("${SDK_ROOT}/external/fprintf")
 include_directories("${SDK_ROOT}/components/thread/utils")
 include_directories("${SDK_ROOT}/components/libraries/experimental_section_vars")
@@ -69,6 +71,6 @@ include_directories("${SDK_ROOT}/external/micro-ecc/micro-ecc")
 include_directories("${U8G2_ROOT}/csrc")
 include_directories("${HFSM_ROOT}/include")
 
-file(GLOB_RECURSE SRC_LIST "${PROJECT_SOURCE_DIR}/src/*.*")
+file(GLOB_RECURSE SRC_LIST "*.cpp")
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})

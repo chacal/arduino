@@ -1,8 +1,8 @@
 #pragma once
 
 #include <hfsm/machine_single.hpp>
-#include <new>
 #include <rendering.hpp>
+#include <eink_display/eink_display.hpp>
 
 struct state_machine;
 
@@ -14,8 +14,8 @@ namespace fsm {
     template<typename T>
     void react(const T &event);
 
-    display                 disp;
-    rendering::display_list display_list;
+    std::unique_ptr<display> disp = std::make_unique<eink_display>();
+    rendering::display_list  display_list;
 
   private:
     state_machine *fsm;

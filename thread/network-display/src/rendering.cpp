@@ -25,7 +25,7 @@ namespace rendering {
       return;
     }
 
-    d.clear_area(point(0,0), width(SCREEN_WIDTH), height(SCREEN_HEIGHT));
+    d.clear();
 
     for(auto &cmd : commands) {
       if(auto str = std::get_if<commands::str_cmd>(&cmd)) {
