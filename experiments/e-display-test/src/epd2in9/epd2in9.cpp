@@ -103,9 +103,9 @@ void Epd::WaitUntilIdle(void) {
  */
 void Epd::Reset(void) {
     DigitalWrite(reset_pin, LOW);                //module reset    
-    DelayMs(200);
+    DelayMs(50);
     DigitalWrite(reset_pin, HIGH);
-    DelayMs(200);
+    DelayMs(50);
 }
 
 /**

@@ -100,9 +100,9 @@ void epd_2in9::wait_until_idle() {
  */
 void epd_2in9::reset() {
   digital_write(reset_pin, LOW);                //module reset
-  delay_ms(200);
+  delay_ms(50);
   digital_write(reset_pin, HIGH);
-  delay_ms(200);
+  delay_ms(50);
 }
 
 /**
