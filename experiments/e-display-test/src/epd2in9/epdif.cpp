@@ -61,7 +61,7 @@ void EpdIf::SpiTransfer(unsigned char data) {
 int EpdIf::IfInit(void) {
   nrf_gpio_cfg_output(RST_PIN);
   nrf_gpio_cfg_output(DC_PIN);
-  nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_NOPULL);
 
   nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG;
   config.sck_pin   = SPI_SCK_PIN;
