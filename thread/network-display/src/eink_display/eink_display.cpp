@@ -28,17 +28,21 @@ eink_display::eink_display() {
     return di;
   }();
 
-  APP_ERROR_CHECK(epd.init(lut_full_update));
   u8g2_SetupDisplay(&u8g2, in_memory_display_handler, u8x8_cad_011, u8x8_byte_empty, u8x8_gpio_and_delay_dummy);
   u8g2_SetupBuffer(&u8g2, u8g2_buf.get(), m_display_info.tile_height, u8g2_ll_hvline_horizontal_right_lsb, U8G2_R1);
 }
 
 void eink_display::on() {
   clear();
+  // Render twice to remove any potential ghosting of the old image
+  render();
   render();
 }
 
 void eink_display::render() {
+  // Wake up and initialize display
+  APP_ERROR_CHECK(epd.init(lut_full_update));
+
   // u8g2 has 0 as white and 1 as black, display vice versa
   // -> invert all bits before writing to display memory
   for (uint32_t i = 0; i < epd.width * epd.height / 8; ++i) {

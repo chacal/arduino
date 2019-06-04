@@ -37,13 +37,10 @@ epd_2in9::epd_2in9() {
   reset_pin = RST_PIN;
   dc_pin    = DC_PIN;
   busy_pin  = BUSY_PIN;
+  epd_interface::init();
 };
 
 int epd_2in9::init(const unsigned char *lut) {
-  /* this calls the peripheral hardware interface, see epdif */
-  if (epd_interface::init() != 0) {
-    return -1;
-  }
   /* EPD hardware init start */
   this->lut = lut;
   reset();
