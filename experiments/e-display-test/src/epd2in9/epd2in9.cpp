@@ -257,7 +257,7 @@ void Epd::SetMemoryPointer(int x, int y) {
  */
 void Epd::Sleep() {
     SendCommand(DEEP_SLEEP_MODE);
-    WaitUntilIdle();
+    SendData(0x01);
 }
 
 const unsigned char lut_full_update[] =

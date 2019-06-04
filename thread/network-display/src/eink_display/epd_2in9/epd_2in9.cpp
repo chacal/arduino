@@ -254,7 +254,7 @@ void epd_2in9::set_memory_pointer(uint32_t x, uint32_t y) {
  */
 void epd_2in9::sleep() {
   send_command(DEEP_SLEEP_MODE);
-  wait_until_idle();
+  send_data(0x01);
 }
 
 const unsigned char lut_full_update[] =
