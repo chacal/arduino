@@ -27,7 +27,8 @@
 
 #pragma once
 
-// Pin definition
+/*
+// Pin definition, Waveshare shield
 #define RST_PIN         8
 #define DC_PIN          6
 #define BUSY_PIN        7
@@ -36,6 +37,17 @@
 #define SPI_MOSI_PIN    3
 #define SPI_MISO_PIN    4
 #define SPI_CS_PIN      5
+*/
+
+// Pin definition, own custom board
+#define RST_PIN        31
+#define DC_PIN         29
+#define BUSY_PIN       30
+
+#define SPI_SCK_PIN    28
+#define SPI_MOSI_PIN    3
+#define SPI_MISO_PIN    4  // Not used
+#define SPI_CS_PIN      2
 
 
 class epd_interface {
