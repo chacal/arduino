@@ -50,19 +50,14 @@
 #define SPI_CS_PIN      2
 
 
-class epd_interface {
-public:
-  epd_interface();
+namespace epd_interface {
+  int init();
 
-  ~epd_interface();
+  void digital_write(int pin, int value);
 
-  static int init();
+  int digital_read(int pin);
 
-  static void digital_write(int pin, int value);
+  void delay_ms(unsigned int delaytime);
 
-  static int digital_read(int pin);
-
-  static void delay_ms(unsigned int delaytime);
-
-  static void spi_transfer(unsigned char data);
+  void spi_transfer(unsigned char data);
 };

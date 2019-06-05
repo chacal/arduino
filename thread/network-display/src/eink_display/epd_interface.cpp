@@ -29,13 +29,8 @@
 #include <nrfx_spim.h>
 #include "epd_interface.hpp"
 
-nrfx_spim_t m_spim_instance = NRFX_SPIM_INSTANCE(0);
-
-epd_interface::epd_interface() {
-};
-
-epd_interface::~epd_interface() {
-};
+bool        m_initialized = false;
+nrfx_spim_t m_spim_instance;
 
 void epd_interface::digital_write(int pin, int value) {
   if (value > 0) {
@@ -58,10 +53,9 @@ void epd_interface::spi_transfer(unsigned char data) {
   APP_ERROR_CHECK(nrfx_spim_xfer(&m_spim_instance, &tx, 0));
 }
 
-int epd_interface::init() {
-  nrf_gpio_cfg_output(RST_PIN);
-  nrf_gpio_cfg_output(DC_PIN);
-  nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_NOPULL);
+
+int initialize_spi() {
+  m_spim_instance = NRFX_SPIM_INSTANCE(0);
 
   nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG;
   config.sck_pin   = SPI_SCK_PIN;
@@ -70,7 +64,19 @@ int epd_interface::init() {
   config.ss_pin    = SPI_CS_PIN;
   config.frequency = NRF_SPIM_FREQ_2M;
 
-  APP_ERROR_CHECK(nrfx_spim_init(&m_spim_instance, &config, nullptr, nullptr));
+  return nrfx_spim_init(&m_spim_instance, &config, nullptr, nullptr);
+}
+
+int epd_interface::init() {
+  if (!m_initialized) {
+    APP_ERROR_CHECK(initialize_spi());
+
+    nrf_gpio_cfg_output(RST_PIN);
+    nrf_gpio_cfg_output(DC_PIN);
+    nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_NOPULL);
+
+    m_initialized = true;
+  }
   return 0;
 }
 

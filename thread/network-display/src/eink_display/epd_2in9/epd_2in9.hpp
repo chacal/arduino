@@ -55,7 +55,7 @@
 extern const unsigned char lut_full_update[];
 extern const unsigned char lut_partial_update[];
 
-class epd_2in9 : epd_interface {
+class epd_2in9 {
 public:
   epd_2in9();
 

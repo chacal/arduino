@@ -30,6 +30,8 @@
 #define HIGH 1
 #define LOW  0
 
+using namespace epd_interface;
+
 epd_2in9::~epd_2in9() {
 };
 
@@ -85,6 +87,7 @@ void epd_2in9::send_data(unsigned char data) {
  *  @brief: Wait until the busy_pin goes LOW
  */
 void epd_2in9::wait_until_idle() {
+  // TODO: Instead of polling, we could set an GPIO interrupt and wait for it
   while (digital_read(busy_pin) == HIGH) {      //LOW: idle, HIGH: busy
     delay_ms(100);
   }
