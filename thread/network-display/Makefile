@@ -58,6 +58,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c\
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_saadc.c\
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_rtc.c\
   $(SDK_ROOT)/components/thread/utils/thread_utils.c \
   $(SDK_ROOT)/components/libraries/mem_manager/mem_manager.c \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
