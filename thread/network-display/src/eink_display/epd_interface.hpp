@@ -60,4 +60,6 @@ namespace epd_interface {
   void delay_ms(unsigned int delaytime);
 
   void spi_transfer(unsigned char data);
+
+  void wait_for_pin_state(uint8_t pin, uint8_t state);
 };

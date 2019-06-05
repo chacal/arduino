@@ -76,6 +76,18 @@ void epd_interface::spi_transfer(unsigned char data) {
   APP_ERROR_CHECK(nrfx_spim_xfer(&m_spim_instance, &tx, 0));
 }
 
+void epd_interface::wait_for_pin_state(uint8_t pin, uint8_t state) {
+  if (digital_read(pin) != state) {
+    nrf_gpio_cfg_sense_set(pin, state > 0 ? NRF_GPIO_PIN_SENSE_HIGH : NRF_GPIO_PIN_SENSE_LOW);
+    while (digital_read(pin) != state) {
+      __SEV();
+      __WFE();
+      __WFE();
+    }
+    nrf_gpio_cfg_sense_set(pin, NRF_GPIO_PIN_NOSENSE);
+  }
+}
+
 int initialize_rtc() {
   m_rtc.p_reg            = NRF_RTC0;
   m_rtc.irq              = RTC0_IRQn;
