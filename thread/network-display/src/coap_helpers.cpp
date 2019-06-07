@@ -64,16 +64,22 @@ namespace coap_helpers {
   }
 
   void handle_json_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
-    coap_message_t *p_response;
-
     if (has_content_type(p_request, COAP_CT_MASK_APP_JSON)) {
-      handler({p_request->p_payload, p_request->payload_len});
-      p_response = create_response_for(p_request, COAP_CODE_204_CHANGED);
-    } else {
-      p_response = create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
-    }
+      // Create a temporary copy of the payload in order to respond and release the request before actually processing it
+      uint8_t temp[p_request->payload_len];
+      memcpy(temp, p_request->p_payload, p_request->payload_len);
+      auto len = p_request->payload_len;
 
-    send_and_delete(p_response);
+      // Respond
+      auto p_response = create_response_for(p_request, COAP_CODE_204_CHANGED);
+      send_and_delete(p_response);
+
+      // Run handler
+      handler({temp, len});
+    } else {
+      auto p_response = create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
+      send_and_delete(p_response);
+    }
   }
 
   void handle_json_get(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::get_handler &handler) {
