@@ -1,0 +1,16 @@
+#pragma once
+
+#include "good_display_base.hpp"
+
+const unsigned char lut_full_update[] =
+                        {
+                            0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22,
+                            0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88,
+                            0x00, 0x00, 0x00, 0x00, 0xF8, 0xB4, 0x13, 0x51,
+                            0x35, 0x51, 0x51, 0x19, 0x01, 0x00
+                        };
+
+class good_display_1in54 : public good_display_base {
+public:
+  good_display_1in54() : good_display_base(200, 200, lut_full_update) {}
+};

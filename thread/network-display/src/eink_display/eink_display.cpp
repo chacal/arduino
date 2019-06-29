@@ -41,7 +41,7 @@ void eink_display::on() {
 
 void eink_display::render() {
   // Wake up and initialize display
-  APP_ERROR_CHECK(epd.init(lut_full_update));
+  APP_ERROR_CHECK(epd.init());
 
   // u8g2 has 0 as white and 1 as black, display vice versa
   // -> invert all bits before writing to display memory

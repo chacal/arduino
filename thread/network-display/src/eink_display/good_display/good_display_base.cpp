@@ -35,16 +35,16 @@ using namespace epd_interface;
 good_display_base::~good_display_base() {
 };
 
-good_display_base::good_display_base() {
+good_display_base::good_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut) : width{w}, height{h}, lut{lut} {
   reset_pin = RST_PIN;
   dc_pin    = DC_PIN;
   busy_pin  = BUSY_PIN;
   epd_interface::init();
+  this->lut = lut;
 };
 
-int good_display_base::init(const unsigned char *lut) {
+int good_display_base::init() {
   /* EPD hardware init start */
-  this->lut = lut;
   reset();
   send_command(DRIVER_OUTPUT_CONTROL);
   send_data((this->height - 1) & 0xFF);
@@ -253,21 +253,3 @@ void good_display_base::sleep() {
   send_command(DEEP_SLEEP_MODE);
   send_data(0x01);
 }
-
-const unsigned char lut_full_update[] =
-                        {
-                            0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22,
-                            0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88,
-                            0x00, 0x00, 0x00, 0x00, 0xF8, 0xB4, 0x13, 0x51,
-                            0x35, 0x51, 0x51, 0x19, 0x01, 0x00
-                        };
-
-const unsigned char lut_partial_update[] =
-                        {
-                            0x10, 0x18, 0x18, 0x08, 0x18, 0x18, 0x08, 0x00,
-                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                            0x00, 0x00, 0x00, 0x00, 0x13, 0x14, 0x44, 0x12,
-                            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                        };
-
-

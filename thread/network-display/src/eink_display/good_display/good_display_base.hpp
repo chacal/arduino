@@ -52,19 +52,16 @@
 #define SET_RAM_Y_ADDRESS_COUNTER                   0x4F
 #define TERMINATE_FRAME_READ_WRITE                  0xFF
 
-extern const unsigned char lut_full_update[];
-extern const unsigned char lut_partial_update[];
-
 class good_display_base {
 public:
-  good_display_base();
+  good_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut);
 
   ~good_display_base();
 
-  const uint32_t width  = 128;
-  const uint32_t height = 296;
+  const uint32_t width;
+  const uint32_t height;
 
-  int init(const unsigned char *lut);
+  int init();
 
   void send_command(unsigned char command);
 
