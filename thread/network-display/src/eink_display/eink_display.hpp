@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <display.hpp>
-#include <eink_display/epd_2in9/epd_2in9.hpp>
+#include <eink_display/good_display/epd_2in9.hpp>
 
 class eink_display : public display {
 public:

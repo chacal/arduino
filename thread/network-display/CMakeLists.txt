@@ -13,7 +13,7 @@ add_definitions(-DBOARD_PCA10056)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src/eink_display")
-include_directories("${PROJECT_SOURCE_DIR}/src/eink_display/epd_2in9")
+include_directories("${PROJECT_SOURCE_DIR}/src/eink_display/good_display")
 include_directories("${SDK_ROOT}/external/fprintf")
 include_directories("${SDK_ROOT}/components/thread/utils")
 include_directories("${SDK_ROOT}/components/libraries/experimental_section_vars")

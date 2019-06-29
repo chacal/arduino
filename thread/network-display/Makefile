@@ -117,7 +117,7 @@ SRC_FILES += \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/settings.cpp \
   $(SRC_DIR)/u8g2_rendering.cpp \
-  $(SRC_DIR)/eink_display/epd_2in9/epd_2in9.cpp \
+  $(SRC_DIR)/eink_display/good_display/epd_2in9.cpp \
   $(SRC_DIR)/eink_display/eink_display.cpp \
   $(SRC_DIR)/eink_display/epd_interface.cpp \
 
@@ -125,7 +125,7 @@ INC_FOLDERS += \
   $(SRC_DIR) \
   $(SRC_DIR)/states \
   $(SRC_DIR)/eink_display \
-  $(SRC_DIR)/eink_display/epd_2in9 \
+  $(SRC_DIR)/eink_display/good_display \
   $(SDK_ROOT)/external/fprintf \
   $(PROJ_DIR) \
   $(SDK_ROOT)/components/thread/utils \
