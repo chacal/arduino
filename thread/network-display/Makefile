@@ -117,7 +117,7 @@ SRC_FILES += \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/settings.cpp \
   $(SRC_DIR)/u8g2_rendering.cpp \
-  $(SRC_DIR)/eink_display/good_display/epd_2in9.cpp \
+  $(SRC_DIR)/eink_display/good_display/good_display_base.cpp \
   $(SRC_DIR)/eink_display/eink_display.cpp \
   $(SRC_DIR)/eink_display/epd_interface.cpp \
 

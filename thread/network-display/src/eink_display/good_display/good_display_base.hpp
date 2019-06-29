@@ -55,11 +55,11 @@
 extern const unsigned char lut_full_update[];
 extern const unsigned char lut_partial_update[];
 
-class epd_2in9 {
+class good_display_base {
 public:
-  epd_2in9();
+  good_display_base();
 
-  ~epd_2in9();
+  ~good_display_base();
 
   const uint32_t width  = 128;
   const uint32_t height = 296;

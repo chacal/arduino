@@ -25,24 +25,24 @@
  */
 
 #include <stdlib.h>
-#include "epd_2in9.hpp"
+#include "good_display_base.hpp"
 
 #define HIGH 1
 #define LOW  0
 
 using namespace epd_interface;
 
-epd_2in9::~epd_2in9() {
+good_display_base::~good_display_base() {
 };
 
-epd_2in9::epd_2in9() {
+good_display_base::good_display_base() {
   reset_pin = RST_PIN;
   dc_pin    = DC_PIN;
   busy_pin  = BUSY_PIN;
   epd_interface::init();
 };
 
-int epd_2in9::init(const unsigned char *lut) {
+int good_display_base::init(const unsigned char *lut) {
   /* EPD hardware init start */
   this->lut = lut;
   reset();
@@ -70,7 +70,7 @@ int epd_2in9::init(const unsigned char *lut) {
 /**
  *  @brief: basic function for sending commands
  */
-void epd_2in9::send_command(unsigned char command) {
+void good_display_base::send_command(unsigned char command) {
   digital_write(dc_pin, LOW);
   spi_transfer(command);
 }
@@ -78,7 +78,7 @@ void epd_2in9::send_command(unsigned char command) {
 /**
  *  @brief: basic function for sending data
  */
-void epd_2in9::send_data(unsigned char data) {
+void good_display_base::send_data(unsigned char data) {
   digital_write(dc_pin, HIGH);
   spi_transfer(data);
 }
@@ -86,7 +86,7 @@ void epd_2in9::send_data(unsigned char data) {
 /**
  *  @brief: Wait until the busy_pin goes LOW
  */
-void epd_2in9::wait_until_idle() {
+void good_display_base::wait_until_idle() {
   wait_for_pin_state(busy_pin, LOW);
 }
 
@@ -95,7 +95,7 @@ void epd_2in9::wait_until_idle() {
  *          often used to awaken the module in deep sleep,
  *          see Epd::Sleep();
  */
-void epd_2in9::reset() {
+void good_display_base::reset() {
   digital_write(reset_pin, LOW);                //module reset
   delay_ms(10);
   digital_write(reset_pin, HIGH);
@@ -105,7 +105,7 @@ void epd_2in9::reset() {
 /**
  *  @brief: set the look-up table register
  */
-void epd_2in9::set_lut(const unsigned char *lut) {
+void good_display_base::set_lut(const unsigned char *lut) {
   this->lut = lut;
   send_command(WRITE_LUT_REGISTER);
   /* the length of look-up table is 30 bytes */
@@ -118,7 +118,7 @@ void epd_2in9::set_lut(const unsigned char *lut) {
  *  @brief: put an image buffer to the frame memory.
  *          this won't update the display.
  */
-void epd_2in9::set_frame_memory(
+void good_display_base::set_frame_memory(
     const unsigned char *image_buffer,
     uint32_t x,
     uint32_t y,
@@ -176,7 +176,7 @@ void epd_2in9::set_frame_memory(
  *          you have to use the function pgm_read_byte to read buffers 
  *          from the flash).
  */
-void epd_2in9::set_frame_memory(const unsigned char *image_buffer) {
+void good_display_base::set_frame_memory(const unsigned char *image_buffer) {
   set_memory_area(0, 0, this->width - 1, this->height - 1);
   set_memory_pointer(0, 0);
   send_command(WRITE_RAM);
@@ -190,7 +190,7 @@ void epd_2in9::set_frame_memory(const unsigned char *image_buffer) {
  *  @brief: clear the frame memory with the specified color.
  *          this won't update the display.
  */
-void epd_2in9::clear_frame_memory(unsigned char color) {
+void good_display_base::clear_frame_memory(unsigned char color) {
   set_memory_area(0, 0, this->width - 1, this->height - 1);
   set_memory_pointer(0, 0);
   send_command(WRITE_RAM);
@@ -207,7 +207,7 @@ void epd_2in9::clear_frame_memory(unsigned char color) {
  *          the the next action of SetFrameMemory or ClearFrame will 
  *          set the other memory area.
  */
-void epd_2in9::display_frame(void) {
+void good_display_base::display_frame(void) {
   send_command(DISPLAY_UPDATE_CONTROL_2);
   send_data(0xC4);
   send_command(MASTER_ACTIVATION);
@@ -218,7 +218,7 @@ void epd_2in9::display_frame(void) {
 /**
  *  @brief: private function to specify the memory area for data R/W
  */
-void epd_2in9::set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_end, uint32_t y_end) {
+void good_display_base::set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_end, uint32_t y_end) {
   send_command(SET_RAM_X_ADDRESS_START_END_POSITION);
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
   send_data((x_start >> 3) & 0xFF);
@@ -233,7 +233,7 @@ void epd_2in9::set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_en
 /**
  *  @brief: private function to specify the start point for data R/W
  */
-void epd_2in9::set_memory_pointer(uint32_t x, uint32_t y) {
+void good_display_base::set_memory_pointer(uint32_t x, uint32_t y) {
   send_command(SET_RAM_X_ADDRESS_COUNTER);
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
   send_data((x >> 3) & 0xFF);
@@ -249,7 +249,7 @@ void epd_2in9::set_memory_pointer(uint32_t x, uint32_t y) {
  *          The deep sleep mode would return to standby by hardware reset. 
  *          You can use Epd::Init() to awaken
  */
-void epd_2in9::sleep() {
+void good_display_base::sleep() {
   send_command(DEEP_SLEEP_MODE);
   send_data(0x01);
 }
