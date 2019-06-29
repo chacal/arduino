@@ -71,7 +71,7 @@ public:
 
   void reset();
 
-  void set_frame_memory(
+  virtual void set_frame_memory(
       const unsigned char *image_buffer,
       uint32_t x,
       uint32_t y,
@@ -79,15 +79,15 @@ public:
       uint32_t image_height
   );
 
-  void set_frame_memory(const unsigned char *image_buffer);
+  virtual void set_frame_memory(const unsigned char *image_buffer);
 
-  void clear_frame_memory(unsigned char color);
+  virtual void clear_frame_memory(unsigned char color);
 
   void display_frame();
 
   void sleep();
 
-private:
+protected:
   uint8_t             reset_pin;
   uint8_t             dc_pin;
   uint8_t             busy_pin;

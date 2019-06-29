@@ -21,10 +21,10 @@ uint8_t u8x8_gpio_and_delay_dummy(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, vo
 eink_display::eink_display() {
   m_display_info = [&] {
     u8x8_display_info_t di{};
-    di.tile_width   = epd.width / 8;
-    di.tile_height  = epd.height / 8;
-    di.pixel_width  = epd.width;
-    di.pixel_height = epd.height;
+    di.tile_width   = epd->width / 8;
+    di.tile_height  = epd->height / 8;
+    di.pixel_width  = epd->width;
+    di.pixel_height = epd->height;
     return di;
   }();
 
@@ -41,17 +41,17 @@ void eink_display::on() {
 
 void eink_display::render() {
   // Wake up and initialize display
-  APP_ERROR_CHECK(epd.init());
+  APP_ERROR_CHECK(epd->init());
 
   // u8g2 has 0 as white and 1 as black, display vice versa
   // -> invert all bits before writing to display memory
-  for (uint32_t i = 0; i < epd.width * epd.height / 8; ++i) {
+  for (uint32_t i = 0; i < epd->width * epd->height / 8; ++i) {
     epd_buf[i] = ~u8g2_buf[i];
   }
 
-  epd.set_frame_memory(epd_buf.get());
-  epd.display_frame();
-  epd.sleep();
+  epd->set_frame_memory(epd_buf.get());
+  epd->display_frame();
+  epd->sleep();
 }
 
 void eink_display::clear() {
