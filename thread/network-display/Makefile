@@ -212,7 +212,8 @@ LIB_FILES += \
   $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-nrf52840-sdk.a \
   $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
   $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
-  -lstdc++
+  -lstdc++ \
+  -lm
 
 # Optimization flags
 OPT = -O3 -g3
@@ -275,7 +276,7 @@ LDFLAGS += -mthumb -mabi=aapcs -L$(SDK_ROOT)/modules/nrfx/mdk -T$(LINKER_SCRIPT)
 LDFLAGS += -mcpu=cortex-m4
 LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 LDFLAGS += -Wl,--gc-sections
-LDFLAGS += --specs=nano.specs -lc -lnosys -lm -lstdc++
+LDFLAGS += --specs=nano.specs -lc -lnosys -lstdc++
 
 .PHONY: $(TARGETS) default all clean flash erase
 

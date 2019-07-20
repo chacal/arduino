@@ -1,5 +1,6 @@
 
 #include <app_error.h>
+#include <cmath>
 #include "eink_display.hpp"
 
 u8x8_display_info_t m_display_info;
@@ -21,8 +22,8 @@ uint8_t u8x8_gpio_and_delay_dummy(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, vo
 eink_display::eink_display() {
   m_display_info = [&] {
     u8x8_display_info_t di{};
-    di.tile_width   = epd->width / 8;
-    di.tile_height  = epd->height / 8;
+    di.tile_width   = ceil(epd->width / 8.0);
+    di.tile_height  = ceil(epd->height / 8.0);
     di.pixel_width  = epd->width;
     di.pixel_height = epd->height;
     return di;
