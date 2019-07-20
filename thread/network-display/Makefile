@@ -16,6 +16,9 @@ SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 U8G2_PATH          := $(HOME)/arduino/u8g2
 U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
+UZLIB_PATH         := $(HOME)/Documents/dev/uzlib
+UZLIB_SOURCES      := $(wildcard $(UZLIB_PATH)/src/*.c)
+
 HFSM_PATH          := $(HOME)/Documents/dev/HFSM
 
 include $(TEMPLATE_PATH)/Makefile.common.jihartik
@@ -120,6 +123,8 @@ SRC_FILES += \
   $(SRC_DIR)/eink_display/good_display/good_display_base.cpp \
   $(SRC_DIR)/eink_display/eink_display.cpp \
   $(SRC_DIR)/eink_display/epd_interface.cpp \
+  $(UZLIB_SOURCES) \
+  $(SRC_DIR)/gzip.cpp \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
@@ -184,6 +189,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/external/micro-ecc/micro-ecc \
   $(U8G2_PATH)/csrc \
   $(HFSM_PATH)/include \
+  $(UZLIB_PATH)/src \
 
 #
 # Original Nordic SDK Openthread libraries

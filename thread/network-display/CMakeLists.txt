@@ -6,6 +6,7 @@ set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
 set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0")
 set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
+set(UZLIB_ROOT "$ENV{HOME}/Documents/dev/uzlib")
 set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")
 
 add_definitions(-DNRF52840_XXAA)
@@ -70,6 +71,7 @@ include_directories("${SDK_ROOT}/external/nano-pb")
 include_directories("${SDK_ROOT}/external/micro-ecc/micro-ecc")
 include_directories("${U8G2_ROOT}/csrc")
 include_directories("${HFSM_ROOT}/include")
+include_directories("${UZLIB_ROOT}/src")
 
 file(GLOB_RECURSE SRC_LIST "*.cpp")
 
