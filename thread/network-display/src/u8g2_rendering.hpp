@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "named_type.hpp"
 
 extern "C" {
@@ -8,8 +9,8 @@ extern "C" {
 }
 
 using font_size = named_type<uint8_t, struct font_size_param>;
-using height = named_type<uint16_t , struct height_param>;
-using width = named_type<uint16_t , struct width_param>;
+using height = named_type<uint16_t, struct height_param>;
+using width = named_type<uint16_t, struct width_param>;
 
 struct point {
 public:
@@ -34,6 +35,9 @@ public:
 
   uint8_t centered_x(const std::string &, const font_size &);
 
+  void draw_bitmap(const point &upper_left, const width &, const height &, const uint8_t *);
+
+  void draw_fullscreen_bitmap(const std::vector<uint8_t> &);
 
 protected:
   u8g2_t u8g2{nullptr};

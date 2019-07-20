@@ -1,3 +1,4 @@
+#include <nrf_log.h>
 #include "u8g2_rendering.hpp"
 
 const uint8_t *font_for_size(const font_size &size) {
@@ -56,3 +57,15 @@ uint8_t u8g2_rendering::centered_x(const std::string &str, const font_size &size
   return x >= 0 ? x : 0;
 }
 
+void u8g2_rendering::draw_bitmap(const point &upper_left, const width &w, const height &h, const uint8_t *bitmap) {
+  u8g2_DrawBitmap(&u8g2, upper_left.x, upper_left.y, w.get() / 8, h.get(), bitmap);
+}
+
+void u8g2_rendering::draw_fullscreen_bitmap(const std::vector<uint8_t> &bitmap) {
+  auto expected_size = u8g2.height * u8g2.width / 8;
+  if (bitmap.size() != expected_size) {
+    NRF_LOG_ERROR("Invalid fullscreen bitmap size! Expected %d bytes, got %d bytes.", expected_size, bitmap.size())
+  } else {
+    draw_bitmap(point{0, 0}, width{u8g2.width}, height{u8g2.height}, bitmap.data());
+  }
+}
