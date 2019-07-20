@@ -63,8 +63,9 @@ namespace coap_helpers {
     APP_ERROR_CHECK(err_code);
   }
 
-  void handle_json_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
-    if (has_content_type(p_request, COAP_CT_MASK_APP_JSON)) {
+  void handle_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler,
+                   uint32_t content_type_mask) {
+    if (has_content_type(p_request, content_type_mask)) {
       // Create a temporary copy of the payload in order to respond and release the request before actually processing it
       uint8_t temp[p_request->payload_len];
       memcpy(temp, p_request->p_payload, p_request->payload_len);
@@ -80,6 +81,14 @@ namespace coap_helpers {
       auto p_response = create_response_for(p_request, COAP_CODE_415_UNSUPPORTED_CONTENT_FORMAT);
       send_and_delete(p_response);
     }
+  }
+
+  void handle_json_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
+    handle_post(p_resource, p_request, handler, COAP_CT_MASK_APP_JSON);
+  }
+
+  void handle_binary_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
+    handle_post(p_resource, p_request, handler, COAP_CT_MASK_APP_OCTET_STREAM);
   }
 
   void handle_json_get(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::get_handler &handler) {
