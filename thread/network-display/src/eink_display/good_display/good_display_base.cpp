@@ -35,7 +35,10 @@ using namespace epd_interface;
 good_display_base::~good_display_base() {
 };
 
-good_display_base::good_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut) : width{w}, height{h}, lut{lut} {
+good_display_base::good_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut, const Rotation r) : width{w},
+                                                                                                                 height{h},
+                                                                                                                 rotation{r},
+                                                                                                                 lut{lut} {
   reset_pin = RST_PIN;
   dc_pin    = DC_PIN;
   busy_pin  = BUSY_PIN;

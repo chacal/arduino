@@ -52,14 +52,17 @@
 #define SET_RAM_Y_ADDRESS_COUNTER                   0x4F
 #define TERMINATE_FRAME_READ_WRITE                  0xFF
 
+enum Rotation { NO_ROTATION, NINETY_DEG_CW };
+
 class good_display_base {
 public:
-  good_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut);
+  good_display_base(uint16_t w, uint16_t h, const uint8_t *lut, Rotation r = NINETY_DEG_CW);
 
   ~good_display_base();
 
   const uint32_t width;
   const uint32_t height;
+  const Rotation rotation;
 
   int init();
 

@@ -12,7 +12,8 @@ const unsigned char lut_full_update[] =
 
 class good_display_2in13 : public good_display_base {
 public:
-  good_display_2in13() : good_display_base(128, 250, lut_full_update) {}  // Display is actually 122 * 250, but logically 128 * 250
+  good_display_2in13() : good_display_base(128, 250, lut_full_update,
+                                           NO_ROTATION) {}  // Display is actually 122 * 250, but logically 128 * 250
 
   void set_frame_memory(const unsigned char *image_buffer, uint32_t x, uint32_t y, uint32_t image_width, uint32_t image_height) override {
     uint32_t x_end;

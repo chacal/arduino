@@ -29,8 +29,9 @@ eink_display::eink_display() {
     return di;
   }();
 
+  auto u8g2_rotation = epd->rotation == NO_ROTATION ? U8G2_R0 : U8G2_R1;
   u8g2_SetupDisplay(&u8g2, in_memory_display_handler, u8x8_cad_011, u8x8_byte_empty, u8x8_gpio_and_delay_dummy);
-  u8g2_SetupBuffer(&u8g2, u8g2_buf.get(), m_display_info.tile_height, u8g2_ll_hvline_horizontal_right_lsb, U8G2_R1);
+  u8g2_SetupBuffer(&u8g2, u8g2_buf.get(), m_display_info.tile_height, u8g2_ll_hvline_horizontal_right_lsb, u8g2_rotation);
 }
 
 void eink_display::on() {
