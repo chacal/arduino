@@ -1,6 +1,6 @@
 PROJECT_NAME       := network-display
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.2.0
+DFU_APP_VERSION_STR:= 1.3.0
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
