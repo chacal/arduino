@@ -20,6 +20,8 @@ void blinkLed() {
 }
 
 void on_pulse_detected() {
+  static uint32_t m_pulse_counter = 0;
+  sendPacket(++m_pulse_counter);
   blinkLed();
 }
 

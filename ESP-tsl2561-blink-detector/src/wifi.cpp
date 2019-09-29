@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 
-#include "wifi_credentials.hpp"
+#include "wifi_config.hpp"
+
+static WiFiUDP Udp;
 
 void connectWifi() {
   Serial.printf("Connecting to %s ", WIFI_SSID);
@@ -13,4 +16,10 @@ void connectWifi() {
   Serial.println();
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
+}
+
+void sendPacket(uint32_t data) {
+  Udp.beginPacket(DST_HOST, DST_PORT);
+  Udp.println(data);
+  Udp.endPacket();
 }
