@@ -1,0 +1,16 @@
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+
+#include "wifi_credentials.hpp"
+
+void connectWifi() {
+  Serial.printf("Connecting to %s ", WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PSK);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+  Serial.print("Connected, IP address: ");
+  Serial.println(WiFi.localIP());
+}

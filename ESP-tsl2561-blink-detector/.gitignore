@@ -1,3 +1,4 @@
 .pio
 CMakeListsPrivate.txt
 cmake-build-d1_mini
+src/wifi_credentials.hpp
