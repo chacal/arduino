@@ -21,9 +21,9 @@ void connectWifi() {
   Serial.println(WiFi.localIP());
 }
 
-void sendPacket(uint32_t data, const String &dst_host) {
+void sendPacket(const String &msg, const String &dst_host) {
   Udp.beginPacket(dst_host.c_str(), DST_PORT);
-  Udp.println(data);
+  Udp.println(msg);
   Udp.endPacket();
 }
 

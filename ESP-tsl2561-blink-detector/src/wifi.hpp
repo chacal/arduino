@@ -2,7 +2,7 @@
 
 void connectWifi();
 
-void sendPacket(uint32_t data, const String &dst_host);
+void sendPacket(const String &msg, const String &dst_host);
 
 typedef void (*udp_packet_cb_t)(const String &);
 

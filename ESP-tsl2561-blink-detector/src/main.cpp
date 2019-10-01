@@ -14,6 +14,8 @@
  * INT  ->  D5
  */
 
+#define INSTANCE   "I100"
+
 static String m_dst_host = DST_HOST;
 
 void blinkLed() {
@@ -22,9 +24,15 @@ void blinkLed() {
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
+String impulse_json_for(uint32_t counter) {
+  char buf[255];
+  sniprintf(buf, sizeof(buf), R"({"instance": "%s", "counter": %u})", INSTANCE, counter);
+  return String(buf);
+}
+
 void on_pulse_detected() {
   static uint32_t m_pulse_counter = 0;
-  sendPacket(++m_pulse_counter, m_dst_host);
+  sendPacket(impulse_json_for(++m_pulse_counter), m_dst_host);
   blinkLed();
 }
 
