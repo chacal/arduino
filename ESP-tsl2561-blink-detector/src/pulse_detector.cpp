@@ -1,12 +1,9 @@
 #include <Arduino.h>
 
 #include "pulse_detector.hpp"
+#include "config.hpp"
 
 #define RUNNING_AVG_SAMPLES    200
-#define MAX_PULSE_LENGTH_MS    100
-#define PULSE_START_COEF         2
-#define PULSE_END_COEF         1.5
-
 
 typedef enum {
   DETECTING_PULSE_START,
@@ -44,16 +41,16 @@ void pulse_detector_process(uint16_t adc_value) {
 
   switch (m_state) {
     case DETECTING_PULSE_START:
-      if (adc_value > PULSE_START_COEF * avg) {
+      if (adc_value > config.pulse_start_coef * avg) {
         // Serial.printf("Pulse start detected. Avg: %u Adc: %u\n", avg, adc_value);
         m_pulse_start_time = millis();
         m_state            = DETECTING_PULSE_END;
       }
       break;
     case DETECTING_PULSE_END:
-      if (millis() - m_pulse_start_time > MAX_PULSE_LENGTH_MS) {
+      if (millis() - m_pulse_start_time > config.max_pulse_length) {
         m_state = DETECTING_PULSE_START;
-      } else if (adc_value < PULSE_END_COEF * avg) {
+      } else if (adc_value < config.pulse_end_coef * avg) {
         // Serial.printf("Pulse end detected. Avg: %u Adc: %u\n", avg, adc_value);
         m_cb();
         m_state = DETECTING_PULSE_START;

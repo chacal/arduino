@@ -3,6 +3,7 @@
 #include <WiFiUdp.h>
 
 #include "wifi_config.hpp"
+#include "config.hpp"
 #include "wifi.hpp"
 
 static WiFiUDP         Udp;

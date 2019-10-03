@@ -1,6 +1,8 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 #include "wifi_config.hpp"
+#include "config.hpp"
 #include "wifi.hpp"
 #include "tsl2561.hpp"
 #include "pulse_detector.hpp"
@@ -16,8 +18,6 @@
 
 #define INSTANCE   "I100"
 
-static String m_dst_host = DST_HOST;
-
 void blinkLed() {
   digitalWrite(LED_BUILTIN, LOW);
   delay(2);
@@ -25,29 +25,25 @@ void blinkLed() {
 }
 
 String impulse_json_for(uint32_t counter) {
-  char buf[255];
-  sniprintf(buf, sizeof(buf), R"({"instance": "%s", "counter": %u})", INSTANCE, counter);
-  return String(buf);
+  StaticJsonDocument<255> doc;
+  doc["instance"] = INSTANCE;
+  doc["counter"]  = counter;
+  return doc.as<String>();
 }
 
 void on_pulse_detected() {
   static uint32_t m_pulse_counter = 0;
-  sendPacket(impulse_json_for(++m_pulse_counter), m_dst_host);
   blinkLed();
-}
-
-void on_udp_packet(const String &data) {
-  m_dst_host = data;
-  m_dst_host.trim();
-  Serial.println("Sending packets to " + m_dst_host);
+  sendPacket(impulse_json_for(++m_pulse_counter), config.dst_host);
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting ESP blink detector");
+  print_config();
   connectWifi();
   tsl2561_init();
-  udp_server_init(UDP_SERVER_PORT, on_udp_packet);
+  udp_server_init(UDP_SERVER_PORT, update_config_from_json);
   pulse_detector_init(on_pulse_detected);
   pinMode(LED_BUILTIN, OUTPUT);
 
