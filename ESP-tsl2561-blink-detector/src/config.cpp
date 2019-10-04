@@ -3,7 +3,7 @@
 #include "config.hpp"
 
 #define DST_HOST               "rapuserver.chacal.fi"
-#define MAX_PULSE_LENGTH_MS    200
+#define MAX_PULSE_LENGTH_MS    50
 #define PULSE_START_COEF       1.8f
 #define PULSE_END_COEF         1.3f
 
