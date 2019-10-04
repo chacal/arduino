@@ -7,6 +7,7 @@
 #include "wifi.hpp"
 #include "tsl2561.hpp"
 #include "pulse_detector.hpp"
+#include "web_server.hpp"
 
 /*
  * Wiring TSL2561 to Wemos D1 Mini:
@@ -49,6 +50,8 @@ void setup() {
   hostname.toLowerCase();
   MDNS.begin(hostname);
   ArduinoOTA.begin();
+
+  web_server_init();
 
   tsl2561_init();
   pulse_detector_init(on_pulse_detected);
