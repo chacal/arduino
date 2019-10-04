@@ -1,7 +1,8 @@
 #include <Arduino.h>
+#include <ArduinoOTA.h>
 #include <ArduinoJson.h>
+#include <ESP8266mDNS.h>
 
-#include "wifi_config.hpp"
 #include "config.hpp"
 #include "wifi.hpp"
 #include "tsl2561.hpp"
@@ -41,12 +42,20 @@ void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting ESP blink detector");
   print_config();
-  connectWifi();
-  tsl2561_init();
-  udp_server_init(UDP_SERVER_PORT, update_config_from_json);
-  pulse_detector_init(on_pulse_detected);
-  pinMode(LED_BUILTIN, OUTPUT);
 
+  connectWifi();
+
+  auto hostname = String(INSTANCE);
+  hostname.toLowerCase();
+  MDNS.begin(hostname);
+  ArduinoOTA.begin();
+
+  udp_server_init(UDP_SERVER_PORT, update_config_from_json);
+
+  tsl2561_init();
+  pulse_detector_init(on_pulse_detected);
+
+  pinMode(LED_BUILTIN, OUTPUT);
   // Indicate that Wifi connection is established
   for (int i = 0; i < 8; ++i) {
     blinkLed();
@@ -60,4 +69,5 @@ void loop() {
     tsl2561_clear_interrupt();
   }
   udp_server_receive();
+  ArduinoOTA.handle();
 }
