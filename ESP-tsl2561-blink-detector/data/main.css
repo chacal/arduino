@@ -1,0 +1,27 @@
+html {
+    font-family: Verdana, sans-serif;
+    font-size: 14px;
+}
+
+#config label {
+    width: 150px;
+    display: inline-block;
+}
+
+#config input {
+    width: 200px;
+    font-size: 14px;
+}
+
+#config input[type="number"] {
+    width: 50px;
+    text-align: right;
+}
+
+#config #saveConfig {
+    width: 70px;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-image: none;
+    text-align: center;
+}

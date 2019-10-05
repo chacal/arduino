@@ -1,4 +1,5 @@
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
 #include <AsyncJson.h>
 
 #include "config.hpp"
@@ -17,8 +18,10 @@ void on_post_config(AsyncWebServerRequest *request, const JsonVariant &json) {
 }
 
 void web_server_init() {
+  SPIFFS.begin();
   server.on("/config", HTTP_GET, on_get_config);
   server.addHandler(new AsyncCallbackJsonWebHandler("/config", on_post_config));
 
+  server.serveStatic("/", SPIFFS, "/");
   server.begin();
 }
