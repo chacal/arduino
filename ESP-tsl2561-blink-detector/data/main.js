@@ -1,6 +1,7 @@
 main()
 
 function main() {
+  connectWs()
   getConfig()
     .then(config => {
       document.getElementById('config').outerHTML = renderConfigForm(config)
@@ -10,6 +11,7 @@ function main() {
 function renderConfigForm(config) {
   return `
 <div id="config">
+    <h3>Configuration</h3>
     <div class="field">
         <label for="dstHost">Destination:</label>
         <input id="dstHost" type="text" value="${config.dstHost}">
@@ -50,4 +52,18 @@ function saveConfig() {
     body: JSON.stringify(config)
   })
     .then(() => main())
+}
+
+function connectWs() {
+  const connection = new WebSocket('ws://' + location.hostname + '/ws')
+  connection.onerror = (error) => console.log('WebSocket Error ', error)
+  connection.onmessage = onWsMessage
+}
+
+function onWsMessage(msg) {
+  renderCurrentADCValue(msg.data)
+}
+
+function renderCurrentADCValue(value) {
+  document.getElementById('currentValue').innerHTML = value
 }

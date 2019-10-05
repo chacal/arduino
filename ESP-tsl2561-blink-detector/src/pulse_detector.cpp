@@ -11,6 +11,7 @@ typedef enum {
 } detector_state;
 
 static pulse_detector_cb_t m_cb;
+static uint16_t            current_avg;
 
 void pulse_detector_init(pulse_detector_cb_t cb) {
   m_cb = cb;
@@ -37,11 +38,11 @@ void pulse_detector_process(uint16_t adc_value) {
   static unsigned long  m_pulse_start_time = 0;
   static detector_state m_state            = DETECTING_PULSE_START;
 
-  auto avg = runningAverage(adc_value);
+  current_avg = runningAverage(adc_value);
 
   switch (m_state) {
     case DETECTING_PULSE_START:
-      if (adc_value > config.pulse_start_coef * avg) {
+      if (adc_value > config.pulse_start_coef * current_avg) {
         // Serial.printf("Pulse start detected. Avg: %u Adc: %u\n", avg, adc_value);
         m_pulse_start_time = millis();
         m_state            = DETECTING_PULSE_END;
@@ -50,11 +51,15 @@ void pulse_detector_process(uint16_t adc_value) {
     case DETECTING_PULSE_END:
       if (millis() - m_pulse_start_time > config.max_pulse_length) {
         m_state = DETECTING_PULSE_START;
-      } else if (adc_value < config.pulse_end_coef * avg) {
+      } else if (adc_value < config.pulse_end_coef * current_avg) {
         // Serial.printf("Pulse end detected. Avg: %u Adc: %u\n", avg, adc_value);
         m_cb();
         m_state = DETECTING_PULSE_START;
       }
       break;
   }
+}
+
+uint16_t pulse_detector_current_avg() {
+  return current_avg;
 }

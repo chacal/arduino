@@ -2,6 +2,7 @@
 #include <ArduinoOTA.h>
 #include <ArduinoJson.h>
 #include <ESP8266mDNS.h>
+#include <Ticker.h>
 
 #include "config.hpp"
 #include "wifi.hpp"
@@ -39,6 +40,12 @@ void on_pulse_detected() {
   sendPacket(impulse_json_for(++m_pulse_counter), config.dst_host);
 }
 
+void on_tick() {
+  web_server_broadcast_ws(String(pulse_detector_current_avg()));
+}
+
+Ticker t;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting ESP blink detector");
@@ -55,6 +62,8 @@ void setup() {
 
   tsl2561_init();
   pulse_detector_init(on_pulse_detected);
+
+  t.attach_scheduled(1, on_tick);
 
   pinMode(LED_BUILTIN, OUTPUT);
   // Indicate that Wifi connection is established
