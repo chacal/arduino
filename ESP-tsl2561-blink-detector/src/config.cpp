@@ -1,5 +1,3 @@
-#include <ArduinoJson.h>
-
 #include "config.hpp"
 
 #define DST_HOST               "rapuserver.chacal.fi"
@@ -14,17 +12,7 @@ Config config = {
     PULSE_END_COEF
 };
 
-void update_config_from_json(const String &config_json) {
-  StaticJsonDocument<512> doc;
-  DeserializationError    error = deserializeJson(doc, config_json);
-
-  if (error) {
-    Serial.println("Failed to parse configuration JSON!");
-    Serial.println("Received:");
-    Serial.println(config_json);
-    return;
-  }
-
+void update_config_from_json(const JsonVariant &doc) {
   if (doc.containsKey("dstHost") && doc["dstHost"].is<char *>()) {
     config.dst_host = doc["dstHost"].as<String>();
   }
@@ -34,6 +22,15 @@ void update_config_from_json(const String &config_json) {
   config.pulse_end_coef   = doc["pulseEndCoef"] | config.pulse_end_coef;
 
   print_config();
+}
+
+DynamicJsonDocument get_config_as_json() {
+  DynamicJsonDocument doc(512);
+  doc["dstHost"]        = config.dst_host;
+  doc["maxPulseLength"] = config.max_pulse_length;
+  doc["pulseStartCoef"] = config.pulse_start_coef;
+  doc["pulseEndCoef"]   = config.pulse_end_coef;
+  return doc;
 }
 
 void print_config() {
