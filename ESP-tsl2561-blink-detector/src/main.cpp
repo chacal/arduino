@@ -50,8 +50,6 @@ void setup() {
   MDNS.begin(hostname);
   ArduinoOTA.begin();
 
-  udp_server_init(UDP_SERVER_PORT, update_config_from_json);
-
   tsl2561_init();
   pulse_detector_init(on_pulse_detected);
 
@@ -68,6 +66,5 @@ void loop() {
     pulse_detector_process(tsl2561_get_adc0_value());
     tsl2561_clear_interrupt();
   }
-  udp_server_receive();
   ArduinoOTA.handle();
 }
