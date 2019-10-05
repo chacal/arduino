@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <CircularBuffer.h>
 
 #include "pulse_detector.hpp"
 #include "config.hpp"
@@ -10,8 +11,9 @@ typedef enum {
   DETECTING_PULSE_END
 } detector_state;
 
-static pulse_detector_cb_t m_cb;
-static uint16_t            current_avg;
+static pulse_detector_cb_t           m_cb;
+static uint16_t                      current_avg;
+static CircularBuffer<uint16_t, 700> buffer;   // Worth of ~10s of samples
 
 void pulse_detector_init(pulse_detector_cb_t cb) {
   m_cb = cb;
@@ -38,6 +40,7 @@ void pulse_detector_process(uint16_t adc_value) {
   static unsigned long  m_pulse_start_time = 0;
   static detector_state m_state            = DETECTING_PULSE_START;
 
+  buffer.push(adc_value);
   current_avg = runningAverage(adc_value);
 
   switch (m_state) {
@@ -62,4 +65,14 @@ void pulse_detector_process(uint16_t adc_value) {
 
 uint16_t pulse_detector_current_avg() {
   return current_avg;
+}
+
+void pulse_detector_write_samples(Print &p) {
+  noInterrupts();
+  using index_t = decltype(buffer)::index_t;
+  for (index_t i = 0; i < buffer.size(); i++) {
+    p.write(buffer[i] & 0xFF);
+    p.write(buffer[i] >> 8);
+  }
+  interrupts();
 }

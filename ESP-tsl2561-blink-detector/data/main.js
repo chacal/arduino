@@ -67,3 +67,51 @@ function onWsMessage(msg) {
 function renderCurrentADCValue(value) {
   document.getElementById('currentValue').innerHTML = value
 }
+
+function loadSamples() {
+  return fetch('/samples')
+    .then(res => res.arrayBuffer())
+    .then(buf => renderSamples(new Uint16Array(buf)))
+}
+
+let chart
+
+function renderSamples(samples) {
+  document.getElementById('samples').innerHTML = samples.join('\n')
+
+  if (chart === undefined) {
+    const labels = []
+    for (let i = 0; i <= samples.length; i++) {
+      labels.push(i)
+    }
+
+    const ctx = document.getElementById('sampleGraph')
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data: samples,
+          label: 'Samples',
+          pointRadius: 0,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        animation: false,
+        tooltips: {
+          mode: 'index',
+          intersect: false
+        }
+      }
+    })
+  } else {
+    const labels = []
+    for (let i = 0; i <= samples.length; i++) {
+      labels.push(i)
+    }
+    chart.data.labels = labels
+    chart.data.datasets[0].data = samples
+    chart.update()
+  }
+}
