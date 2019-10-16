@@ -94,7 +94,7 @@ static void pin_interrupt_init() {
 
 void tsl2561_init() {
   Serial.println("Initializing TSL2561");
-
+  Wire.setClock(400000);
   Wire.begin();
 
   tsl2561_enable();
