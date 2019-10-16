@@ -45,7 +45,6 @@ void pulse_detector_process(uint16_t adc_value) {
   static uint16_t       adc_counter        = 0;
 
   buffer.push(adc_value);
-  current_avg = runningAverage(adc_value);
   adc_counter++;
 
   switch (m_state) {
@@ -54,9 +53,12 @@ void pulse_detector_process(uint16_t adc_value) {
         // Serial.printf("Pulse start detected. Avg: %u Adc: %u\n", avg, adc_value);
         m_pulse_start_time = millis();
         m_state            = DETECTING_PULSE_END;
+      } else {
+        current_avg = runningAverage(adc_value);
       }
       break;
     case DETECTING_PULSE_END:
+      current_avg = runningAverage(adc_value);
       if (millis() - m_pulse_start_time > config.max_pulse_length) {
         m_state = DETECTING_PULSE_START;
       } else if (adc_value < config.pulse_end_coef * current_avg) {
