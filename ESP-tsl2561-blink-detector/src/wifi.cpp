@@ -6,7 +6,7 @@
 #include "config.hpp"
 #include "wifi.hpp"
 
-static WiFiUDP         Udp;
+static WiFiUDP Udp;
 
 void connectWifi() {
   Serial.printf("Connecting to %s ", WIFI_SSID);
