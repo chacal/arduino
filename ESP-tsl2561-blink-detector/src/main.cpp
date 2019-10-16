@@ -37,7 +37,7 @@ String impulse_json_for(uint32_t counter) {
 void on_pulse_detected() {
   static uint32_t m_pulse_counter = 0;
   blinkLed();
-  sendPacket(impulse_json_for(++m_pulse_counter), config.dst_host);
+  sendPacket(impulse_json_for(++m_pulse_counter), config.dst_host, config.pulse_reporting_port);
 }
 
 void on_tick() {

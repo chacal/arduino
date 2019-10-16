@@ -20,12 +20,12 @@ input[type="button"] {
 }
 
 #config label {
-    width: 150px;
+    width: 190px;
     display: inline-block;
 }
 
 #config input[type="number"] {
-    width: 50px;
+    width: 60px;
     text-align: right;
 }
 
