@@ -4,7 +4,7 @@
 #include "pulse_detector.hpp"
 #include "config.hpp"
 
-#define RUNNING_AVG_SAMPLES    200
+#define RUNNING_AVG_SAMPLES     30
 #define SAMPLE_BUFFER_SIZE     700
 
 typedef enum {
