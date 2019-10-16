@@ -21,6 +21,10 @@ function renderConfigForm(config) {
         <input id="pulseReportingPort" type="number" min="0" max="65535" step="1" value="${config.pulseReportingPort}">
     </div>
     <div class="field">
+        <label for="samplesReportingPort">Samples reporting port:</label>
+        <input id="samplesReportingPort" type="number" min="0" max="65535" step="1" value="${config.samplesReportingPort}">
+    </div>
+    <div class="field">
         <label for="maxPulseLength">Max pulse length:</label>
         <input id="maxPulseLength" type="number" min="0" max="2000" step="5" value="${config.maxPulseLength}">
     </div>
@@ -47,6 +51,7 @@ function saveConfig() {
   const config = {
     dstHost: document.getElementById('dstHost').value,
     pulseReportingPort: parseInt(document.getElementById('pulseReportingPort').value),
+    samplesReportingPort: parseInt(document.getElementById('samplesReportingPort').value),
     maxPulseLength: parseInt(document.getElementById('maxPulseLength').value),
     pulseStartCoef: parseFloat(document.getElementById('pulseStartCoef').value),
     pulseEndCoef: parseFloat(document.getElementById('pulseEndCoef').value)

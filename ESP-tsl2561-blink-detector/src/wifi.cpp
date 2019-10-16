@@ -25,3 +25,9 @@ void sendPacket(const String &msg, const String &dst_host, uint16_t port) {
   Udp.println(msg);
   Udp.endPacket();
 }
+
+void sendPacket(udp_body_writer body_writer, const String &dst_host, uint16_t port) {
+  Udp.beginPacket(dst_host.c_str(), port);
+  body_writer(Udp);
+  Udp.endPacket();
+}

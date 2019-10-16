@@ -40,6 +40,12 @@ void on_pulse_detected() {
   sendPacket(impulse_json_for(++m_pulse_counter), config.dst_host, config.pulse_reporting_port);
 }
 
+void on_full_adc_buffer() {
+  sendPacket([](UDP &udp) {
+    pulse_detector_write_samples(udp);
+  }, config.dst_host, config.samples_reporting_port);
+}
+
 void on_tick() {
   web_server_broadcast_ws(String(pulse_detector_current_avg()));
 }
@@ -61,7 +67,7 @@ void setup() {
   web_server_init();
 
   tsl2561_init();
-  pulse_detector_init(on_pulse_detected);
+  pulse_detector_init(on_pulse_detected, on_full_adc_buffer);
 
   t.attach_scheduled(1, on_tick);
 
