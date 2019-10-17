@@ -16,6 +16,7 @@ void on_get_config(AsyncWebServerRequest *request) {
 
 void on_post_config(AsyncWebServerRequest *request, const JsonVariant &json) {
   update_config_from_json(json);
+  save_config_to_file();
   request->send(204);
 }
 

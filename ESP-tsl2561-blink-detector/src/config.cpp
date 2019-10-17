@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include <FS.h>
 
 #define DST_HOST               "rapuserver.chacal.fi"
 #define PULSE_REPORTING_PORT   5555
@@ -7,6 +8,8 @@
 #define MAX_PULSE_LENGTH_MS    40
 #define PULSE_START_COEF       1.8f
 #define PULSE_END_COEF         1.3f
+
+#define CONFIG_FILE_NAME       "config.json"
 
 Config config = {
     DST_HOST,
@@ -17,6 +20,36 @@ Config config = {
     PULSE_START_COEF,
     PULSE_END_COEF
 };
+
+void load_config_from_file() {
+  SPIFFS.begin();
+  File                    config_file = SPIFFS.open(CONFIG_FILE_NAME, "r");
+  StaticJsonDocument<512> doc;
+
+  DeserializationError error = deserializeJson(doc, config_file);
+  if (error) {
+    Serial.println("Failed to read config file, using default configuration");
+    print_config();
+    save_config_to_file();
+  } else {
+    update_config_from_json(doc.as<JsonVariant>());
+  }
+
+  config_file.close();
+}
+
+void save_config_to_file() {
+  SPIFFS.begin();
+  auto file = SPIFFS.open(CONFIG_FILE_NAME, "w");
+
+  if (!file) {
+    Serial.println("Failed to create file!");
+    return;
+  }
+
+  serializeJson(get_config_as_json(), file);
+  file.close();
+}
 
 void update_config_from_json(const JsonVariant &doc) {
   if (doc.containsKey("dstHost") && doc["dstHost"].is<char *>()) {

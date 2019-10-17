@@ -57,7 +57,7 @@ Ticker t;
 void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting ESP blink detector");
-  print_config();
+  load_config_from_file();
 
   connectWifi();
 

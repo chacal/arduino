@@ -15,6 +15,10 @@ struct Config {
 
 extern Config config;
 
+void load_config_from_file();
+
+void save_config_to_file();
+
 void update_config_from_json(const JsonVariant &json);
 
 DynamicJsonDocument get_config_as_json();
