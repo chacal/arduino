@@ -41,9 +41,11 @@ void on_pulse_detected() {
 }
 
 void on_full_adc_buffer() {
-  sendPacket([](UDP &udp) {
-    pulse_detector_write_samples(udp);
-  }, config.dst_host, config.samples_reporting_port);
+  if (config.report_samples) {
+    sendPacket([](UDP &udp) {
+      pulse_detector_write_samples(udp);
+    }, config.dst_host, config.samples_reporting_port);
+  }
 }
 
 void on_tick() {

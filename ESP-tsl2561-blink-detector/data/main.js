@@ -25,6 +25,10 @@ function renderConfigForm(config) {
         <input id="samplesReportingPort" type="number" min="0" max="65535" step="1" value="${config.samplesReportingPort}">
     </div>
     <div class="field">
+        <label for="reportSamples">Report samples:</label>
+        <input id="reportSamples" type="checkbox" value="reportSamples" ${config.reportSamples ? 'checked' : ''}>
+    </div>
+    <div class="field">
         <label for="maxPulseLength">Max pulse length:</label>
         <input id="maxPulseLength" type="number" min="0" max="2000" step="5" value="${config.maxPulseLength}">
     </div>
@@ -52,6 +56,7 @@ function saveConfig() {
     dstHost: document.getElementById('dstHost').value,
     pulseReportingPort: parseInt(document.getElementById('pulseReportingPort').value),
     samplesReportingPort: parseInt(document.getElementById('samplesReportingPort').value),
+    reportSamples: document.getElementById('reportSamples').checked,
     maxPulseLength: parseInt(document.getElementById('maxPulseLength').value),
     pulseStartCoef: parseFloat(document.getElementById('pulseStartCoef').value),
     pulseEndCoef: parseFloat(document.getElementById('pulseEndCoef').value)
