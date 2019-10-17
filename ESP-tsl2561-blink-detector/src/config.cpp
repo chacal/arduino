@@ -3,7 +3,7 @@
 #define DST_HOST               "rapuserver.chacal.fi"
 #define PULSE_REPORTING_PORT   5555
 #define SAMPLES_REPORTING_PORT 5556
-#define MAX_PULSE_LENGTH_MS    120
+#define MAX_PULSE_LENGTH_MS    40
 #define PULSE_START_COEF       1.8f
 #define PULSE_END_COEF         1.3f
 

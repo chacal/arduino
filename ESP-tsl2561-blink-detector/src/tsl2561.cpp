@@ -102,7 +102,7 @@ void tsl2561_init() {
 
   pin_interrupt_init();
 
-  write8(TSL2561_REGISTER_TIMING, TSL2561_INTEGRATIONTIME_101MS | TSL2561_GAIN_16X);
+  write8(TSL2561_REGISTER_TIMING, TSL2561_INTEGRATIONTIME_13MS | TSL2561_GAIN_16X);
   write8(TSL2561_REGISTER_INTERRUPT, 0x10);  // Level interrupts, trigger after every ADC read
 }
 
