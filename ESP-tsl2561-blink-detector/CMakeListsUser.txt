@@ -1,0 +1,11 @@
+add_custom_target(
+    PLATFORMIO_UPLOAD_OTA ALL
+    COMMAND ${PLATFORMIO_CMD} -f -c clion run --target upload --upload-port i100.local
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(
+    PLATFORMIO_UPLOADFS_OTA ALL
+    COMMAND ${PLATFORMIO_CMD} -f -c clion run --target uploadfs --upload-port i100.local
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)

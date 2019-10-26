@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"
+            integrity="sha256-xKeoJ50pzbUGkpQxDYHD7o7hxe0LaOGeguUidbq6vis=" crossorigin="anonymous"></script>
+    <title>I100</title>
+</head>
+<body>
+<div id="sampleGraphContainer">
+    <canvas id="sampleGraph"></canvas>
+</div>
+<div id="currentValueContainer">
+    <h3>State</h3>
+    Current average ADC value: <span id="currentValue"></span>
+</div>
+<div id="config"></div>
+<div id="sampleContainer">
+    <h3>Samples</h3>
+    <div id="samples">No samples loaded</div>
+    <input id="loadSamples" type="button" value="Load samples" onclick="loadSamples()">
+</div>
+<script src="main.js"></script>
+</body>
+</html>

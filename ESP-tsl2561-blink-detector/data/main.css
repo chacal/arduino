@@ -1,0 +1,52 @@
+html {
+    font-family: Verdana, sans-serif;
+    font-size: 14px;
+}
+
+h3 {
+    margin-top: 40px;
+}
+
+input {
+    width: 200px;
+    font-size: 14px;
+}
+
+input[type="button"] {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-image: none;
+    text-align: center;
+}
+
+#config label {
+    width: 190px;
+    display: inline-block;
+}
+
+#config input[type="number"] {
+    width: 60px;
+    text-align: right;
+}
+
+#config #saveConfig {
+    width: 70px;
+}
+
+
+#samples {
+    float: left;
+    width: 200px;
+    margin-right: 20px;
+    min-height: 20px;
+}
+
+#loadSamples {
+    width: 120px;
+}
+
+#sampleGraphContainer {
+    float: right;
+    width: 1200px;
+    height: 500px;
+}
