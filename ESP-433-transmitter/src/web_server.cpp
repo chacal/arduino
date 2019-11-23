@@ -5,35 +5,47 @@
 
 static AsyncWebServer server(80);
 
-void respondWithMissingField(const String &fieldName, AsyncWebServerRequest *request) {
-  auto res = String(R"({"error": "Missing or invalid field: ')") + fieldName + R"('"})";
-  request->send(400, "application/json", res);
+bool validate_url(const String &url) {
+  return url.length() == 15 && isAlpha(url.charAt(10)) &&
+         isDigit(url.charAt(12)) && isDigit(url.charAt(14));
+}
+
+TxTarget target_from_url(const String &url) {
+  char family = url.charAt(10);
+  uint32_t group = url.charAt(12) - '0';
+  uint32_t device = url.charAt(14) - '0';
+  return {family, group, device};
 }
 
 void on_post_transmit(AsyncWebServerRequest *request, const JsonVariant &json) {
-  if (!json.containsKey("family") || !json["family"].is<char *>() || json["family"].as<String>().length() != 1) {
-    respondWithMissingField("family", request);
-  } else if (!json.containsKey("group") || !json["group"].is<unsigned int>()) {
-    respondWithMissingField("group", request);
-  } else if (!json.containsKey("device") || !json["device"].is<unsigned int>()) {
-    respondWithMissingField("device", request);
-  } else if (!json.containsKey("state") || !json["state"].is<bool>()) {
-    respondWithMissingField("state", request);
-  } else {
-    String family = json["family"];
-    uint32_t group = json["group"];
-    uint32_t device = json["device"];
-    bool state = json["state"];
+  auto url = request->url();
 
-    tx_submit({family.charAt(0), group, device, state});
-    request->send(204);
+  if (validate_url(url) && json.containsKey("state") && json["state"].is<bool>()) {
+    auto target = target_from_url(url);
+    tx_submit({target, json["state"]});
+    request->send(200);
+  } else {
+    request->send(400, "application/json", R"({"error": "Invalid request"})");
+  }
+}
+
+void on_get_status(AsyncWebServerRequest *request) {
+  auto url = request->url();
+
+  if (validate_url(url)) {
+    auto state = tx_get_state(target_from_url(url));
+
+    auto response = request->beginResponseStream("application/json");
+    response->setCode(200);
+    response->printf(R"({"state": %s})", state ? "true" : "false");
+    request->send(response);
+  } else {
+    request->send(404, "application/json", R"({"error": "Invalid request"})");
   }
 }
 
 void web_server_init() {
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(200, "text/plain", String(ESP.getFreeHeap()));
-  });
+  server.on("/transmit", HTTP_GET, on_get_status);
   server.addHandler(new AsyncCallbackJsonWebHandler("/transmit", on_post_transmit));
   server.begin();
 }
