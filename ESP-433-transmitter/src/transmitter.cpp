@@ -3,7 +3,7 @@
 
 #include "transmitter.hpp"
 
-#define RADIO_TX_PIN        D0
+#define RADIO_TX_PIN        D8
 #define STATE_CACHE_SIZE    20
 
 static TxData txBuf;
