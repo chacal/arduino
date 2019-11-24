@@ -4,10 +4,10 @@
 #include "transmitter.hpp"
 
 #define RADIO_TX_PIN        D8
+#define TX_QUEUE_SIZE       20
 #define STATE_CACHE_SIZE    20
 
-static TxData txBuf;
-volatile bool txNeeded = false;
+static Array<TxData, TX_QUEUE_SIZE> txQueue;
 
 static RCSwitch mySwitch = RCSwitch();
 static Array<TxData, STATE_CACHE_SIZE> stateCache;
@@ -28,8 +28,8 @@ void tx_init() {
 
 void tx_submit(const TxData &data) {
   noInterrupts();
-  txBuf = data;
-  txNeeded = true;
+  txQueue.push_back(data);
+
   size_t idx;
   if (find_in_cache(data, idx)) {
     stateCache[idx] = data;
@@ -40,21 +40,23 @@ void tx_submit(const TxData &data) {
 }
 
 void tx_process() {
-  TxData tmpBuf;
-  bool tmpNeeded;
+  TxData tmpData;
+  bool txNeeded = false;
 
   noInterrupts();
-  tmpNeeded = txNeeded;
-  tmpBuf = txBuf;
-  txNeeded = false;
+  if (!txQueue.empty()) {
+    tmpData = txQueue.front();
+    txQueue.remove(0);
+    txNeeded = true;
+  }
   interrupts();
 
-  if (tmpNeeded) {
-    Serial.printf("Transmit: %c %d %d, state: %d\n", tmpBuf.family, tmpBuf.group, tmpBuf.device, tmpBuf.state);
-    if (tmpBuf.state) {
-      mySwitch.switchOn(tmpBuf.family, tmpBuf.group, tmpBuf.device);
+  if (txNeeded) {
+    Serial.printf("Transmit: %c %d %d, state: %d\n", tmpData.family, tmpData.group, tmpData.device, tmpData.state);
+    if (tmpData.state) {
+      mySwitch.switchOn(tmpData.family, tmpData.group, tmpData.device);
     } else {
-      mySwitch.switchOff(tmpBuf.family, tmpBuf.group, tmpBuf.device);
+      mySwitch.switchOff(tmpData.family, tmpData.group, tmpData.device);
     }
   }
 }
