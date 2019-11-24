@@ -6,7 +6,7 @@
 #include "web_server.hpp"
 #include "transmitter.hpp"
 
-#define HOSTNAME   "esp-433-transmitter"
+#define HOSTNAME   "esp-433-gateway"
 
 void blinkLed() {
   digitalWrite(LED_BUILTIN, LOW);
