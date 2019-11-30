@@ -21,9 +21,10 @@
 
 #include "sdk_config.h"
 
-#define PIN_SCL           2
-#define PIN_SDA           3
-#define PIN_BME280_POWER 12
+#define PIN_SDA           2
+#define PIN_SCL           3
+#define PIN_BME280_GND    4
+#define PIN_BME280_POWER  5
 
 #endif  // #ifdef NRF51
 
@@ -225,12 +226,19 @@ static void twi_init(void) {
 }
 
 static void bme280_power_on() {
+#ifdef PIN_BME280_GND
+  nrf_drv_gpiote_out_config_t bme280_gnd_pin_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
+  nrf_drv_gpiote_out_init(PIN_BME280_GND, &bme280_gnd_pin_config);
+#endif
   nrf_drv_gpiote_out_config_t bme280_power_pin_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
   nrf_drv_gpiote_out_init(PIN_BME280_POWER, &bme280_power_pin_config);
 }
 
 static void bme280_power_off() {
   nrf_drv_gpiote_out_uninit(PIN_BME280_POWER);
+#ifdef PIN_BME280_GND
+  nrf_drv_gpiote_out_uninit(PIN_BME280_GND);
+#endif
 }
 
 
