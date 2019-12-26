@@ -12,7 +12,7 @@ MonModeDebug = 0
 MaxNumAPs = 0
 LowPowerHandlingMode = 0
 OverrideMemMap = 0
-AllowSimulation = 1
+AllowSimulation = 0
 ScriptFile=""
 [FLASH]
 CacheExcludeSize = 0x00
@@ -21,12 +21,12 @@ MinNumBytesFlashDL = 0
 SkipProgOnCRCMatch = 1
 VerifyDownload = 1
 AllowCaching = 1
-EnableFlashDL = 2
+EnableFlashDL = 1
 Override = 0
 Device="ARM7"
 [GENERAL]
-WorkRAMSize = 0x00
-WorkRAMAddr = 0x00
+WorkRAMSize = 0x40000
+WorkRAMAddr = 0x20000000
 RAMUsageLimit = 0x00
 [SWO]
 SWOLogFile=""
