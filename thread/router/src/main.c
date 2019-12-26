@@ -23,8 +23,8 @@ void configure_antenna() {
       nrfx_gpiote_out_init(24, &low_config);
       nrfx_gpiote_out_init(25, &high_config);
     } else {
-      nrfx_gpiote_out_init(25, &low_config);
       nrfx_gpiote_out_init(24, &high_config);
+      nrfx_gpiote_out_init(25, &low_config);
     }
   }
 }
