@@ -1,5 +1,6 @@
 .pioenvs
-.piolibdeps
+.pio
 CMakeListsPrivate.txt
 cmake-build-debug
 .idea
+cmake-build-esp12e
