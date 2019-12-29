@@ -23,18 +23,22 @@ char         buffer[UART_RX_BUF_SIZE];
 void setup() {
   Serial.begin(234000);
   Serial.println("Starting ESP-BT-MQTT gateway..");
+  blinkLed(1);
+
   loadConfigFromFile();
 
   randomSeed(micros());
 
   connectWiFi(wifiManager);
+  blinkLed(3);
+
   printConfig();
   MDNS.begin(config.hostname);
   ArduinoOTA.begin();
-
   connectMQTT(mqttClient, wifiClient);
 
   Serial.pins(UART_TX_PIN_AFTER_SWAP, UART_RX_PIN_AFTER_SWAP);
+  blinkLed(8);
 }
 
 void loop() {

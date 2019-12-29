@@ -38,3 +38,16 @@ void resetConfigAndReboot(WiFiManager &wifiManager) {
   delay(2000);
   ESP.restart();
 }
+
+void blinkLed(uint8_t times) {
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  for (uint8_t i = 0; i < times; ++i) {
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(2);
+    digitalWrite(LED_BUILTIN, HIGH);
+    if (times > 1) {
+      delay(100);
+    }
+  }
+}
