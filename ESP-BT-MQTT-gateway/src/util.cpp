@@ -51,3 +51,11 @@ void blinkLed(uint8_t times) {
     }
   }
 }
+
+void resetAndRebootIfPinLow(uint8_t pin, WiFiManager &wifiManager) {
+  pinMode(pin, INPUT_PULLUP);
+  if (digitalRead(pin) == LOW) {
+    blinkLed(20);
+    resetConfigAndReboot(wifiManager);
+  }
+}

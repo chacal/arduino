@@ -11,6 +11,7 @@
 #define UART_RX_PIN_AFTER_SWAP   13
 #define UART_RX_BUF_SIZE        200
 
+#define RESET_PIN                13   // Pull this to GND during bootup to reset all settings (Wifi & configuration)
 
 WiFiManager  wifiManager;
 WiFiClient   wifiClient;
@@ -25,8 +26,9 @@ void setup() {
   Serial.println("Starting ESP-BT-MQTT gateway..");
   blinkLed(1);
 
-  loadConfigFromFile();
+  resetAndRebootIfPinLow(RESET_PIN, wifiManager);
 
+  loadConfigFromFile();
   randomSeed(micros());
 
   connectWiFi(wifiManager);
