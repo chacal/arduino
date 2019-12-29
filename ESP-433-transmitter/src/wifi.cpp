@@ -7,6 +7,7 @@
 
 void connectWifi() {
   Serial.printf("Connecting to %s ", WIFI_SSID);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PSK);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
