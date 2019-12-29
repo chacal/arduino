@@ -8,6 +8,7 @@ bool configurationSaved = false;
 void connectWiFi(WiFiManager &wifiManager) {
   Serial << "Connecting to WiFi.." << endl;
   configurationSaved = false;
+  WiFi.hostname(config.hostname);
 
   WiFiManagerParameter mqttServerParam("mqtt_server", "MQTT server", config.mqttServer.c_str(), 100);
   WiFiManagerParameter mqttPortParam("mqtt_port", "MQTT port", String(config.mqttPort).c_str(), 6);
