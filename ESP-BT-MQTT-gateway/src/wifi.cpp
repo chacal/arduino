@@ -1,9 +1,11 @@
+#include <Ticker.h>
 #include <StreamPrint.h>
 
 #include "wifi.hpp"
 #include "config.hpp"
 
-bool configurationSaved = false;
+bool   configurationSaved = false;
+Ticker blinker;
 
 void connectWiFi(WiFiManager &wifiManager) {
   Serial << "Connecting to WiFi.." << endl;
@@ -20,10 +22,17 @@ void connectWiFi(WiFiManager &wifiManager) {
   wifiManager.addParameter(&mqttTopicParam);
   wifiManager.addParameter(&hostnameParam);
 
+  wifiManager.setAPCallback([](WiFiManager *wifiManager) {
+      blinker.attach_ms(500, []() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); });
+  });
+
   wifiManager.setSaveConfigCallback([]() {
+      blinker.detach();
+      digitalWrite(LED_BUILTIN, HIGH);
       Serial << "Configuration saved!" << endl;
       configurationSaved = true;
   });
+
   wifiManager.setConfigPortalTimeout(180);
 
   if (!wifiManager.autoConnect("ESP-BT-MQTT-Setup")) {
