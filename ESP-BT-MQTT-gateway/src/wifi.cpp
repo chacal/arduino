@@ -35,7 +35,7 @@ void connectWiFi(WiFiManager &wifiManager) {
     config.mqttServer = String(mqttServerParam.getValue());
     config.mqttTopic  = String(mqttTopicParam.getValue());
     config.mqttPort   = atol(mqttPortParam.getValue());
-    Serial << "Topic: " << config.mqttTopic << endl;
+    config.hostname   = String(hostnameParam.getValue());
     saveConfigToFile();
   }
 

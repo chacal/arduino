@@ -7,6 +7,7 @@ struct Config {
     String   mqttServer;
     uint16_t mqttPort;
     String   mqttTopic;
+    String   hostname;
 };
 
 extern Config config;

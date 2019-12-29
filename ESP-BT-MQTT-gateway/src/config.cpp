@@ -6,13 +6,15 @@
 #define DEFAULT_MQTT_SERVER     "mqtt-home.chacal.fi"
 #define DEFAULT_MQTT_PORT       1883
 #define DEFAULT_MQTT_TOPIC      "/test/bt-sensor-gw/1"
+#define DEFAULT_HOST_NAME       "esp-bt-mqtt-test"
 
 #define CONFIG_FILE_NAME       "config.json"
 
 Config config = {
     DEFAULT_MQTT_SERVER,
     DEFAULT_MQTT_PORT,
-    DEFAULT_MQTT_TOPIC
+    DEFAULT_MQTT_TOPIC,
+    DEFAULT_HOST_NAME
 };
 
 void loadConfigFromFile() {
@@ -54,6 +56,10 @@ void updateConfigFromJson(const JsonVariant &doc) {
   if (doc.containsKey("mqttTopic") && doc["mqttTopic"].is<char *>()) {
     config.mqttTopic = doc["mqttTopic"].as<String>();
   }
+
+  if (doc.containsKey("hostname") && doc["hostname"].is<char *>()) {
+    config.hostname = doc["hostname"].as<String>();
+  }
 }
 
 void removeSavedConfig() {
@@ -67,6 +73,7 @@ DynamicJsonDocument getConfigAsJson() {
   doc["mqttServer"] = config.mqttServer;
   doc["mqttPort"]   = config.mqttPort;
   doc["mqttTopic"]  = config.mqttTopic;
+  doc["hostname"]   = config.hostname;
   return doc;
 }
 
@@ -76,4 +83,5 @@ void printConfig() {
   Serial << "MQTT server: \t" << config.mqttServer << endl;
   Serial << "MQTT port: \t" << config.mqttPort << endl;
   Serial << "MQTT topic: \t" << config.mqttTopic << endl;
+  Serial << "MDNS hostname: \t" << config.hostname << endl;
 }
