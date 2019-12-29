@@ -31,6 +31,7 @@ void setup() {
 
   connectWiFi(wifiManager);
   blinkLed(3);
+  delay(1000);
 
   printConfig();
   MDNS.begin(config.hostname);
