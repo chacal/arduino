@@ -12,10 +12,12 @@ void connectWiFi(WiFiManager &wifiManager) {
   WiFiManagerParameter mqttServerParam("mqtt_server", "MQTT server", config.mqttServer.c_str(), 100);
   WiFiManagerParameter mqttPortParam("mqtt_port", "MQTT port", String(config.mqttPort).c_str(), 6);
   WiFiManagerParameter mqttTopicParam("mqtt_topc", "MQTT topic", config.mqttTopic.c_str(), 100);
+  WiFiManagerParameter hostnameParam("hostname", "MDNS hostname", config.hostname.c_str(), 100);
 
   wifiManager.addParameter(&mqttServerParam);
   wifiManager.addParameter(&mqttPortParam);
   wifiManager.addParameter(&mqttTopicParam);
+  wifiManager.addParameter(&hostnameParam);
 
   wifiManager.setSaveConfigCallback([]() {
       Serial << "Configuration saved!" << endl;

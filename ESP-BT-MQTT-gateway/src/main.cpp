@@ -1,5 +1,6 @@
 #include <StreamPrint.h>
 #include <ESP8266mDNS.h>
+#include <ArduinoOTA.h>
 
 #include "config.hpp"
 #include "wifi.hpp"
@@ -29,6 +30,8 @@ void setup() {
   connectWiFi(wifiManager);
   printConfig();
   MDNS.begin(config.hostname);
+  ArduinoOTA.begin();
+
   connectMQTT(mqttClient, wifiClient);
 
   Serial.pins(UART_TX_PIN_AFTER_SWAP, UART_RX_PIN_AFTER_SWAP);
@@ -45,4 +48,5 @@ void loop() {
 
   mqttClient.loop();
   MDNS.update();
+  ArduinoOTA.handle();
 }
