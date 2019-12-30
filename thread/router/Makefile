@@ -1,13 +1,13 @@
 PROJECT_NAME       := thread_router
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.1.0
+DFU_APP_VERSION_STR:= 1.2.0
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
 OUTPUT_DIRECTORY   := build
 LINKER_SCRIPT      := openthread_nrf52840.ld
 
-SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0
+SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
@@ -107,6 +107,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/balloc \
   $(SDK_ROOT)/components/libraries/log \
   $(SDK_ROOT)/components/libraries/memobj \
+  $(SDK_ROOT)/components/libraries/pwr_mgmt \
   $(SDK_ROOT)/components \
   $(SDK_ROOT)/modules/nrfx/mdk \
   $(SDK_ROOT)/components/libraries/scheduler \
@@ -142,6 +143,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/crypto/backend/nrf_sw \
   $(SDK_ROOT)/components/libraries/crypto/backend/nrf_hw \
   $(SDK_ROOT)/components/libraries/crypto/backend/cifra \
+  $(SDK_ROOT)/components/libraries/crypto/backend/optiga \
   $(SDK_ROOT)/components/iot/coap \
   $(SDK_ROOT)/components/iot/common \
   $(SDK_ROOT)/components/iot/background_dfu \
@@ -155,29 +157,33 @@ INC_FOLDERS += \
 # Original Nordic SDK Openthread libraries
 #
 #LIB_FILES += \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-diag.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-ftd.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-cli-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-diag.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libmbedcrypto.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-sdk.a \
+#  $(SDK_ROOT)/external/nrf_cc310/lib/cortex-m4/hard-float/libnrf_cc310_0.9.12.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libnordicsemi-nrf52840-radio-driver.a \
 #  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
-#  $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
 
 
 #
-# Self compiled more minimal libraries, configured with COAP=1 DNS_CLIENT=1 DISABLE_SPI=1 (Own openthread fork commit 17227a1da942..)
+# Self compiled more minimal libraries built with build_library_chacal.sh
+# Built from https://github.com/chacal/openthread/commit/5b826ef5b0cc1b58934b52a2ca24c770a5949822
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
 LIB_FILES += \
-  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-diag.a \
-  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-ftd.a \
-  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-platform-utils.a \
-  $(PROJ_DIR)/openthread/nrf52840/lib/libmbedcrypto.a \
-  $(PROJ_DIR)/openthread/nrf52840/lib/libopenthread-nrf52840-sdk.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-ftd.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-platform-utils.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libmbedcrypto.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-nrf52840-sdk.a \
+  $(SDK_ROOT)/external/nrf_cc310/lib/cortex-m4/hard-float/libnrf_cc310_0.9.12.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libnordicsemi-nrf52840-radio-driver.a \
   $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
-  $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
+  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-platform-utils.a \
 
 # Optimization flags
 OPT = -O3 -g3

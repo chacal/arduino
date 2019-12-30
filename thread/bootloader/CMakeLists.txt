@@ -3,7 +3,7 @@ project(thread-bootloader)
 
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
-set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0")
+set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0")
 
 add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_PCA10056)
