@@ -1,6 +1,6 @@
 #include <nrf_gpio.h>
 #include <nrf_delay.h>
-#include <nrf_drv_spi.h>
+#include <nrfx_spim.h>
 
 #include "nrf_u8g2_adapter.hpp"
 #include "power_manager.hpp"
@@ -13,25 +13,26 @@
 
 #define SPI_INSTANCE     0
 
-nrf_drv_spi_t nrf_u8g2_adapter::spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);
+nrfx_spim_t nrf_u8g2_adapter::spi = NRFX_SPIM_INSTANCE(SPI_INSTANCE);
 volatile bool nrf_u8g2_adapter::spi_xfer_done = false;
 
-void nrf_u8g2_adapter::spi_evt_handler(nrf_drv_spi_evt_t const *p_event, void *p_context) {
+void nrf_u8g2_adapter::spi_evt_handler(nrfx_spim_evt_t const *p_event, void *p_context) {
   spi_xfer_done = true;
 }
 
 void nrf_u8g2_adapter::spi_init() {
-  nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+  nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
   spi_config.ss_pin   = CS_PIN;
-  spi_config.miso_pin = NRF_DRV_SPI_PIN_NOT_USED;
+  spi_config.miso_pin = NRFX_SPIM_PIN_NOT_USED;
   spi_config.mosi_pin = MOSI_PIN;
   spi_config.sck_pin  = SCK_PIN;
-  APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, spi_evt_handler, NULL));
+  APP_ERROR_CHECK(nrfx_spim_init(&spi, &spi_config, spi_evt_handler, NULL));
 }
 
 void nrf_u8g2_adapter::spi_send(uint8_t *data, uint8_t length) {
   spi_xfer_done = false;
-  APP_ERROR_CHECK(nrf_drv_spi_transfer(&spi, data, length, NULL, 0));
+  nrfx_spim_xfer_desc_t xfer_desc = NRFX_SPIM_XFER_TX(data, length);
+  APP_ERROR_CHECK(nrfx_spim_xfer(&spi, &xfer_desc, 0));
   while(!spi_xfer_done) {
     power_manager::manage();
   }
