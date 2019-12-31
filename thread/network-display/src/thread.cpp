@@ -12,7 +12,7 @@ extern "C" {
 }
 
 #define LOG_IP6_ADDRESSES                   true
-#define TX_POWER                               8  // dBm
+#define TX_POWER                               0  // dBm
 #define SED_POLL_PERIOD_MS                  5000
 #define CHILD_TIMEOUT_S                       60
 
