@@ -9,7 +9,7 @@
   <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
  </FrameBufferWindow>
  <Memory1>
-  <MemoryWindow addressSpace="" dataSize="1" autoEvaluate="0" viewMode="0" addressOrder="0" columnsText="" refreshPeriod="0" name="network-display" radix="16" sizeText="144" addressText="r1"/>
+  <MemoryWindow addressSpace="" dataSize="1" autoEvaluate="0" viewMode="0" addressOrder="0" columnsText="" refreshPeriod="0" name="network-display" radix="16" sizeText="100" addressText="0x2003fc80"/>
   <MemoryWindow addressSpace="" dataSize="1" autoEvaluate="0" viewMode="0" addressOrder="0" columnsText="" refreshPeriod="0" name="router" radix="16" sizeText="144" addressText="r1"/>
  </Memory1>
  <Memory2>
@@ -67,7 +67,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="26" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.cpp" selected="1" top="6" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="9" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.cpp" selected="1" top="6" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="161" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components/thread/utils/thread_utils.c" selected="0" top="142" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components/libraries/util/app_error_weak.c" selected="0" top="64" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="48" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components/libraries/util/app_error_handler_gcc.c" selected="0" top="23" codecName="Default"/>
@@ -75,6 +75,11 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="239" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components/iot/coap/coap_resource.c" selected="0" top="218" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="472" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/components/iot/coap/coap.c" selected="0" top="443" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="20" useTextEdit="1" useBinaryEdit="0" left="0" path="../router/src/main.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="3129" useTextEdit="1" useBinaryEdit="0" left="0" path="src/ArduinoJson-v5.13.4.hpp" selected="0" top="3107" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="687" useTextEdit="1" useBinaryEdit="0" left="0" path="/usr/local/Cellar/arm-none-eabi-gcc/9-2019-q4-major/gcc/arm-none-eabi/include/c++/9.2.1/bits/std_function.h" selected="0" top="665" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="645" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0/components/iot/coap/coap.c" selected="0" top="623" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="51" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0/components/iot/coap/coap_transport_ot.c" selected="0" top="29" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="12" useTextEdit="1" useBinaryEdit="0" left="0" path="src/settings.cpp" selected="0" top="0" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="network-display" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="../../micro-ecc/asm_arm.inc&#xa;/Users/jihartik/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_2.0.0/external/micro-ecc/micro-ecc/asm_arm.inc&#xa;/home/jihartik/openthread_fork/examples/platforms/nrf52840/alarm.c&#xa;/Users/jihartik/nonbackupped/openthread_fork/examples/platforms/nrf52840/alarm.c&#xa;/mnt/hgfs/jihartik/nonbackupped/openthread_fork/examples/platforms/nrf528xx/src/alarm.c&#xa;/Users/jihartik/nonbackupped/openthread_fork/examples/platforms/nrf528xx/src/alarm.c" fileDialogInitialDirectory="/Users/jihartik/nonbackupped/openthread_fork/examples/platforms/nrf528xx/src" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>
