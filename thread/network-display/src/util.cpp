@@ -1,5 +1,4 @@
-#include "util.hpp"
-#include "ArduinoJson-v5.13.4.hpp"
+#include "ArduinoJson-v6.13.0.hpp"
 #include "vcc.hpp"
 #include "thread.hpp"
 
@@ -21,22 +20,20 @@ namespace util {
   }
 
   std::string get_status_json() {
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject            &root = jsonBuffer.createObject();
-    root["vcc"]      = vcc::measure();
-    root["instance"] = DEVICE_NAME;
+    StaticJsonDocument<512> doc;
+    doc["vcc"]      = vcc::measure();
+    doc["instance"] = DEVICE_NAME;
 
     auto       parent_info = thread::get_parent_info();
-    JsonObject &parent     = root.createNestedObject("parent");
+    JsonObject parent      = doc.createNestedObject("parent");
+
     parent["rloc16"]      = "0x" + n2hexstr(parent_info.rloc16);
     parent["linkQualityIn"]   = parent_info.link_quality_in;
     parent["linkQualityOut"]  = parent_info.link_quality_out;
     parent["avgRssi"]    = parent_info.avg_rssi;
     parent["latestRssi"] = parent_info.latest_rssi;
 
-    std::string output;
-    root.printTo(output);
-    return output;
+    return doc.as<std::string>();
   }
 
 }

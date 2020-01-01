@@ -3,7 +3,7 @@
 
 #define JSON_PARSE_BUFFER_SIZE      2000
 
-#include "ArduinoJson-v5.13.4.hpp"
+#include "ArduinoJson-v6.13.0.hpp"
 #include "thread.hpp"
 
 using namespace ArduinoJson;
@@ -11,25 +11,25 @@ using namespace ArduinoJson;
 namespace settings {
   void update(const coap_service::post_data &coap_data) {
     NRF_LOG_DEBUG("Updating settings..")
-    StaticJsonBuffer<JSON_PARSE_BUFFER_SIZE> doc;
-    auto                                     &settings = doc.parseObject(coap_data.data);
+    StaticJsonDocument<JSON_PARSE_BUFFER_SIZE> doc;
+    DeserializationError                       error = deserializeJson(doc, coap_data.data);
 
-    if (!settings.success()) {
+    if (error) {
       NRF_LOG_ERROR("Parsing settings JSON failed!");
       return;
     }
 
-    if (settings.containsKey("txPower")) {
-      if (settings["txPower"].is<int8_t>()) {
-        thread::set_tx_power(settings["txPower"]);
+    if (doc.containsKey("txPower")) {
+      if (doc["txPower"].is<int8_t>()) {
+        thread::set_tx_power(doc["txPower"]);
       } else {
         NRF_LOG_ERROR("Tx power must be an integer!");
       }
     }
 
-    if (settings.containsKey("pollPeriod")) {
-      if (settings["pollPeriod"].is<uint32_t>()) {
-        thread::set_poll_period(milliseconds(settings["pollPeriod"]));
+    if (doc.containsKey("pollPeriod")) {
+      if (doc["pollPeriod"].is<uint32_t>()) {
+        thread::set_poll_period(milliseconds(doc["pollPeriod"]));
       } else {
         NRF_LOG_ERROR("Poll period must be an integer!");
       }
@@ -37,13 +37,10 @@ namespace settings {
   }
 
   std::string get_as_json() {
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject            &root = jsonBuffer.createObject();
-    root["txPower"] = thread::get_tx_power();
-    root["pollPeriod"] = thread::get_poll_period().count();
+    StaticJsonDocument<512> doc;
+    doc["txPower"]    = thread::get_tx_power();
+    doc["pollPeriod"] = thread::get_poll_period().count();
 
-    std::string output;
-    root.printTo(output);
-    return output;
+    return doc.as<std::string>();
   }
 }

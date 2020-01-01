@@ -4,7 +4,7 @@
 #define ARDUINOJSON_EMBEDDED_MODE   1
 #define JSON_PARSE_BUFFER_SIZE      2000
 
-#include "ArduinoJson-v5.13.4.hpp"
+#include "ArduinoJson-v6.13.0.hpp"
 
 
 using namespace ArduinoJson;
@@ -12,20 +12,20 @@ using namespace ArduinoJson;
 
 namespace commands {
   static std::optional<display_command> parse(const JsonObject &obj) {
-    auto cmd_type = obj.get<char *>("c")[0];
+    auto cmd_type = obj["c"].as<char *>()[0];
     switch (cmd_type) {
       case 's':
         return {str_cmd{
-            obj.get<uint8_t>("i"),
-            point(obj.get<uint16_t>("x"), obj.get<uint16_t>("y")),
-            font_size(obj.get<uint8_t>("font")),
-            obj.get<char *>("msg")
+          obj["i"].as<uint8_t>(),
+          point(obj["x"].as<uint16_t>(), obj["y"].as<uint16_t>()),
+          font_size(obj["font"].as<uint8_t>()),
+          obj["msg"].as<char *>()
         }};
       case 'l':
         return {line_cmd{
-            obj.get<uint8_t>("i"),
-            point(obj.get<uint16_t>("x1"), obj.get<uint16_t>("y1")),
-            point(obj.get<uint16_t>("x2"), obj.get<uint16_t>("y2")),
+          obj["i"].as<uint8_t>(),
+          point(obj["x1"].as<uint16_t>(), obj["y1"].as<uint16_t>()),
+          point(obj["x2"].as<uint16_t>(), obj["y2"].as<uint16_t>()),
         }};
       case 'c':
         return {clear_cmd{}};
@@ -36,17 +36,23 @@ namespace commands {
   }
 
   const std::unique_ptr<display_command_seq> parse(const coap_service::post_data &data) {
-    StaticJsonBuffer<JSON_PARSE_BUFFER_SIZE> doc;
-    JsonArray                                &arr = doc.parseArray(data.data);
+    StaticJsonDocument<JSON_PARSE_BUFFER_SIZE> doc;
+    DeserializationError                       error = deserializeJson(doc, data.data);
 
-    if (!arr.success()) {
-      NRF_LOG_INFO("Parsing JSON input failed!");
+    if (error) {
+      NRF_LOG_ERROR("Parsing JSON input failed!");
       return std::unique_ptr<display_command_seq>();  // Return empty pointer
     }
 
-    auto ret = std::make_unique<display_command_seq>();
+    if (!doc.is<JsonArray>()) {
+      NRF_LOG_ERROR("Expecting JSON array of commands!");
+      return std::unique_ptr<display_command_seq>();  // Return empty pointer
+    }
 
-    for (JsonObject &elem : arr) {
+    JsonArray arr = doc.as<JsonArray>();
+    auto      ret = std::make_unique<display_command_seq>();
+
+    for (JsonObject elem : arr) {
       if (auto cmd = parse(elem)) {
         ret->push_back(cmd.value());
       }
