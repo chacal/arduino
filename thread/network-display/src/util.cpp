@@ -2,7 +2,7 @@
 #include "vcc.hpp"
 #include "thread.hpp"
 
-#define DEVICE_NAME         "D100"
+#define DEVICE_NAME         "D101"
 
 using namespace ArduinoJson;
 
@@ -27,11 +27,11 @@ namespace util {
     auto       parent_info = thread::get_parent_info();
     JsonObject parent      = doc.createNestedObject("parent");
 
-    parent["rloc16"]      = "0x" + n2hexstr(parent_info.rloc16);
-    parent["linkQualityIn"]   = parent_info.link_quality_in;
-    parent["linkQualityOut"]  = parent_info.link_quality_out;
-    parent["avgRssi"]    = parent_info.avg_rssi;
-    parent["latestRssi"] = parent_info.latest_rssi;
+    parent["rloc16"]         = "0x" + n2hexstr(parent_info.rloc16);
+    parent["linkQualityIn"]  = parent_info.link_quality_in;
+    parent["linkQualityOut"] = parent_info.link_quality_out;
+    parent["avgRssi"]        = parent_info.avg_rssi;
+    parent["latestRssi"]     = parent_info.latest_rssi;
 
     return doc.as<std::string>();
   }
