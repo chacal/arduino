@@ -8,8 +8,9 @@
 
 static WiFiUDP Udp;
 
-void connectWifi() {
+void connectWifi(const String &hostname) {
   Serial.printf("Connecting to %s ", WIFI_SSID);
+  WiFi.hostname(hostname);
   WiFi.begin(WIFI_SSID, WIFI_PSK);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);

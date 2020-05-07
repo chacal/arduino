@@ -2,7 +2,7 @@
 
 #include <Udp.h>
 
-void connectWifi();
+void connectWifi(const String &hostname);
 
 void sendPacket(const String &msg, const String &dst_host, uint16_t port);
 

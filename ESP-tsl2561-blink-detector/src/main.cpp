@@ -59,10 +59,11 @@ void setup() {
   Serial.println("\nStarting ESP blink detector");
   load_config_from_file();
 
-  connectWifi();
-
   auto hostname = String(INSTANCE);
   hostname.toLowerCase();
+
+  connectWifi(hostname);
+
   MDNS.begin(hostname);
   ArduinoOTA.begin();
 
