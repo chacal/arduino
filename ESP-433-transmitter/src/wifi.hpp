@@ -1,3 +1,3 @@
 #pragma once
 
-void connectWifi();
+void connectWifi(const String &hostname);

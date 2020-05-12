@@ -19,10 +19,11 @@ void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting ESP 433 transmitter");
 
-  connectWifi();
-
   auto hostname = String(HOSTNAME);
   hostname.toLowerCase();
+
+  connectWifi(hostname);
+
   MDNS.begin(hostname);
   ArduinoOTA.begin();
 

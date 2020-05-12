@@ -5,9 +5,10 @@
 #include "wifi.hpp"
 
 
-void connectWifi() {
+void connectWifi(const String &hostname) {
   Serial.printf("Connecting to %s ", WIFI_SSID);
   WiFi.mode(WIFI_STA);
+  WiFi.hostname(hostname);
   WiFi.begin(WIFI_SSID, WIFI_PSK);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
