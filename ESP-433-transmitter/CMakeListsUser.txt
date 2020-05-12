@@ -1,0 +1,5 @@
+add_custom_target(
+    PLATFORMIO_UPLOAD_OTA ALL
+    COMMAND /usr/local/bin/pio -f -c clion run --target upload --upload-port 10.60.0.3
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
