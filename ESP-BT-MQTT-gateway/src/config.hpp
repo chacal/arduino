@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 
 struct Config {
-    String   mqttServer;
+    String   mqttUrl;
     uint16_t mqttPort;
     String   mqttUsername;
     String   mqttPassword;

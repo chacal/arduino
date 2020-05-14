@@ -59,3 +59,11 @@ void resetAndRebootIfPinLow(uint8_t pin, WiFiManager &wifiManager) {
     resetConfigAndReboot(wifiManager);
   }
 }
+
+String protocolFromMqttUrl(const String &url) {
+  return url.substring(0, url.indexOf(':'));
+}
+
+String addressFromMqttUrl(const String &url) {
+  return url.substring(url.lastIndexOf('/') + 1);
+}

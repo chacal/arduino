@@ -3,8 +3,8 @@
 
 #include "config.hpp"
 
-#define DEFAULT_MQTT_SERVER     "mqtt-home.chacal.fi"
-#define DEFAULT_MQTT_PORT       1883
+#define DEFAULT_MQTT_URL        "mqtts://mqtt-home.chacal.fi"
+#define DEFAULT_MQTT_PORT       8883
 #define DEFAULT_MQTT_USERNAME   "esp-sender"
 #define DEFAULT_MQTT_PASSWORD   ""
 #define DEFAULT_MQTT_TOPIC      "/test/bt-sensor-gw/1"
@@ -13,7 +13,7 @@
 #define CONFIG_FILE_NAME       "config.json"
 
 Config config = {
-  DEFAULT_MQTT_SERVER,
+  DEFAULT_MQTT_URL,
   DEFAULT_MQTT_PORT,
   DEFAULT_MQTT_USERNAME,
   DEFAULT_MQTT_PASSWORD,
@@ -51,8 +51,8 @@ void saveConfigToFile() {
 }
 
 void updateConfigFromJson(const JsonVariant &doc) {
-  if (doc.containsKey("mqttServer") && doc["mqttServer"].is<char *>()) {
-    config.mqttServer = doc["mqttServer"].as<String>();
+  if (doc.containsKey("mqttUrl") && doc["mqttUrl"].is<char *>()) {
+    config.mqttUrl = doc["mqttUrl"].as<String>();
   }
 
   config.mqttPort = doc["mqttPort"] | config.mqttPort;
@@ -82,7 +82,7 @@ void removeSavedConfig() {
 
 DynamicJsonDocument getConfigAsJson() {
   DynamicJsonDocument doc(512);
-  doc["mqttServer"]   = config.mqttServer;
+  doc["mqttUrl"]   = config.mqttUrl;
   doc["mqttPort"]     = config.mqttPort;
   doc["mqttUsername"] = config.mqttUsername;
   doc["mqttPassword"] = config.mqttPassword;
@@ -94,7 +94,7 @@ DynamicJsonDocument getConfigAsJson() {
 void printConfig() {
   Serial << endl
          << "Using config:\n-------------" << endl;
-  Serial << "MQTT server: \t" << config.mqttServer << endl;
+  Serial << "MQTT url: \t" << config.mqttUrl << endl;
   Serial << "MQTT port: \t" << config.mqttPort << endl;
   Serial << "MQTT username: \t" << config.mqttUsername << endl;
   Serial << "MQTT password: \t" << config.mqttPassword.substring(0, 1) << "*********" << endl;

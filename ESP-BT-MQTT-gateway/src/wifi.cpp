@@ -12,14 +12,14 @@ void connectWiFi(WiFiManager &wifiManager) {
   configurationSaved = false;
   WiFi.hostname(config.hostname);
 
-  WiFiManagerParameter mqttServerParam("mqtt_server", "MQTT server", config.mqttServer.c_str(), 100);
+  WiFiManagerParameter mqttUrlParam("mqtt_url", "MQTT url", config.mqttUrl.c_str(), 100);
   WiFiManagerParameter mqttPortParam("mqtt_port", "MQTT port", String(config.mqttPort).c_str(), 6);
   WiFiManagerParameter mqttUsernameParam("mqtt_username", "MQTT username", config.mqttUsername.c_str(), 100);
   WiFiManagerParameter mqttPasswordParam("mqtt_password", "MQTT password", config.mqttPassword.c_str(), 100);
   WiFiManagerParameter mqttTopicParam("mqtt_topic", "MQTT topic", config.mqttTopic.c_str(), 100);
   WiFiManagerParameter hostnameParam("hostname", "MDNS hostname", config.hostname.c_str(), 100);
 
-  wifiManager.addParameter(&mqttServerParam);
+  wifiManager.addParameter(&mqttUrlParam);
   wifiManager.addParameter(&mqttPortParam);
   wifiManager.addParameter(&mqttUsernameParam);
   wifiManager.addParameter(&mqttPasswordParam);
@@ -48,7 +48,7 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   if (configurationSaved) {
     Serial << "Saving configuration to file." << endl;
-    config.mqttServer   = String(mqttServerParam.getValue());
+    config.mqttUrl      = String(mqttUrlParam.getValue());
     config.mqttPort     = atol(mqttPortParam.getValue());
     config.mqttUsername = String(mqttUsernameParam.getValue());
     config.mqttPassword = String(mqttPasswordParam.getValue());
