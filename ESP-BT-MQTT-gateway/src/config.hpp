@@ -6,6 +6,8 @@
 struct Config {
     String   mqttServer;
     uint16_t mqttPort;
+    String   mqttUsername;
+    String   mqttPassword;
     String   mqttTopic;
     String   hostname;
 };

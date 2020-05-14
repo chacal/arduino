@@ -14,23 +14,27 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   WiFiManagerParameter mqttServerParam("mqtt_server", "MQTT server", config.mqttServer.c_str(), 100);
   WiFiManagerParameter mqttPortParam("mqtt_port", "MQTT port", String(config.mqttPort).c_str(), 6);
-  WiFiManagerParameter mqttTopicParam("mqtt_topc", "MQTT topic", config.mqttTopic.c_str(), 100);
+  WiFiManagerParameter mqttUsernameParam("mqtt_username", "MQTT username", config.mqttUsername.c_str(), 100);
+  WiFiManagerParameter mqttPasswordParam("mqtt_password", "MQTT password", config.mqttPassword.c_str(), 100);
+  WiFiManagerParameter mqttTopicParam("mqtt_topic", "MQTT topic", config.mqttTopic.c_str(), 100);
   WiFiManagerParameter hostnameParam("hostname", "MDNS hostname", config.hostname.c_str(), 100);
 
   wifiManager.addParameter(&mqttServerParam);
   wifiManager.addParameter(&mqttPortParam);
+  wifiManager.addParameter(&mqttUsernameParam);
+  wifiManager.addParameter(&mqttPasswordParam);
   wifiManager.addParameter(&mqttTopicParam);
   wifiManager.addParameter(&hostnameParam);
 
   wifiManager.setAPCallback([](WiFiManager *wifiManager) {
-      blinker.attach_ms(500, []() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); });
+    blinker.attach_ms(500, []() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); });
   });
 
   wifiManager.setSaveConfigCallback([]() {
-      blinker.detach();
-      digitalWrite(LED_BUILTIN, HIGH);
-      Serial << "Configuration saved!" << endl;
-      configurationSaved = true;
+    blinker.detach();
+    digitalWrite(LED_BUILTIN, HIGH);
+    Serial << "Configuration saved!" << endl;
+    configurationSaved = true;
   });
 
   wifiManager.setConfigPortalTimeout(180);
@@ -44,10 +48,12 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   if (configurationSaved) {
     Serial << "Saving configuration to file." << endl;
-    config.mqttServer = String(mqttServerParam.getValue());
-    config.mqttTopic  = String(mqttTopicParam.getValue());
-    config.mqttPort   = atol(mqttPortParam.getValue());
-    config.hostname   = String(hostnameParam.getValue());
+    config.mqttServer   = String(mqttServerParam.getValue());
+    config.mqttPort     = atol(mqttPortParam.getValue());
+    config.mqttUsername = String(mqttUsernameParam.getValue());
+    config.mqttPassword = String(mqttPasswordParam.getValue());
+    config.mqttTopic    = String(mqttTopicParam.getValue());
+    config.hostname     = String(hostnameParam.getValue());
     saveConfigToFile();
   }
 
