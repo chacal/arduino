@@ -6,6 +6,7 @@
 struct Config {
     String   mqttUrl;
     uint16_t mqttPort;
+    boolean  verifyTlsCertificate;
     String   mqttUsername;
     String   mqttPassword;
     String   mqttTopic;

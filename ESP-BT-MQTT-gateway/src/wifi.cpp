@@ -14,6 +14,7 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   WiFiManagerParameter mqttUrlParam("mqtt_url", "MQTT url", config.mqttUrl.c_str(), 100);
   WiFiManagerParameter mqttPortParam("mqtt_port", "MQTT port", String(config.mqttPort).c_str(), 6);
+  WiFiManagerParameter verifyTlsCertificateParam("verifyTlsCertificate", "Verify TLS cert", String(config.verifyTlsCertificate).c_str(), 1);
   WiFiManagerParameter mqttUsernameParam("mqtt_username", "MQTT username", config.mqttUsername.c_str(), 100);
   WiFiManagerParameter mqttPasswordParam("mqtt_password", "MQTT password", config.mqttPassword.c_str(), 100);
   WiFiManagerParameter mqttTopicParam("mqtt_topic", "MQTT topic", config.mqttTopic.c_str(), 100);
@@ -21,6 +22,7 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   wifiManager.addParameter(&mqttUrlParam);
   wifiManager.addParameter(&mqttPortParam);
+  wifiManager.addParameter(&verifyTlsCertificateParam);
   wifiManager.addParameter(&mqttUsernameParam);
   wifiManager.addParameter(&mqttPasswordParam);
   wifiManager.addParameter(&mqttTopicParam);
@@ -48,12 +50,13 @@ void connectWiFi(WiFiManager &wifiManager) {
 
   if (configurationSaved) {
     Serial << "Saving configuration to file." << endl;
-    config.mqttUrl      = String(mqttUrlParam.getValue());
-    config.mqttPort     = atol(mqttPortParam.getValue());
-    config.mqttUsername = String(mqttUsernameParam.getValue());
-    config.mqttPassword = String(mqttPasswordParam.getValue());
-    config.mqttTopic    = String(mqttTopicParam.getValue());
-    config.hostname     = String(hostnameParam.getValue());
+    config.mqttUrl              = String(mqttUrlParam.getValue());
+    config.mqttPort             = atol(mqttPortParam.getValue());
+    config.verifyTlsCertificate = atol(verifyTlsCertificateParam.getValue());
+    config.mqttUsername         = String(mqttUsernameParam.getValue());
+    config.mqttPassword         = String(mqttPasswordParam.getValue());
+    config.mqttTopic            = String(mqttTopicParam.getValue());
+    config.hostname             = String(hostnameParam.getValue());
     saveConfigToFile();
   }
 

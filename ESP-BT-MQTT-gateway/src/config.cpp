@@ -5,6 +5,7 @@
 
 #define DEFAULT_MQTT_URL        "mqtts://mqtt-home.chacal.fi"
 #define DEFAULT_MQTT_PORT       8883
+#define DEFAULT_VERIFY_TLS_CERT true
 #define DEFAULT_MQTT_USERNAME   "esp-sender"
 #define DEFAULT_MQTT_PASSWORD   ""
 #define DEFAULT_MQTT_TOPIC      "/test/bt-sensor-gw/1"
@@ -15,6 +16,7 @@
 Config config = {
   DEFAULT_MQTT_URL,
   DEFAULT_MQTT_PORT,
+  DEFAULT_VERIFY_TLS_CERT,
   DEFAULT_MQTT_USERNAME,
   DEFAULT_MQTT_PASSWORD,
   DEFAULT_MQTT_TOPIC,
@@ -67,7 +69,8 @@ void updateConfigFromJson(const JsonVariant &doc) {
   setValueIfKeyExists(&config.mqttTopic, doc, "mqttTopic");
   setValueIfKeyExists(&config.hostname, doc, "hostname");
 
-  config.mqttPort = doc["mqttPort"] | config.mqttPort;
+  config.mqttPort             = doc["mqttPort"] | config.mqttPort;
+  config.verifyTlsCertificate = doc["verifyTlsCertificate"] | config.verifyTlsCertificate;
 }
 
 void removeSavedConfig() {
@@ -78,22 +81,24 @@ void removeSavedConfig() {
 
 DynamicJsonDocument getConfigAsJson() {
   DynamicJsonDocument doc(512);
-  doc["mqttUrl"]      = config.mqttUrl;
-  doc["mqttPort"]     = config.mqttPort;
-  doc["mqttUsername"] = config.mqttUsername;
-  doc["mqttPassword"] = config.mqttPassword;
-  doc["mqttTopic"]    = config.mqttTopic;
-  doc["hostname"]     = config.hostname;
+  doc["mqttUrl"]              = config.mqttUrl;
+  doc["mqttPort"]             = config.mqttPort;
+  doc["verifyTlsCertificate"] = config.verifyTlsCertificate;
+  doc["mqttUsername"]         = config.mqttUsername;
+  doc["mqttPassword"]         = config.mqttPassword;
+  doc["mqttTopic"]            = config.mqttTopic;
+  doc["hostname"]             = config.hostname;
   return doc;
 }
 
 void printConfig() {
   Serial << endl
          << "Using config:\n-------------" << endl;
-  Serial << "MQTT url: \t" << config.mqttUrl << endl;
-  Serial << "MQTT port: \t" << config.mqttPort << endl;
-  Serial << "MQTT username: \t" << config.mqttUsername << endl;
-  Serial << "MQTT password: \t" << config.mqttPassword.substring(0, 2) << "*********" << endl;
-  Serial << "MQTT topic: \t" << config.mqttTopic << endl;
-  Serial << "MDNS hostname: \t" << config.hostname << endl;
+  Serial << "MQTT url: \t\t" << config.mqttUrl << endl;
+  Serial << "MQTT port: \t\t" << config.mqttPort << endl;
+  Serial << "Verify TLS cert: \t" << (config.verifyTlsCertificate ? "true" : "false") << endl;
+  Serial << "MQTT username: \t\t" << config.mqttUsername << endl;
+  Serial << "MQTT password: \t\t" << config.mqttPassword.substring(0, 2) << "*********" << endl;
+  Serial << "MQTT topic: \t\t" << config.mqttTopic << endl;
+  Serial << "MDNS hostname: \t\t" << config.hostname << endl;
 }
