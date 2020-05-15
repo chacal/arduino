@@ -50,26 +50,30 @@ void saveConfigToFile() {
   file.close();
 }
 
+boolean hasStringKey(const JsonVariant &doc, const String &key) {
+  return doc.containsKey(key) && doc[key].is<char *>();
+}
+
 void updateConfigFromJson(const JsonVariant &doc) {
-  if (doc.containsKey("mqttUrl") && doc["mqttUrl"].is<char *>()) {
+  if (hasStringKey(doc, "mqttUrl")) {
     config.mqttUrl = doc["mqttUrl"].as<String>();
   }
 
   config.mqttPort = doc["mqttPort"] | config.mqttPort;
 
-  if (doc.containsKey("mqttUsername") && doc["mqttUsername"].is<char *>()) {
+  if (hasStringKey(doc, "mqttUsername")) {
     config.mqttUsername = doc["mqttUsername"].as<String>();
   }
 
-  if (doc.containsKey("mqttPassword") && doc["mqttPassword"].is<char *>()) {
+  if (hasStringKey(doc, "mqttPassword")) {
     config.mqttPassword = doc["mqttPassword"].as<String>();
   }
 
-  if (doc.containsKey("mqttTopic") && doc["mqttTopic"].is<char *>()) {
+  if (hasStringKey(doc, "mqttTopic")) {
     config.mqttTopic = doc["mqttTopic"].as<String>();
   }
 
-  if (doc.containsKey("hostname") && doc["hostname"].is<char *>()) {
+  if (hasStringKey(doc, "hostname")) {
     config.hostname = doc["hostname"].as<String>();
   }
 }
@@ -82,7 +86,7 @@ void removeSavedConfig() {
 
 DynamicJsonDocument getConfigAsJson() {
   DynamicJsonDocument doc(512);
-  doc["mqttUrl"]   = config.mqttUrl;
+  doc["mqttUrl"]      = config.mqttUrl;
   doc["mqttPort"]     = config.mqttPort;
   doc["mqttUsername"] = config.mqttUsername;
   doc["mqttPassword"] = config.mqttPassword;
