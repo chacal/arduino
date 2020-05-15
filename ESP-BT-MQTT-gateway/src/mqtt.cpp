@@ -11,8 +11,9 @@ void connectMQTT(PubSubClient &mqttClient, Client &client) {
   mqttClient.setServer(address.c_str(), config.mqttPort);
   mqttClient.setClient(client);
 
-  // Loop until we're connected
-  while (!mqttClient.connected()) {
+  uint8_t retriesLeft = 60;  // Try to establish connection for 5 minutes before rebooting
+  // Loop until we're connected or timed out
+  while (!mqttClient.connected() && retriesLeft > 0) {
     String clientId = "ESP-BT-MQTT-" + String(random(0xffff), HEX);
 
     Serial << "Connecting to " << config.mqttUrl << ":" << config.mqttPort << " as " << config.mqttUsername << "@" << clientId << endl;
@@ -26,6 +27,13 @@ void connectMQTT(PubSubClient &mqttClient, Client &client) {
       Serial << "MQTT connection failed, rc=" << mqttClient.state() << ", trying again in 5 seconds" << endl;
       delay(5000);
     }
+
+    retriesLeft--;
+  }
+
+  if (retriesLeft == 0) {
+    Serial << "MQTT connection timed out. Rebooting.." << endl;
+    ESP.restart();
   }
 }
 
