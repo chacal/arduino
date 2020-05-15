@@ -97,7 +97,7 @@ void printConfig() {
   Serial << "MQTT url: \t" << config.mqttUrl << endl;
   Serial << "MQTT port: \t" << config.mqttPort << endl;
   Serial << "MQTT username: \t" << config.mqttUsername << endl;
-  Serial << "MQTT password: \t" << config.mqttPassword.substring(0, 1) << "*********" << endl;
+  Serial << "MQTT password: \t" << config.mqttPassword.substring(0, 2) << "*********" << endl;
   Serial << "MQTT topic: \t" << config.mqttTopic << endl;
   Serial << "MDNS hostname: \t" << config.hostname << endl;
 }
