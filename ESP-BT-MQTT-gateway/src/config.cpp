@@ -54,28 +54,20 @@ boolean hasStringKey(const JsonVariant &doc, const String &key) {
   return doc.containsKey(key) && doc[key].is<char *>();
 }
 
-void updateConfigFromJson(const JsonVariant &doc) {
-  if (hasStringKey(doc, "mqttUrl")) {
-    config.mqttUrl = doc["mqttUrl"].as<String>();
+void setValueIfKeyExists(String *value, const JsonVariant &doc, const String &key) {
+  if (hasStringKey(doc, key)) {
+    *value = doc[key].as<String>();
   }
+}
+
+void updateConfigFromJson(const JsonVariant &doc) {
+  setValueIfKeyExists(&config.mqttUrl, doc, "mqttUrl");
+  setValueIfKeyExists(&config.mqttUsername, doc, "mqttUsername");
+  setValueIfKeyExists(&config.mqttPassword, doc, "mqttPassword");
+  setValueIfKeyExists(&config.mqttTopic, doc, "mqttTopic");
+  setValueIfKeyExists(&config.hostname, doc, "hostname");
 
   config.mqttPort = doc["mqttPort"] | config.mqttPort;
-
-  if (hasStringKey(doc, "mqttUsername")) {
-    config.mqttUsername = doc["mqttUsername"].as<String>();
-  }
-
-  if (hasStringKey(doc, "mqttPassword")) {
-    config.mqttPassword = doc["mqttPassword"].as<String>();
-  }
-
-  if (hasStringKey(doc, "mqttTopic")) {
-    config.mqttTopic = doc["mqttTopic"].as<String>();
-  }
-
-  if (hasStringKey(doc, "hostname")) {
-    config.hostname = doc["hostname"].as<String>();
-  }
 }
 
 void removeSavedConfig() {
