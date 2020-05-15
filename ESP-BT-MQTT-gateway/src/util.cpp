@@ -67,3 +67,20 @@ String protocolFromMqttUrl(const String &url) {
 String addressFromMqttUrl(const String &url) {
   return url.substring(url.lastIndexOf('/') + 1);
 }
+
+void setClock() {
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+
+  Serial << "Waiting for NTP time sync: ";
+
+  time_t now = time(nullptr);
+  while (now < 8 * 3600 * 2) {
+    delay(500);
+    Serial << ".";
+    now = time(nullptr);
+  }
+
+  struct tm timeinfo;
+  gmtime_r(&now, &timeinfo);
+  Serial << endl << "Current time: " << asctime(&timeinfo) << endl;
+}
