@@ -88,7 +88,7 @@ void sendButtonPress(ButtonID btnId, bool isLongPress) {
   measurements.vcc = readRawVoltage();
   measurements.btnId = btnId;
   measurements.isLongPress = isLongPress;
-  radio->sendWithRetry(RFM_RECEIVER_ID, &measurements, sizeof(measurements), 3, 20);
+  radio->sendWithRetry(RFM_RECEIVER_ID, &measurements, sizeof(measurements), 2, 15);
   radio->sleep();
   measurements.previousSampleTimeMicros = micros() - start;
 
