@@ -4,3 +4,5 @@
 .piolibdeps
 CMakeListsPrivate.txt
 cmake-build-debug/
+.pio
+cmake-build-pro8mhzatmega328

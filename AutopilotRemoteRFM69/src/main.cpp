@@ -3,6 +3,7 @@
 #include "main.h"
 #include "buttons.h"
 #include <EEPROM.h>
+#include <LowPower.h>
 
 static RFM69 radio(RFM69_NSS_PIN, RF69_IRQ_PIN, true);
 static Config config;
@@ -35,7 +36,7 @@ void goToSleep() {
     Serial.println("Sleeping");
     Serial.flush();
   }
-  powerDown();
+  LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   wakeUpTime = millis();
 }
 

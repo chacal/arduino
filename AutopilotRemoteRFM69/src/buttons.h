@@ -1,7 +1,6 @@
 #ifndef AUTOPILOTREMOTERFM69_BUTTONS_H
 #define AUTOPILOTREMOTERFM69_BUTTONS_H
 
-#include <Button.h>
 #include <RFM69.h>
 #include "main.h"
 
