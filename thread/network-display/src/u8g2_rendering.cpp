@@ -62,7 +62,7 @@ void u8g2_rendering::draw_bitmap(const point &upper_left, const width &w, const 
 }
 
 void u8g2_rendering::draw_fullscreen_bitmap(const std::vector<uint8_t> &bitmap) {
-  auto expected_size = u8g2.height * u8g2.width / 8;
+  uint32_t expected_size = u8g2.height * u8g2.width / 8;
   if (bitmap.size() != expected_size) {
     NRF_LOG_ERROR("Invalid fullscreen bitmap size! Expected %d bytes, got %d bytes.", expected_size, bitmap.size())
   } else {
