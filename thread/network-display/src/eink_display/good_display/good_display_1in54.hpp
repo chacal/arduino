@@ -2,7 +2,7 @@
 
 #include "il3820_display_base.hpp"
 
-const unsigned char lut_full_update[] =
+const unsigned char lut_1in54[] =
                       {
                         0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22,
                         0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88,
@@ -12,5 +12,5 @@ const unsigned char lut_full_update[] =
 
 class good_display_1in54 : public il3820_display_base {
 public:
-  good_display_1in54() : il3820_display_base(200, 200, lut_full_update) {}
+  good_display_1in54() : il3820_display_base(200, 200, lut_1in54) {}
 };

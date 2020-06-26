@@ -1,26 +1,75 @@
 #include <cstdint>
+#include <cmath>
+#include <nrf_log.h>
 #include "good_display_base.hpp"
 #include "il3820_display_base.hpp"
 #include "eink_display/epd_interface.hpp"
 
 
-using namespace epd_interface;
+u8x8_display_info_t m_display_info;
 
-il3820_display_base::~il3820_display_base() {
+uint8_t in_memory_display_handler(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+  if (msg == U8X8_MSG_DISPLAY_SETUP_MEMORY) {
+    u8x8_d_helper_display_setup_memory(u8x8, &m_display_info);
+  }
+  return 0;
 }
 
-il3820_display_base::il3820_display_base(const uint16_t w, const uint16_t h, const uint8_t *lut, const Rotation r)
-  : good_display_base(w, h, r) {
-  epd_interface::init();
-  this->lut = lut;
+uint8_t u8x8_gpio_and_delay_dummy(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+  u8x8_SetGPIOResult(u8x8, 1);      // default return value
+  return 1;
+}
+
+il3820_display_base::il3820_display_base(const uint16_t w, const uint16_t h, const uint8_t *l, const Rotation r)
+  : good_display_base(w, h), lut{l} {
+
+  m_display_info = [&] {
+    u8x8_display_info_t di{};
+    di.tile_width   = ceil(w / 8.0);
+    di.tile_height  = ceil(h / 8.0);
+    di.pixel_width  = w;
+    di.pixel_height = h;
+    return di;
+  }();
+
+  auto u8g2_rotation = r == NO_ROTATION ? U8G2_R0 : U8G2_R1;
+  u8g2_SetupDisplay(&u8g2, in_memory_display_handler, u8x8_cad_011, u8x8_byte_empty, u8x8_gpio_and_delay_dummy);
+  u8g2_SetupBuffer(&u8g2, u8g2_buf.get(), m_display_info.tile_height, u8g2_ll_hvline_horizontal_right_lsb, u8g2_rotation);
+}
+
+void il3820_display_base::render() {
+  init();
+
+  uint8_t       tmp_buf[width * height / 8];
+  // u8g2 has 0 as white and 1 as black, display vice versa
+  // -> invert all bits before writing to display memory
+  for (uint32_t i = 0; i < width * height / 8; ++i) {
+    tmp_buf[i] = ~u8g2_buf[i];
+  }
+  set_frame_memory(tmp_buf);
+  display_frame();
+  sleep();
+}
+
+void il3820_display_base::draw_fullscreen_bitmap(const std::vector<uint8_t> &bitmap) {
+  uint32_t expected_size = u8g2.height * u8g2.width / 8;
+  if (bitmap.size() != expected_size) {
+    NRF_LOG_ERROR("Invalid fullscreen bitmap size! Expected %d bytes, got %d bytes.", expected_size, bitmap.size())
+  } else {
+    u8g2_DrawBitmap(&u8g2, 0, 0, u8g2.width / 8, u8g2.height, bitmap.data());
+  }
+}
+
+void il3820_display_base::clear() {
+  u8g2_ClearBuffer(&u8g2);
 }
 
 int il3820_display_base::init() {
   /* EPD hardware init start */
   reset();
   send_command(DRIVER_OUTPUT_CONTROL);
-  send_data((this->height - 1) & 0xFF);
-  send_data(((this->height - 1) >> 8) & 0xFF);
+  send_data((height - 1) & 0xFF);
+  send_data(((height - 1) >> 8) & 0xFF);
   send_data(0x00);                     // GD = 0; SM = 0; TB = 0;
   send_command(BOOSTER_SOFT_START_CONTROL);
   send_data(0xD7);
@@ -34,16 +83,12 @@ int il3820_display_base::init() {
   send_data(0x08);                     // 2us per line
   send_command(DATA_ENTRY_MODE_SETTING);
   send_data(0x03);                     // X increment; Y increment
-  set_lut(this->lut);
+  send_lut();
   /* EPD hardware init end */
   return 0;
 }
 
-/**
- *  @brief: set the look-up table register
- */
-void il3820_display_base::set_lut(const unsigned char *lut) {
-  this->lut = lut;
+void il3820_display_base::send_lut() {
   send_command(WRITE_LUT_REGISTER);
   /* the length of look-up table is 30 bytes */
   for (int i = 0; i < 30; i++) {
@@ -51,68 +96,6 @@ void il3820_display_base::set_lut(const unsigned char *lut) {
   }
 }
 
-/**
- *  @brief: put an image buffer to the frame memory.
- *          this won't update the display.
- */
-void il3820_display_base::set_frame_memory(
-  const unsigned char *image_buffer,
-  uint32_t x,
-  uint32_t y,
-  uint32_t image_width,
-  uint32_t image_height
-) {
-  uint32_t x_end;
-  uint32_t y_end;
-
-  if (
-    image_buffer == nullptr ||
-    x < 0 || image_width < 0 ||
-    y < 0 || image_height < 0
-    ) {
-    return;
-  }
-  /* x point must be the multiple of 8 or the last 3 bits will be ignored */
-  x &= 0xF8;
-  image_width &= 0xF8;
-  if (x + image_width >= this->width) {
-    x_end = this->width - 1;
-  } else {
-    x_end = x + image_width - 1;
-  }
-  if (y + image_height >= this->height) {
-    y_end = this->height - 1;
-  } else {
-    y_end = y + image_height - 1;
-  }
-  set_memory_area(x, y, x_end, y_end);
-  set_memory_pointer(x, y);
-  send_command(WRITE_RAM);
-  /* send the image data */
-  for (uint32_t j = 0; j < y_end - y + 1; j++) {
-    for (uint32_t i = 0; i < (x_end - x + 1) / 8; i++) {
-      send_data(image_buffer[i + j * (image_width / 8)]);
-    }
-  }
-}
-
-/**
- *  @brief: put an image buffer to the frame memory.
- *          this won't update the display.
- *
- *          Question: When do you use this function instead of 
- *          void SetFrameMemory(
- *              const unsigned char* image_buffer,
- *              int x,
- *              int y,
- *              int image_width,
- *              int image_height
- *          );
- *          Answer: SetFrameMemory with parameters only reads image data
- *          from the RAM but not from the flash in AVR chips (for AVR chips,
- *          you have to use the function pgm_read_byte to read buffers 
- *          from the flash).
- */
 void il3820_display_base::set_frame_memory(const unsigned char *image_buffer) {
   set_memory_area(0, 0, this->width - 1, this->height - 1);
   set_memory_pointer(0, 0);
@@ -123,27 +106,6 @@ void il3820_display_base::set_frame_memory(const unsigned char *image_buffer) {
   }
 }
 
-/**
- *  @brief: clear the frame memory with the specified color.
- *          this won't update the display.
- */
-void il3820_display_base::clear_frame_memory(unsigned char color) {
-  set_memory_area(0, 0, this->width - 1, this->height - 1);
-  set_memory_pointer(0, 0);
-  send_command(WRITE_RAM);
-  /* send the color data */
-  for (uint32_t i = 0; i < this->width / 8 * this->height; i++) {
-    send_data(color);
-  }
-}
-
-/**
- *  @brief: update the display
- *          there are 2 memory areas embedded in the e-paper display
- *          but once this function is called,
- *          the the next action of SetFrameMemory or ClearFrame will 
- *          set the other memory area.
- */
 void il3820_display_base::display_frame() {
   send_command(DISPLAY_UPDATE_CONTROL_2);
   send_data(0xC4);
@@ -152,9 +114,6 @@ void il3820_display_base::display_frame() {
   wait_until_idle();
 }
 
-/**
- *  @brief: private function to specify the memory area for data R/W
- */
 void il3820_display_base::set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_end, uint32_t y_end) {
   send_command(SET_RAM_X_ADDRESS_START_END_POSITION);
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
@@ -167,9 +126,6 @@ void il3820_display_base::set_memory_area(uint32_t x_start, uint32_t y_start, ui
   send_data((y_end >> 8) & 0xFF);
 }
 
-/**
- *  @brief: private function to specify the start point for data R/W
- */
 void il3820_display_base::set_memory_pointer(uint32_t x, uint32_t y) {
   send_command(SET_RAM_X_ADDRESS_COUNTER);
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
@@ -180,13 +136,11 @@ void il3820_display_base::set_memory_pointer(uint32_t x, uint32_t y) {
   wait_until_idle();
 }
 
-/**
- *  @brief: After this command is transmitted, the chip would enter the 
- *          deep-sleep mode to save power. 
- *          The deep sleep mode would return to standby by hardware reset. 
- *          You can use Epd::Init() to awaken
- */
 void il3820_display_base::sleep() {
   send_command(DEEP_SLEEP_MODE);
   send_data(0x01);
+}
+
+void il3820_display_base::wait_until_idle() {
+  epd_interface::wait_for_pin_state(BUSY_PIN, LOW);
 }

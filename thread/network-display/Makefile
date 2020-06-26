@@ -110,19 +110,13 @@ SRC_FILES += \
   $(SRC_DIR)/periodic_timer.cpp \
   $(SRC_DIR)/coap_service.cpp \
   $(SRC_DIR)/coap_helpers.cpp \
-  $(SRC_DIR)/cmd_protocol.cpp \
-  $(SRC_DIR)/nokia_display.cpp \
-  $(SRC_DIR)/nrf_u8g2_adapter.cpp \
   $(SRC_DIR)/power_manager.cpp \
-  $(SRC_DIR)/display_command_handler.cpp \
-  $(SRC_DIR)/rendering.cpp \
   $(SRC_DIR)/vcc.cpp \
   $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/settings.cpp \
-  $(SRC_DIR)/u8g2_rendering.cpp \
   $(SRC_DIR)/eink_display/good_display/good_display_base.cpp \
   $(SRC_DIR)/eink_display/good_display/il3820_display_base.cpp \
-  $(SRC_DIR)/eink_display/eink_display.cpp \
+  $(SRC_DIR)/eink_display/good_display/il0373_display_base.cpp \
   $(SRC_DIR)/eink_display/epd_interface.cpp \
   $(UZLIB_SOURCES) \
   $(SRC_DIR)/gzip.cpp \

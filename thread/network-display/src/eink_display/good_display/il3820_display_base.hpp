@@ -1,6 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include "good_display_base.hpp"
+
+extern "C" {
+#include <u8g2.h>
+}
 
 // IL3820 commands
 #define DRIVER_OUTPUT_CONTROL                       0x01
@@ -25,35 +31,44 @@
 #define SET_RAM_Y_ADDRESS_COUNTER                   0x4F
 #define TERMINATE_FRAME_READ_WRITE                  0xFF
 
+enum Rotation {
+  NO_ROTATION, NINETY_DEG_CW
+};
+
+
 class il3820_display_base : public good_display_base {
 public:
   il3820_display_base(uint16_t width, uint16_t h, const uint8_t *lut, Rotation r = NINETY_DEG_CW);
 
-  ~il3820_display_base();
+  ~il3820_display_base() = default;
 
-  int init() override;
+  void render() override;
 
-  void set_frame_memory(const unsigned char *image_buffer,
-                        uint32_t x,
-                        uint32_t y,
-                        uint32_t image_width,
-                        uint32_t image_height) override;
+  void clear() override;
 
-  void set_frame_memory(const unsigned char *image_buffer) override;
-
-  void clear_frame_memory(unsigned char color) override;
-
-  void display_frame() override;
-
-  void sleep() override;
+  void draw_fullscreen_bitmap(const std::vector<uint8_t> &) override;
 
 protected:
 
-  void set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_end, uint32_t y_end);
-
-  void set_memory_pointer(uint32_t x, uint32_t y);
-
   const unsigned char *lut;
 
-  void set_lut(const unsigned char *lut);
+  u8g2_t u8g2{nullptr};
+
+  std::unique_ptr<uint8_t[]> u8g2_buf = std::make_unique<uint8_t[]>(width * height / 8);
+
+  int init();
+
+  void set_frame_memory(const unsigned char *image_buffer) override;
+
+  static void display_frame();
+
+  static void sleep();
+
+  static void wait_until_idle();
+
+  static void set_memory_area(uint32_t x_start, uint32_t y_start, uint32_t x_end, uint32_t y_end);
+
+  static void set_memory_pointer(uint32_t x, uint32_t y);
+
+  void send_lut();
 };
