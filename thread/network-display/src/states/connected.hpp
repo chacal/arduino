@@ -6,8 +6,6 @@
 #include "periodic_timer.hpp"
 #include "common.hpp"
 #include "coap_service.hpp"
-#include "cmd_protocol.hpp"
-#include "display_command_handler.hpp"
 #include "gzip.hpp"
 
 #define COAP_TICK_PERIOD      std::chrono::seconds(1)
@@ -24,10 +22,8 @@ namespace states {
       coap_tick_timer.start(&context);
       context.disp->on();
 
-      auto on_display_post       = [&](auto coap_data) { handle_display_post(coap_data, context); };
       auto on_display_image_post = [&](auto coap_data) { handle_display_image_post(coap_data, context); };
       coap_service::initialize({
-                                   on_display_post,
                                    on_display_image_post,
                                    &settings::get_as_json,
                                    &settings::update,
@@ -44,18 +40,6 @@ namespace states {
 
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
-
-    void handle_display_post(const coap_service::post_data &coap_data, Context &context) {
-      NRF_LOG_DEBUG("Got %d bytes of data", coap_data.len)
-      auto cmd_seq = commands::parse(coap_data);
-      if (cmd_seq) {
-        NRF_LOG_DEBUG("Received %d commands", cmd_seq->size())
-        for (auto &cmd : *cmd_seq) {
-          std::visit(display_command_handler{context.display_list}, cmd);
-        }
-        context.display_list.render(*context.disp);
-      }
-    }
 
     void handle_display_image_post(const coap_service::post_data &coap_data, Context &context) {
       NRF_LOG_DEBUG("Got %d bytes of compressed image data", coap_data.len)

@@ -16,7 +16,6 @@ namespace coap_service {
   struct request_handler {
     request_handler &operator=(const request_handler &other) = default;
 
-    post_handler on_display_post;
     post_handler on_display_image_post;
     get_handler on_settings_get;
     post_handler on_settings_post;
