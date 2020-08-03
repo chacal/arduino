@@ -1,36 +1,40 @@
 PROJECT_NAME       := nrf5-bt-sensor-receiver
+PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
 PLATFORM_FAMILY    := NRF52
-PLATFORM           := NRF52832
+PLATFORM           := NRF52832_XXAA
 
-TARGETS            := $(PLATFORM)_xxaa
+TARGETS            := $(PLATFORM)
 OUTPUT_DIRECTORY   := build
-BMP_DEV            := /dev/cu.usbmodemD6DC8FD1
 LINKER_SCRIPT      := gcc_nrf52_no_softdevice.ld
 
-SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_14.2.0
+SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_17.0.0
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
-CMSIS_CONFIG_TOOL  := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
-GDB                 = "$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gdb"
-GDB_TARGET          = $(GDB) -ex "target extended-remote $(BMP_DEV)" -ex "mon swdp_scan" -ex "attach 1"
+include $(TEMPLATE_PATH)/Makefile.common.jihartik
 
 # Source files common to all targets
 SRC_FILES += \
-  $(SDK_ROOT)/components/libraries/experimental_log/src/nrf_log_frontend.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_str_formatter.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_frontend.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_default_backends.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_rtt.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_serial.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
+  $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/components/libraries/util/app_error.c \
   $(SDK_ROOT)/components/libraries/util/app_error_weak.c \
   $(SDK_ROOT)/components/libraries/util/app_util_platform.c \
-  $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
-  $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
-  $(SDK_ROOT)/components/libraries/experimental_memobj/nrf_memobj.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
+  $(SDK_ROOT)/components/libraries/memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
-  $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
-  $(SDK_ROOT)/components/toolchain/system_nrf52.c \
+  $(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
+  $(SDK_ROOT)/components/libraries/atomic/nrf_atomic.c \
+  $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52.S \
+  $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52.c \
   $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/radio.cpp \
   $(SRC_DIR)/util.cpp \
@@ -43,35 +47,28 @@ INC_FOLDERS += \
 
 INC_FOLDERS += \
   $(SRC_DIR) \
-  $(SDK_ROOT)/components/drivers_nrf/comp \
-  $(SDK_ROOT)/components/drivers_nrf/twi_master \
   $(SDK_ROOT)/components/ble/ble_services/ble_ancs_c \
   $(SDK_ROOT)/components/ble/ble_services/ble_ias_c \
   $(SDK_ROOT)/components/ble/ble_advertising \
   $(SDK_ROOT)/components/ble/ble_db_discovery \
   $(SDK_ROOT)/components/libraries/pwm \
+  $(SDK_ROOT)/components/libraries/delay \
   $(SDK_ROOT)/components/libraries/usbd/class/cdc/acm \
   $(SDK_ROOT)/components/libraries/usbd/class/hid/generic \
   $(SDK_ROOT)/components/libraries/usbd/class/msc \
   $(SDK_ROOT)/components/libraries/usbd/class/hid \
   $(SDK_ROOT)/components/ble/ble_services/ble_gls \
   $(SDK_ROOT)/components/libraries/fstorage \
-  $(SDK_ROOT)/components/drivers_nrf/i2s \
   $(SDK_ROOT)/components/libraries/gpiote \
-  $(SDK_ROOT)/components/drivers_nrf/gpiote \
-  $(SDK_ROOT)/components/drivers_nrf/nrf_soc_nosd \
   $(SDK_ROOT)/components/boards \
-  $(SDK_ROOT)/components/drivers_nrf/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_bas_c \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs_c \
   $(SDK_ROOT)/components/libraries/queue \
   $(SDK_ROOT)/components/ble/ble_dtm \
   $(SDK_ROOT)/components/toolchain/cmsis/include \
   $(SDK_ROOT)/components/ble/ble_services/ble_rscs_c \
-  $(SDK_ROOT)/components/drivers_nrf/uart \
   $(SDK_ROOT)/components/libraries/usbd/class/hid/kbd \
   $(SDK_ROOT)/components/ble/ble_services/ble_lls \
-  $(SDK_ROOT)/components/drivers_nrf/wdt \
   $(SDK_ROOT)/components/libraries/bsp \
   $(SDK_ROOT)/components/ble/ble_services/ble_bas \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
@@ -79,64 +76,43 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/slip \
   $(SDK_ROOT)/external/segger_rtt \
   $(SDK_ROOT)/components/libraries/csense_drv \
-  $(SDK_ROOT)/components/drivers_nrf/hal \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus_c \
-  $(SDK_ROOT)/components/drivers_nrf/rtc \
   $(SDK_ROOT)/components/ble/ble_services/ble_ias \
   $(SDK_ROOT)/components/libraries/usbd/class/hid/mouse \
-  $(SDK_ROOT)/components/drivers_nrf/ppi \
   $(SDK_ROOT)/components/ble/ble_services/ble_dfu \
-  $(SDK_ROOT)/components/drivers_nrf/twis_slave \
   $(SDK_ROOT)/components \
-  $(SDK_ROOT)/components/drivers_nrf/usbd \
   $(SDK_ROOT)/components/libraries/scheduler \
   $(SDK_ROOT)/components/ble/ble_services/ble_lbs \
   $(SDK_ROOT)/components/ble/ble_services/ble_hts \
-  $(SDK_ROOT)/components/drivers_nrf/delay \
   $(SDK_ROOT)/components/libraries/crc16 \
-  $(SDK_ROOT)/components/drivers_nrf/timer \
   $(SDK_ROOT)/components/libraries/util \
-  $(SDK_ROOT)/components/drivers_nrf/pwm \
   $(SDK_ROOT)/components/libraries/usbd/class/cdc \
   $(SDK_ROOT)/components/libraries/csense \
-  $(SDK_ROOT)/components/drivers_nrf/rng \
   $(SDK_ROOT)/components/libraries/low_power_pwm \
   $(SDK_ROOT)/components/libraries/hardfault \
   $(SDK_ROOT)/components/ble/ble_services/ble_cscs \
   $(SDK_ROOT)/components/libraries/uart \
   $(SDK_ROOT)/components/libraries/hci \
-  $(SDK_ROOT)/components/drivers_nrf/spi_slave \
-  $(SDK_ROOT)/components/drivers_nrf/lpcomp \
   $(SDK_ROOT)/components/libraries/timer \
-  $(SDK_ROOT)/components/drivers_nrf/power \
-  $(SDK_ROOT)/components/libraries/usbd/config \
   $(SDK_ROOT)/components/toolchain \
   $(SDK_ROOT)/components/libraries/led_softblink \
-  $(SDK_ROOT)/components/drivers_nrf/qdec \
   $(SDK_ROOT)/components/ble/ble_services/ble_cts_c \
-  $(SDK_ROOT)/components/drivers_nrf/spi_master \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
   $(SDK_ROOT)/components/ble/ble_services/ble_hids \
-  $(SDK_ROOT)/components/drivers_nrf/pdm \
   $(SDK_ROOT)/components/libraries/crc32 \
   $(SDK_ROOT)/components/libraries/usbd/class/audio \
   $(SDK_ROOT)/components/ble/peer_manager \
   $(SDK_ROOT)/components/libraries/mem_manager \
   $(SDK_ROOT)/components/ble/ble_services/ble_tps \
   $(SDK_ROOT)/components/ble/ble_services/ble_dis \
-  $(SDK_ROOT)/components/device \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr \
   $(SDK_ROOT)/components/libraries/button \
   $(SDK_ROOT)/components/libraries/usbd \
-  $(SDK_ROOT)/components/drivers_nrf/saadc \
   $(SDK_ROOT)/components/ble/ble_services/ble_lbs_c \
   $(SDK_ROOT)/components/ble/ble_racp \
   $(SDK_ROOT)/components/toolchain/gcc \
   $(SDK_ROOT)/components/libraries/fds \
-  $(SDK_ROOT)/components/libraries/twi \
-  $(SDK_ROOT)/components/drivers_nrf/clock \
   $(SDK_ROOT)/components/ble/ble_services/ble_rscs \
-  $(SDK_ROOT)/components/drivers_nrf/swi \
   $(SDK_ROOT)/components/ble/ble_services/ble_hrs \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/ble_services/ble_nus \
@@ -144,16 +120,20 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/ecc \
   $(SDK_ROOT)/components/libraries/sha256 \
   $(SDK_ROOT)/components/libraries/svc \
-  $(SDK_ROOT)/external/micro-ecc/micro-ecc \
-  $(SDK_ROOT)/components/libraries/experimental_log \
-  $(SDK_ROOT)/components/libraries/experimental_log/src \
-  $(SDK_ROOT)/components/libraries/experimental_memobj \
+  $(SDK_ROOT)/components/libraries/log \
+  $(SDK_ROOT)/components/libraries/log/src \
+  $(SDK_ROOT)/components/libraries/memobj \
   $(SDK_ROOT)/components/libraries/balloc \
   $(SDK_ROOT)/components/libraries/strerror \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/components/libraries/atomic \
   $(SDK_ROOT)/components/softdevice/common \
   $(SDK_ROOT)/components/libraries/mutex \
+  $(SDK_ROOT)/components/libraries/ringbuf \
+  $(SDK_ROOT)/modules/nrfx/mdk \
+  $(SDK_ROOT)/modules/nrfx \
+  $(SDK_ROOT)/integration/nrfx \
+  $(SDK_ROOT)/modules/nrfx/drivers/include
 
 LIB_FILES += \
   -lstdc++ \
@@ -194,7 +174,7 @@ ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 
 # Linker flags
 LDFLAGS += $(OPT)
-LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT)
+LDFLAGS += -mthumb -mabi=aapcs -L $(TEMPLATE_PATH) -T$(LINKER_SCRIPT) -L$(SDK_ROOT)/modules/nrfx/mdk
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += --specs=nano.specs -lc -lnosys
 LDFLAGS += -mcpu=cortex-m4
@@ -205,20 +185,19 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 # Make default (=first) target -> needs to be before including Makefile.common
 default: clean_linked_binaries
-	@$(MAKE) -j8 $(PLATFORM)_xxaa
+	@$(MAKE) -j8 $(PLATFORM)
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Flash the program
 flash_app: default
-	@echo Flashing: $(OUTPUT_FILE).hex
-	$(GDB_TARGET) -ex load -ex kill -ex quit $(OUTPUT_FILE).hex
+	$(call flash,$(OUTPUT_FILE).hex)
 
 flash: flash_app
 
 erase:
-	$(GDB_TARGET) -ex "mon erase_mass" -ex detach -ex quit
+	$(call erase)
 
 $(OUTPUT_DIRECTORY)/.clean_linked_binaries: $(PROJ_DIR)/$(LINKER_SCRIPT)
 	@echo Cleaning linked binaries..

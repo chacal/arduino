@@ -1,10 +1,9 @@
 #include <vector>
 #include <algorithm>
-#include <iterator>
+#include <nrf.h>
 
 
 #include "channel_resolver.hpp"
-#include "nrf_gpio.h"
 
 namespace channel_resolver {
 
