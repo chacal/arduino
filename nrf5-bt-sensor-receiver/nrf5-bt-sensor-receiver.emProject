@@ -51,6 +51,8 @@
     </folder>
     <configuration
       Name="Debug"
+      debug_initial_breakpoint="main"
+      debug_initial_breakpoint_set_option="Never"
       external_debug_symbols_file_name="$(ProjectDir)/build/NRF52832_XXAA.out" />
   </project>
 </solution>
