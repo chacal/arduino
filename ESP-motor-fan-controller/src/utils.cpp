@@ -45,3 +45,21 @@ void blink(uint8_t times) {
     }
   }
 }
+
+void resetConfigAndReboot(WiFiManager &wifiManager) {
+  Serial.println("Resetting configuration.");
+  wifiManager.resetSettings();
+  delay(1000);
+  Serial.println("Rebooting..");
+  delay(2000);
+  ESP.restart();
+}
+
+void resetAndRebootIfPinLow(uint8_t pin, WiFiManager &wifiManager) {
+  pinMode(pin, INPUT_PULLUP);
+  if (digitalRead(pin) == LOW) {
+    blink(20);
+    resetConfigAndReboot(wifiManager);
+  }
+}
+
