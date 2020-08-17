@@ -2,4 +2,4 @@
 
 #include <WiFiManager.h>
 
-void connectWiFi(WiFiManager &wifiManager);
+void connectWiFi(WiFiManager &wifiManager, const String &hostname);

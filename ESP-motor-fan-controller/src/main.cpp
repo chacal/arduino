@@ -3,12 +3,15 @@
 #include <WiFiManager.h>
 #include "utils.hpp"
 #include "wifi.hpp"
+#include "web_server.hpp"
 
 #define FAN_TURN_ON_TEMP     60
 #define FAN_TURN_OFF_TEMP    45
 #define FAN_MOSFET_GATE_PIN  D1
 #define NTC_MEASUREMENT_PIN  A0
 #define RESET_PIN            D7   // Pull this to GND during bootup to reset all settings (Wifi & configuration)
+#define HOSTNAME             "esp-fan-controller"
+
 
 WiFiManager wifiManager;
 SetPoint    setPoint;
@@ -46,7 +49,8 @@ void setup() {
 
   initializeSetpoint();
 
-  connectWiFi(wifiManager);
+  connectWiFi(wifiManager, HOSTNAME);
+  webServerInit();
 
   if (measure_ntc_temp(NTC_MEASUREMENT_PIN) >= FAN_TURN_ON_TEMP) {
     turnFanOn();
@@ -58,6 +62,7 @@ void loop() {
   setPoint.update(temp);
 
   Serial.println(String("Temp: ") + temp);
+  webServerBroadcastWs(String(temp) + "°C, fan state: " + (fanOn ? "on" : "off"));
 
   blink(fanOn ? 3 : 1);
   delay(1000);

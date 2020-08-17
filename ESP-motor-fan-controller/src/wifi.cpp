@@ -4,9 +4,9 @@
 
 Ticker blinker;
 
-void connectWiFi(WiFiManager &wifiManager) {
+void connectWiFi(WiFiManager &wifiManager, const String &hostname) {
   Serial.println("Connecting to WiFi..");
-  WiFi.hostname("esp-fan-controller");
+  WiFi.hostname(hostname);
 
   wifiManager.setAPCallback([](WiFiManager *wifiManager) {
     blinker.attach_ms(500, []() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); });
