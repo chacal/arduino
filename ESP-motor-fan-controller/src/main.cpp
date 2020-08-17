@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SetPoint.h>
 #include <WiFiManager.h>
+#include <ESP8266mDNS.h>
 #include "utils.hpp"
 #include "wifi.hpp"
 #include "web_server.hpp"
@@ -51,6 +52,7 @@ void setup() {
 
   connectWiFi(wifiManager, HOSTNAME);
   webServerInit();
+  MDNS.begin(HOSTNAME);
 
   if (measure_ntc_temp(NTC_MEASUREMENT_PIN) >= FAN_TURN_ON_TEMP) {
     turnFanOn();
