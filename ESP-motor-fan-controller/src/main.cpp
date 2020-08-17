@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoOTA.h>
 #include <SetPoint.h>
 #include <WiFiManager.h>
 #include <ESP8266mDNS.h>
@@ -53,6 +54,7 @@ void setup() {
   connectWiFi(wifiManager, HOSTNAME);
   webServerInit();
   MDNS.begin(HOSTNAME);
+  ArduinoOTA.begin();
 
   if (measure_ntc_temp(NTC_MEASUREMENT_PIN) >= FAN_TURN_ON_TEMP) {
     turnFanOn();
@@ -67,5 +69,7 @@ void loop() {
   webServerBroadcastWs(String(temp) + "°C, fan state: " + (fanOn ? "on" : "off"));
 
   blink(fanOn ? 3 : 1);
+  ArduinoOTA.handle();
+
   delay(1000);
 }
