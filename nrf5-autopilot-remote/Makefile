@@ -1,6 +1,5 @@
 PROJECT_NAME       := nrf5-autopilot-remote
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.0.0
 PLATFORM_FAMILY    := NRF52
 PLATFORM           := NRF52832_XXAA
 
@@ -131,7 +130,7 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 .PHONY: $(TARGETS) default all clean flash erase
 
 # Make default (=first) target -> needs to be before including Makefile.common
-default: $(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex
+default: build_app
 
 include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
@@ -139,29 +138,15 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 build_app: clean_linked_binaries
 	@$(MAKE) -j12 $(TARGETS)
 
-$(OUTPUT_DIRECTORY)/bootloader_settings.hex: build_app
-	$(NRFUTIL) settings generate --no-backup --family $(PLATFORM_FAMILY) --application $(OUTPUT_FILE).hex --application-version-string $(DFU_APP_VERSION_STR) --bootloader-version 1 --bl-settings-version 1 $@
-
-dfu_pkg: build_app
-	$(NRFUTIL) pkg generate --hw-version $(DFU_HW_VERSION) --application-version-string "$(DFU_APP_VERSION_STR)" --application $(OUTPUT_FILE).hex --sd-req $(DFU_SOFT_DEVICE_ID) --key-file $(DFU_PRIVATE_KEY) app_dfu_package_$(DFU_APP_VERSION_STR).zip
-
 # Flash the program
 flash_app: build_app
 	$(call flash,$(OUTPUT_FILE).hex)
-
-$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex: build_app $(OUTPUT_DIRECTORY)/bootloader_settings.hex
-	$(MERGEHEX) -m $(OUTPUT_DIRECTORY)/bootloader_settings.hex $(OUTPUT_FILE).hex -o $@
 
 flash_softdevice:
 	@echo Flashing Soft Device..
 	$(call flash,$(SOFTDEVICE_HEX))
 
-flash_dfu_settings: $(OUTPUT_DIRECTORY)/bootloader_settings.hex
-	@echo Flashing bootloader settings..
-	$(call flash,$<)
-
-flash: default
-	$(call flash,$(OUTPUT_DIRECTORY)/app_and_bootloader_settings.hex)
+flash: flash_softdevice flash_app
 
 erase:
 	$(call erase)

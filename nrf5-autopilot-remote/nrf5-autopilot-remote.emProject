@@ -18,7 +18,7 @@
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
       external_build_command="make default"
-      external_build_file_name="$(ProjectDir)/build/app_and_bootloader_settings.hex"
+      external_build_file_name="$(ProjectDir)/build/NRF52832_XXAA.hex"
       external_clean_command="make clean"
       external_debug_symbols_file_name="$(ProjectDir)/build/NRF52832_XXAA.out"
       linker_section_placements_segments="FLASH RX 0x00000000 0x00080000;RAM RWX 0x20000000 0x00010000"
