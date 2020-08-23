@@ -93,6 +93,7 @@ INC_FOLDERS += \
 
 LIB_FILES += \
   -lstdc++ \
+  -lm
 
 # Optimization flags
 OPT = -Wall -O3 -g3
