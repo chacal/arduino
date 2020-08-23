@@ -2,6 +2,7 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "ble.hpp"
+#include "buttons.hpp"
 
 #define DEVICE_NAME         "A100"
 
@@ -32,6 +33,8 @@ int main() {
   ble_init(DEVICE_NAME);
   ble_sensor_advertising_init(reinterpret_cast<uint8_t *>(&m_ap_data), sizeof(m_ap_data));
   ble_sensor_advertising_start();
+
+  buttons_init();
 
   NRF_LOG_INFO("Advertising..")
 
