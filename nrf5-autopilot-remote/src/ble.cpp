@@ -8,7 +8,6 @@
 
 #define APP_BLE_CFG_TAG    1
 #define TX_POWER_LEVEL     4     // Max power, +4dBm
-#define ADV_INTERVAL       MSEC_TO_UNITS(500, UNIT_0_625_MS)
 #define COMPANY_IDENTIFIER 0xDADA
 
 static uint8_t            m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
@@ -54,8 +53,8 @@ void ble_sensor_advertising_init(uint8_t *const manuf_data, const uint8_t manuf_
   m_adv_params.properties.type = BLE_GAP_ADV_TYPE_NONCONNECTABLE_NONSCANNABLE_UNDIRECTED;
   m_adv_params.p_peer_addr     = nullptr;    // Undirected advertisement.
   m_adv_params.filter_policy   = BLE_GAP_ADV_FP_ANY;
-  m_adv_params.interval        = ADV_INTERVAL;
-  m_adv_params.duration        = 0;       // Never time out.
+  m_adv_params.interval        = BLE_GAP_ADV_INTERVAL_MIN;  // 20ms
+  m_adv_params.max_adv_evts    = 3;  // Send 3 consecutive advertising events
 
   APP_ERROR_CHECK(sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, &m_adv_params));
   APP_ERROR_CHECK(sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_adv_handle, TX_POWER_LEVEL));
