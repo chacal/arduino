@@ -9,6 +9,7 @@
 #define APP_BLE_CFG_TAG    1
 #define TX_POWER_LEVEL     4     // Max power, +4dBm
 #define ADV_INTERVAL       MSEC_TO_UNITS(500, UNIT_0_625_MS)
+#define COMPANY_IDENTIFIER 0xDADA
 
 static uint8_t            m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
 static uint8_t            m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
@@ -25,7 +26,7 @@ static ble_gap_adv_data_t m_adv_data   = {
 
 static void encode_adv_data(uint8_t *const manuf_data, const uint8_t manuf_data_len, uint8_t *const p_encoded_data, uint16_t *const p_len) {
   ble_advdata_manuf_data_t mf = {};
-  mf.company_identifier = 0xDABA;
+  mf.company_identifier = COMPANY_IDENTIFIER;
   mf.data.p_data        = manuf_data;
   mf.data.size          = manuf_data_len;
 
