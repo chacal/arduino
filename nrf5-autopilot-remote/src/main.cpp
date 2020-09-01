@@ -3,6 +3,7 @@
 #include "nrf_log_default_backends.h"
 #include "ble.hpp"
 #include "buttons.hpp"
+#include "vcc_measurement.hpp"
 
 #define DEVICE_NAME         "A100"
 
@@ -40,6 +41,11 @@ void on_button_press(button_id btn_id, bool is_long_press) {
   ble_sensor_advertising_start();
 }
 
+void on_vcc_measurement(uint16_t vcc) {
+  NRF_LOG_DEBUG("VCC: %d", vcc)
+  m_ap_data.vcc = vcc;
+}
+
 int main() {
   APP_ERROR_CHECK(NRF_LOG_INIT(nullptr));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
@@ -47,6 +53,7 @@ int main() {
 
   ble_init(DEVICE_NAME);
   buttons_init(on_button_press);
+  vcc_measurement_init(on_vcc_measurement);
 
   for (;;) {
     APP_ERROR_CHECK(sd_app_evt_wait());
