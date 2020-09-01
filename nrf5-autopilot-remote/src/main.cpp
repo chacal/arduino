@@ -39,5 +39,6 @@ int main() {
   NRF_LOG_INFO("Advertising..")
 
   for (;;) {
+    APP_ERROR_CHECK(sd_app_evt_wait());
   }
 }
