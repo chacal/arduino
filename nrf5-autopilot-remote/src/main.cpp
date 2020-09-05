@@ -1,3 +1,5 @@
+#define NRF_LOG_DEFAULT_LEVEL 4
+
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
@@ -29,7 +31,11 @@ static autopilot_data_t m_ap_data = {
   .vcc             = 0
 };
 
-void on_button_press(button_id btn_id, bool is_long_press) {
+void on_button_push(button_id btn_id, bool is_long_press) {
+  sample_vcc();
+}
+
+void on_button_release(button_id btn_id, bool is_long_press) {
   NRF_LOG_DEBUG("Button ID %d pressed. Long press: %d", btn_id, is_long_press)
   m_ap_data.button_id       = btn_id;
   m_ap_data.is_long_press   = is_long_press;
@@ -52,7 +58,7 @@ int main() {
   NRF_LOG_INFO("nRF5 autopilot remote starting..")
 
   ble_init(DEVICE_NAME);
-  buttons_init(on_button_press);
+  buttons_init(on_button_push, on_button_release);
   vcc_measurement_init(on_vcc_measurement);
 
   for (;;) {

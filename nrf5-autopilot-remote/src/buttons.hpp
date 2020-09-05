@@ -13,4 +13,4 @@ enum button_id {
 
 typedef void (*button_cb_t)(button_id btn_id, bool is_long_press);
 
-void buttons_init(button_cb_t cb);
+void buttons_init(button_cb_t push_cb, button_cb_t release_cb);

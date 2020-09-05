@@ -16,11 +16,11 @@ void on_button(uint8_t pin_no, uint8_t button_action) {
   buttons.at(pin_no).on_action(button_action);
 }
 
-void buttons_init(button_cb_t cb) {
+void buttons_init(button_cb_t push_cb, button_cb_t release_cb) {
   buttons                           = {
-    {BUTTON_PIN1, Button(BTN_ENABLE, cb)},
-    {BUTTON_PIN2, Button(BTN_DISABLE, cb)},
-    {BUTTON_PIN3, Button(BTN_MINUS10, cb)},
+    {BUTTON_PIN1, Button(BTN_ENABLE, push_cb, release_cb)},
+    {BUTTON_PIN2, Button(BTN_DISABLE, push_cb, release_cb)},
+    {BUTTON_PIN3, Button(BTN_MINUS10, push_cb, release_cb)},
   };
 
   APP_ERROR_CHECK(app_timer_init());
