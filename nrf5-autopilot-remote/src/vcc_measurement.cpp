@@ -36,5 +36,4 @@ void sample_vcc() {
 void vcc_measurement_init(vcc_measurement_cb_t callback) {
   m_measurement_cb = callback;
   adc_init();
-  sample_vcc();
 }
