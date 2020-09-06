@@ -1,5 +1,3 @@
-#define NRF_LOG_DEFAULT_LEVEL 4
-
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
