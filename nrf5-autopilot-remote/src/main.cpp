@@ -52,6 +52,14 @@ void on_vcc_measurement(uint16_t vcc) {
   m_ap_data.vcc = vcc;
 }
 
+static void power_manage(void) {
+  // Always clear FPU IRQs to allow CPU to sleep. See: https://devzone.nordicsemi.com/question/87838/high-power-consumption-when-using-fpu/
+  __set_FPSCR(__get_FPSCR() & ~(0x0000009F));
+  (void) __get_FPSCR();
+  NVIC_ClearPendingIRQ(FPU_IRQn);
+  APP_ERROR_CHECK(sd_app_evt_wait());
+}
+
 int main() {
   APP_ERROR_CHECK(NRF_LOG_INIT(nullptr));
   NRF_LOG_DEFAULT_BACKENDS_INIT();
@@ -62,6 +70,6 @@ int main() {
   vcc_measurement_init(on_vcc_measurement);
 
   for (;;) {
-    APP_ERROR_CHECK(sd_app_evt_wait());
+    power_manage();
   }
 }
