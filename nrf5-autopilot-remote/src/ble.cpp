@@ -3,6 +3,8 @@
 #include <app_error.h>
 #include <ble_advdata.h>
 #include <crc32.h>
+#include <app_util_platform.h>
+#include <nrf_log.h>
 
 #include "ble.hpp"
 
@@ -10,9 +12,10 @@
 #define TX_POWER_LEVEL     4     // Max power, +4dBm
 #define COMPANY_IDENTIFIER 0xDADA
 
-static uint8_t            m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
+static volatile bool      m_is_advertising = false;
+static uint8_t            m_adv_handle     = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
 static uint8_t            m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
-static ble_gap_adv_data_t m_adv_data   = {
+static ble_gap_adv_data_t m_adv_data       = {
   .adv_data = {
     .p_data = m_enc_advdata,
     .len    = BLE_GAP_ADV_SET_DATA_SIZE_MAX
@@ -22,6 +25,13 @@ static ble_gap_adv_data_t m_adv_data   = {
     .len    = 0
   }
 };
+
+static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
+  if (p_ble_evt->header.evt_id == BLE_GAP_EVT_ADV_SET_TERMINATED) {
+    NRF_LOG_DEBUG("Advertising ended")
+    m_is_advertising = false;
+  }
+}
 
 static void encode_adv_data(uint8_t *const manuf_data, const uint8_t manuf_data_len, uint8_t *const p_encoded_data, uint16_t *const p_len) {
   ble_advdata_manuf_data_t mf = {};
@@ -56,13 +66,23 @@ void ble_sensor_advertising_init(uint8_t *const manuf_data, const uint8_t manuf_
   m_adv_params.interval        = BLE_GAP_ADV_INTERVAL_MIN;  // 20ms
   m_adv_params.max_adv_evts    = 3;  // Send 3 consecutive advertising events
 
+  CRITICAL_REGION_ENTER()
+    if (m_is_advertising) {
+      NRF_LOG_DEBUG("Stopping advertising")
+      APP_ERROR_CHECK(sd_ble_gap_adv_stop(m_adv_handle));
+    }
+  CRITICAL_REGION_EXIT()
+
   APP_ERROR_CHECK(sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, &m_adv_params));
   APP_ERROR_CHECK(sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_adv_handle, TX_POWER_LEVEL));
 }
 
 
 void ble_sensor_advertising_start() {
-  APP_ERROR_CHECK(sd_ble_gap_adv_start(m_adv_handle, APP_BLE_CFG_TAG));
+  CRITICAL_REGION_ENTER()
+    m_is_advertising = true;
+    APP_ERROR_CHECK(sd_ble_gap_adv_start(m_adv_handle, APP_BLE_CFG_TAG));
+  CRITICAL_REGION_EXIT()
 }
 
 void ble_sensor_advertising_stop() {
@@ -75,6 +95,7 @@ static void softdevice_init() {
   APP_ERROR_CHECK(nrf_sdh_enable_request());
   APP_ERROR_CHECK(nrf_sdh_ble_default_cfg_set(APP_BLE_CFG_TAG, &ram_start));
   APP_ERROR_CHECK(nrf_sdh_ble_enable(&ram_start));
+  NRF_SDH_BLE_OBSERVER(m_ble_observer, BLE_ADV_BLE_OBSERVER_PRIO, ble_evt_handler, nullptr);
 }
 
 
