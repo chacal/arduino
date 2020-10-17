@@ -1,13 +1,13 @@
 PROJECT_NAME       := network-display
 PROJECT_DIR_NAME   := $(shell dirname "$(strip $(MAKEFILE_LIST))")
-DFU_APP_VERSION_STR:= 1.5.0
+DFU_APP_VERSION_STR:= 1.6.1
 PLATFORM           := NRF52840_XXAA
 
 TARGETS            := $(PLATFORM)
 OUTPUT_DIRECTORY   := build
 LINKER_SCRIPT      := openthread_nrf52840.ld
 
-SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0
+SDK_ROOT           := $(HOME)/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v4.1.0
 PROJ_DIR           := .
 SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
@@ -62,6 +62,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_spim.c\
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_saadc.c\
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_rtc.c\
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_nvmc.c \
   $(SDK_ROOT)/components/thread/utils/thread_utils.c \
   $(SDK_ROOT)/components/libraries/mem_manager/mem_manager.c \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
@@ -77,10 +78,11 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_ecc.c \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_hash.c \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_ecdsa.c \
-  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c \
-  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c \
-  $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c \
-  $(SDK_ROOT)/components/libraries/crypto/backend/nrf_sw/nrf_sw_backend_hash.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl/cc310_bl_backend_ecc.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl/cc310_bl_backend_ecdsa.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl/cc310_bl_backend_hash.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl/cc310_bl_backend_init.c \
+  $(SDK_ROOT)/components/libraries/crypto/backend/cc310_bl/cc310_bl_backend_shared.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_settings.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_flash.c \
   $(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_req_handler.c \
@@ -122,6 +124,7 @@ SRC_FILES += \
   $(SRC_DIR)/gzip.cpp \
 
 INC_FOLDERS += \
+  $(SDK_ROOT)/external/nrf_security/include \
   $(SRC_DIR) \
   $(SRC_DIR)/states \
   $(SRC_DIR)/eink_display \
@@ -159,7 +162,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/sha256 \
   $(SDK_ROOT)/components/libraries/crc32 \
   $(SDK_ROOT)/components/libraries/fstorage \
-  $(SDK_ROOT)/components/softdevice/mbr/nrf52840/headers \
   $(SDK_ROOT)/components/libraries/mem_manager \
   $(SDK_ROOT)/components/libraries/mutex \
   $(SDK_ROOT)/components/libraries/pwr_mgmt \
@@ -171,10 +173,20 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/crypto/backend/mbedtls \
   $(SDK_ROOT)/components/libraries/crypto/backend/oberon \
   $(SDK_ROOT)/components/libraries/crypto/backend/micro_ecc \
+  $(SDK_ROOT)/components/libraries/crypto/backend/optiga \
   $(SDK_ROOT)/components/libraries/crypto/backend/nrf_sw \
   $(SDK_ROOT)/components/libraries/crypto/backend/nrf_hw \
   $(SDK_ROOT)/components/libraries/crypto/backend/cifra \
   $(SDK_ROOT)/components/libraries/crypto/backend/optiga \
+  $(SDK_ROOT)/components/libraries/sortlist \
+  $(SDK_ROOT)/external/nrf_cc310_bl/include \
+  $(SDK_ROOT)/external/mbedtls/include \
+  $(SDK_ROOT)/external/nrf_security/config \
+  $(SDK_ROOT)/external/nrf_security/mbedtls_plat_config \
+  $(SDK_ROOT)/external/nrf_security/nrf_cc310_plat/include \
+  $(SDK_ROOT)/external/openthread/project/nrf52840 \
+  $(SDK_ROOT)/external/openthread/project/config \
+  $(SDK_ROOT)/components/softdevice/mbr/headers \
   $(SDK_ROOT)/components/iot/coap \
   $(SDK_ROOT)/components/iot/common \
   $(SDK_ROOT)/components/iot/background_dfu \
@@ -191,32 +203,67 @@ INC_FOLDERS += \
 # Original Nordic SDK Openthread libraries
 #
 #LIB_FILES += \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-diag.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-ftd.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a \
-#  $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a \
-#  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
-#  $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-cli-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-transport.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_tls_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_x509_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libnrf_cc310_platform_0.9.2.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-sdk.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_base_vanilla.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libnordicsemi-nrf52840-radio-driver.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-nrf52840-transport.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-platform-utils.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_base_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_x509_vanilla.a \
+#  $(SDK_ROOT)/external/nrf_security/lib/libnrf_cc310_platform_0.9.2.a \
+#  $(SDK_ROOT)/external/openthread/lib/nrf52840/gcc/libopenthread-ftd.a \
+#  $(SDK_ROOT)/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.12.a \
 #  -lstdc++
 
 
 #
 # Self compiled more minimal libraries built with build_library_chacal.sh
-# Built from https://github.com/chacal/openthread/commit/5b826ef5b0cc1b58934b52a2ca24c770a5949822
+# Built from https://github.com/chacal/openthread/commit/f16f7e00b0c2db9085b52de148638cee9bc581f9
 #
 # NOTE! Includes are still used from the Nordic SDK!
 #
 LIB_FILES += \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-ftd.a \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-platform-utils.a \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libmbedcrypto.a \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-nrf52840-sdk.a \
-  $(SDK_ROOT)/external/nrf_cc310/lib/cortex-m4/hard-float/libnrf_cc310_0.9.12.a \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libnordicsemi-nrf52840-radio-driver.a \
-  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
-  $(PROJ_DIR)/openthread-5b826ef5/nrf52840/lib/libopenthread-platform-utils.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-ftd.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-nrf52840-transport.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_tls_vanilla.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_x509_vanilla.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-nrf52840-sdk.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_cc310.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_glue_vanilla.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_base_vanilla.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libnordicsemi-nrf52840-radio-driver.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_cc310_backend.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedcrypto_vanilla_backend.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-platform-utils.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-nrf52840-transport.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_base_vanilla.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libmbedtls_x509_vanilla.a \
+  $(SDK_ROOT)/external/nrf_security/lib/libnrf_cc310_platform_0.9.2.a \
+  $(PROJ_DIR)/openthread-3bb0872b/nrf52840/lib/libopenthread-ftd.a \
+  $(SDK_ROOT)/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.12.a \
   -lstdc++ \
   -lm
 
@@ -229,10 +276,15 @@ OPT = -O3 -g3
 # C flags common to all targets
 CFLAGS += $(OPT)
 CFLAGS += -DBOARD_PCA10056
+CFLAGS += -DAPP_TIMER_V2
+CFLAGS += -DAPP_TIMER_V2_RTC1_ENABLED
 CFLAGS += -DFLOAT_ABI_HARD
 CFLAGS += -D$(PLATFORM)
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -DUART0_ENABLED=0
+CFLAGS += -DMBEDTLS_CONFIG_FILE=\"nrf-config.h\"
+CFLAGS += -DMBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"
+CFLAGS += -DOPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS=0
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall
@@ -242,19 +294,14 @@ CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
 CFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
 CFLAGS += -DNRF_DFU_NO_TRANSPORT
-CFLAGS += -DuECC_ENABLE_VLI_API=0
-CFLAGS += -DuECC_OPTIMIZATION_LEVEL=3
-CFLAGS += -DuECC_SQUARE_FUNC=0
-CFLAGS += -DuECC_SUPPORT_COMPRESSED_POINT=0
-CFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 CFLAGS += -DAPP_VERSION='"$(DFU_APP_VERSION_STR)"'
-CFLAGS += -DDEBUG
+#CFLAGS += -DDEBUG
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
 CXXFLAGS += -std=c++17 -Wno-register
 CXXFLAGS += -fno-threadsafe-statics
-CXXFLAGS += -DDEBUG
+#CXXFLAGS += -DDEBUG
 
 # Assembler flags common to all targets
 ASMFLAGS += -g3
@@ -268,11 +315,6 @@ ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DUART0_ENABLED=0
 ASMFLAGS += -DNRF_DFU_SETTINGS_VERSION=1
 ASMFLAGS += -DNRF_DFU_NO_TRANSPORT
-ASMFLAGS += -DuECC_ENABLE_VLI_API=0
-ASMFLAGS += -DuECC_OPTIMIZATION_LEVEL=3
-ASMFLAGS += -DuECC_SQUARE_FUNC=0
-ASMFLAGS += -DuECC_SUPPORT_COMPRESSED_POINT=0
-ASMFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 
 
 # Linker flags

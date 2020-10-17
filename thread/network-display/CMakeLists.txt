@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_C_COMPILER "/usr/local/bin/arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "/usr/local/bin/arm-none-eabi-g++")
-set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v3.2.0")
+set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v4.1.0")
 set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
 set(UZLIB_ROOT "$ENV{HOME}/Documents/dev/uzlib")
 set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")

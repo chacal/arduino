@@ -2,7 +2,7 @@
 #include "vcc.hpp"
 #include "thread.hpp"
 
-#define DEVICE_NAME         "D105"
+#define DEVICE_NAME         "D108"
 
 using namespace ArduinoJson;
 

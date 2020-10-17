@@ -42,7 +42,7 @@ void thread_initialize() {
       {
           .radio_mode            = THREAD_RADIO_MODE_RX_ON_WHEN_IDLE,
           .autocommissioning     = false,
-          .autostart_disable     = true,
+          .autostart_disable     = false
       };
 
   thread_init(&thread_configuration);
@@ -65,11 +65,15 @@ void thread_initialize() {
   NRF_LOG_INFO("802.15.4 Network/Master Key:");
   NRF_LOG_HEXDUMP_INFO(otThreadGetMasterKey(ot)->m8, OT_MASTER_KEY_SIZE);
   NRF_LOG_INFO("rx-on-when-idle:  %s", otThreadGetLinkMode(ot).mRxOnWhenIdle ? "enabled" : "disabled");
+  NRF_LOG_INFO("Device type:  %s", otThreadGetLinkMode(ot).mDeviceType == 1? "FTD" : "MTD");
   int8_t tx_power = 0;
   ASSERT_OT(otPlatRadioGetTransmitPower(ot, &tx_power))
   NRF_LOG_INFO("TX Power: %d dBm", tx_power);
   NRF_LOG_INFO("SLAAC enabled: %d", otIp6IsSlaacEnabled(ot));
 
-  //thread_cli_init();
+#ifdef BOARD_PCA10059
+  thread_cli_init();
+#endif
+
   thread_state_changed_callback_set(thread_state_changed_callback);
 }

@@ -3,7 +3,7 @@
 #include <memory>
 #include <hfsm/machine_single.hpp>
 #include <display.hpp>
-#include <eink_display/good_display/good_display_2in13.hpp>
+#include <eink_display/good_display/good_display_2in9_4gray.hpp>
 
 struct state_machine;
 
@@ -15,7 +15,7 @@ namespace fsm {
     template<typename T>
     void react(const T &event);
 
-    std::unique_ptr<display> disp = std::make_unique<good_display_2in13>();
+    std::unique_ptr<display> disp = std::make_unique<good_display_2in9_4gray>();
   private:
     state_machine *fsm;
   };
