@@ -335,7 +335,7 @@ ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
 ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-ASMFLAGS += -DBOARD_PCA10056
+ASMFLAGS += -D$(TARGET_BOARD)
 ASMFLAGS += -DFLOAT_ABI_HARD
 ASMFLAGS += -D$(PLATFORM)
 ASMFLAGS += -DSWI_DISABLE0
