@@ -4,6 +4,7 @@
 #include <nrf_log_ctrl.h>
 #include <nrf_log.h>
 #include <nrf_log_default_backends.h>
+#include <app_timer.h>
 
 #include "thread.hpp"
 
@@ -13,12 +14,19 @@ extern "C" {
 
 #define LOG_IP6_ADDRESSES                   true
 #define TX_POWER                               0  // dBm
-#define SED_POLL_PERIOD_MS                  5000
+#define SED_NORMAL_POLL_PERIOD_MS           5000
+#define SED_INCREASED_POLL_PERIOD_MS         400
+#define SED_INCREASED_POLL_DURATION_MS     15000
 #define CHILD_TIMEOUT_S                       60
 
 namespace thread {
 
   static thread_role_handler_t m_thread_role_handler;
+  static milliseconds          m_normal_poll_period          = milliseconds(SED_NORMAL_POLL_PERIOD_MS);
+  static milliseconds          m_increased_poll_period       = milliseconds(SED_INCREASED_POLL_PERIOD_MS);
+  static milliseconds          m_increased_poll_duration     = milliseconds(SED_INCREASED_POLL_DURATION_MS);
+  static bool                  m_using_increased_poll_period = false;
+  APP_TIMER_DEF(m_increased_poll_rate_timer);
 
   static void print_ipv6_address(const otNetifAddress *address) {
     char          buf[40];
@@ -45,6 +53,10 @@ namespace thread {
       print_addresses();
     }
     m_thread_role_handler(role);
+  }
+
+  static void on_poll_rate_timer(void *p_context) {
+    end_increased_poll_rate();
   }
 
   otInstance *initialize(const thread_role_handler_t &role_handler) {
@@ -75,7 +87,7 @@ namespace thread {
 
     ASSERT_OT(otThreadSetEnabled(ot, true));
 
-    otLinkSetPollPeriod(ot, SED_POLL_PERIOD_MS);
+    otLinkSetPollPeriod(ot, m_normal_poll_period.count());
     otThreadSetChildTimeout(ot, CHILD_TIMEOUT_S);
     otIp6SetSlaacEnabled(ot, true);
 
@@ -99,6 +111,8 @@ namespace thread {
 
     //thread_cli_init();
     thread_state_changed_callback_set(thread_state_changed_callback);
+
+    APP_ERROR_CHECK(app_timer_create(&m_increased_poll_rate_timer, APP_TIMER_MODE_SINGLE_SHOT, on_poll_rate_timer));
     return ot;
   }
 
@@ -141,17 +155,54 @@ namespace thread {
     return power;
   }
 
-  void set_poll_period(milliseconds poll_period) {
+  void set_ot_poll_period(milliseconds poll_period) {
     otInstance *ot = thread_ot_instance_get();
     ASSERT(ot != nullptr);
     NRF_LOG_DEBUG("Setting poll period to %dms", poll_period.count());
     otLinkSetPollPeriod(ot, static_cast<uint32_t>(poll_period.count()));
   }
 
-  milliseconds get_poll_period() {
-    otInstance *ot = thread_ot_instance_get();
-    ASSERT(ot != nullptr);
-    return milliseconds(otLinkGetPollPeriod(ot));
+  void set_normal_poll_period(milliseconds poll_period) {
+    m_normal_poll_period = poll_period;
+    if (!m_using_increased_poll_period) {
+      set_ot_poll_period(m_normal_poll_period);
+    }
+  }
+
+  milliseconds get_normal_poll_period() {
+    return m_normal_poll_period;
+  }
+
+  void set_increased_poll_period(milliseconds poll_period) {
+    m_increased_poll_period = poll_period;
+    if (m_using_increased_poll_period) {
+      set_ot_poll_period(m_increased_poll_period);
+    }
+  }
+
+  milliseconds get_increased_poll_period() {
+    return m_increased_poll_period;
+  }
+
+  void set_increased_poll_duration(milliseconds duration) {
+    m_increased_poll_duration = duration;
+  }
+
+  milliseconds get_increased_poll_duration() {
+    return m_increased_poll_duration;
+  }
+
+  void begin_increased_poll_rate() {
+    m_using_increased_poll_period = true;
+    set_ot_poll_period(get_increased_poll_period());
+    app_timer_stop(m_increased_poll_rate_timer);
+    app_timer_start(m_increased_poll_rate_timer, APP_TIMER_TICKS(m_increased_poll_duration.count()), nullptr);
+  }
+
+  void end_increased_poll_rate() {
+    m_using_increased_poll_period = false;
+    app_timer_stop(m_increased_poll_rate_timer);
+    set_ot_poll_period(get_normal_poll_period());
   }
 
   void run() {

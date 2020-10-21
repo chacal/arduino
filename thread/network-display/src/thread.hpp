@@ -30,7 +30,13 @@ namespace thread {
   parent_info get_parent_info();
   void set_tx_power(int8_t power);
   int8_t get_tx_power();
-  void set_poll_period(milliseconds poll_period);
-  milliseconds get_poll_period();
+  void set_normal_poll_period(milliseconds poll_period);
+  milliseconds get_normal_poll_period();
+  void set_increased_poll_period(milliseconds poll_period);
+  milliseconds get_increased_poll_period();
+  void set_increased_poll_duration(milliseconds duration);
+  milliseconds get_increased_poll_duration();
+  void begin_increased_poll_rate();
+  void end_increased_poll_rate();
 }
 

@@ -6,6 +6,7 @@
 #include <nrf_log.h>
 
 #include "coap_helpers.hpp"
+#include "thread.hpp"
 
 namespace coap_helpers {
 
@@ -101,6 +102,7 @@ namespace coap_helpers {
 
     if (block1_request_opt.number == 0) {
       msg_buf.clear();
+      thread::begin_increased_poll_rate();
     }
     msg_buf.insert(msg_buf.end(), &p_request->p_payload[0], &p_request->p_payload[p_request->payload_len]);
 
@@ -113,6 +115,7 @@ namespace coap_helpers {
 
     if (block1_request_opt.more == COAP_BLOCK_OPT_BLOCK_MORE_BIT_UNSET) {
       NRF_LOG_DEBUG("Block1 complete: total payload: %dB", msg_buf.size())
+      thread::end_increased_poll_rate();
       handler({msg_buf.data(), (uint16_t) msg_buf.size()});
       msg_buf.clear();
     }
