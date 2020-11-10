@@ -73,6 +73,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
   $(SDK_ROOT)/components/iot/coap/coap.c \
   $(SDK_ROOT)/components/iot/coap/coap_block.c \
+  $(SDK_ROOT)/components/iot/ipv6_parse/ipv6_parse.c \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_init.c \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_shared.c \
   $(SDK_ROOT)/components/libraries/crypto/nrf_crypto_ecc.c \
@@ -192,6 +193,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/iot/background_dfu \
   $(SDK_ROOT)/components/iot/background_dfu/transport \
   $(SDK_ROOT)/components/iot/background_dfu/transport/coap \
+  $(SDK_ROOT)/components/iot/ipv6_parse \
   $(SDK_ROOT)/external/nrf_tls \
   $(SDK_ROOT)/external/nano-pb \
   $(SDK_ROOT)/external/micro-ecc/micro-ecc \

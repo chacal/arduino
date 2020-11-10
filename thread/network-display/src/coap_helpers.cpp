@@ -3,12 +3,16 @@
 #include <coap_api.h>
 #include <coap_message.h>
 #include <coap_block.h>
+#include <iot_defines.h>
+#include <ipv6_parse.h>
 #include <nrf_log.h>
 
 #include "coap_helpers.hpp"
 #include "thread.hpp"
+#include "util.hpp"
 
 namespace coap_helpers {
+  static uint16_t m_token_value = 0x1010;
 
   void add_resource_to_root(coap_resource_t &resource) {
     coap_resource_t *root;
@@ -166,5 +170,33 @@ namespace coap_helpers {
     }
 
     send_and_delete(p_response);
+  }
+
+  void get(const std::string &addr, uint16_t port, const std::string &path, coap_response_callback_t response_callback, void *ctx) {
+    coap_message_t      *p_request;
+    coap_message_conf_t message_conf;
+    uint32_t            handle;
+    coap_remote_t       remote_device;
+    memset(&message_conf, 0, sizeof(message_conf));
+
+    message_conf.type              = COAP_TYPE_NON;
+    message_conf.code              = COAP_CODE_GET;
+    message_conf.port.port_number  = DFU_UDP_PORT;  // Source port needs to be the on used by DFU as it is the only one opened
+    message_conf.id                = 0; // Auto-generate message ID.
+    message_conf.token_len         = 2;
+    message_conf.response_callback = response_callback;
+    uint16_encode(HTONS(m_token_value), message_conf.token);
+    m_token_value++;
+
+    ipv6_parse_addr(remote_device.addr, addr.c_str(), addr.length());
+    remote_device.port_number = port;
+
+    APP_ERROR_CHECK(coap_message_new(&p_request, &message_conf));
+    p_request->p_arg = ctx;
+    APP_ERROR_CHECK(coap_message_opt_str_add(p_request, COAP_OPT_URI_PATH, (uint8_t *) path.c_str(), path.length()));
+    APP_ERROR_CHECK(coap_message_remote_addr_set(p_request, &remote_device));
+    APP_ERROR_CHECK(coap_message_send(&handle, p_request));
+
+    coap_message_delete(p_request);
   }
 }

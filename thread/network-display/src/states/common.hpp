@@ -16,6 +16,7 @@ namespace fsm {
     void react(const T &event);
 
     std::unique_ptr<display> disp = std::make_unique<good_display_2in9_4gray>();
+    std::string              mgmt_server_address;
   private:
     state_machine *fsm;
   };

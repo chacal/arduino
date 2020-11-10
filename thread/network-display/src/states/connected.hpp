@@ -3,44 +3,32 @@
 #include <variant>
 #include <nrf_log.h>
 #include <settings.hpp>
-#include "periodic_timer.hpp"
+#include <coap_helpers.hpp>
 #include "common.hpp"
-#include "coap_service.hpp"
 #include "gzip.hpp"
-
-#define COAP_TICK_PERIOD      std::chrono::seconds(1)
 
 using namespace fsm;
 
 namespace states {
 
   struct connected : Base {
-    struct coap_timer_ticked {};
-
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected");
-      coap_tick_timer.start(&context);
       context.disp->on();
 
       auto on_display_image_post = [&](auto coap_data) { handle_display_image_post(coap_data, context); };
       coap_service::initialize({
-                                   on_display_image_post,
-                                   &settings::get_as_json,
-                                   &settings::update,
-                                   &util::get_status_json,
+                                 on_display_image_post,
+                                 &settings::get_as_json,
+                                 &settings::update,
+                                 &util::get_status_json,
                                });
-    }
-
-    virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {
-      coap_time_tick();
     }
 
     using Base::react;
 
 
   private:
-    periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
-
     void handle_display_image_post(const coap_service::post_data &coap_data, Context &context) {
       NRF_LOG_DEBUG("Got %d bytes of compressed image data", coap_data.len)
       auto result = gzip::uncompress(coap_data.data, coap_data.len);
