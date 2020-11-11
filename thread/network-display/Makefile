@@ -110,7 +110,7 @@ SRC_FILES += \
   $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/thread.cpp \
   $(SRC_DIR)/dfu_public_key.c \
-  $(SRC_DIR)/periodic_timer.cpp \
+  $(SRC_DIR)/timer.cpp \
   $(SRC_DIR)/coap_service.cpp \
   $(SRC_DIR)/coap_helpers.cpp \
   $(SRC_DIR)/power_manager.cpp \

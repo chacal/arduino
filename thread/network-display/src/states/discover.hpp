@@ -4,7 +4,7 @@
 #include <nrf_log.h>
 #include <settings.hpp>
 #include <coap_helpers.hpp>
-#include "periodic_timer.hpp"
+#include "timer.hpp"
 #include "common.hpp"
 #include "coap_service.hpp"
 #include "ArduinoJson-v6.13.0.hpp"

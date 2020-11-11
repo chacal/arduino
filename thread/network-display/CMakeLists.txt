@@ -11,6 +11,7 @@ set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")
 
 add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_PCA10056)
+add_definitions(-DAPP_TIMER_V2)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src/eink_display")

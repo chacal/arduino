@@ -3,7 +3,7 @@
 #include <nrf_log.h>
 #include <app_timer.h>
 #include <mem_manager.h>
-#include <periodic_timer.hpp>
+#include <timer.hpp>
 
 extern "C" {
 #include <coap_dfu.h>
