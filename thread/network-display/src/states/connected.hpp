@@ -25,8 +25,8 @@ namespace states {
       coap_service::initialize({
                                  on_display_image_post,
                                  &settings::get_as_json,
-                                 &settings::update,
-                                 [&]() { return util::get_status_json(context.instance); }
+                                 &settings::updateFromCoapData,
+                                 &util::get_status_json
                                });
       coap_tick_timer.start(&context);
     }

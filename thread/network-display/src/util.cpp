@@ -3,6 +3,7 @@
 #include "ArduinoJson-v6.13.0.hpp"
 #include "vcc.hpp"
 #include "thread.hpp"
+#include "settings.hpp"
 
 
 using namespace ArduinoJson;
@@ -20,10 +21,10 @@ namespace util {
     return rc;
   }
 
-  std::string get_status_json(std::string &instance) {
+  std::string get_status_json() {
     StaticJsonDocument<512> doc;
     doc["vcc"]      = vcc::measure();
-    doc["instance"] = instance;
+    doc["instance"] = settings::m_instance;
 
     auto       parent_info = thread::get_parent_info();
     JsonObject parent      = doc.createNestedObject("parent");

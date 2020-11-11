@@ -25,7 +25,8 @@ namespace states {
     }
 
     virtual void react(const config_set &event, Control &control, Context &context) {
-      NRF_LOG_INFO("Configured. Instance: %s", context.instance.c_str())
+      NRF_LOG_INFO("Configured:")
+      NRF_LOG_INFO("%s", settings::get_as_json().c_str())
       control.changeTo<connected>();
     }
 
@@ -47,19 +48,8 @@ namespace states {
           NRF_LOG_ERROR("Error status from config response. Status: %d", status)
           return;
         }
-
-        ArduinoJson::StaticJsonDocument<500> doc;
-        ArduinoJson::DeserializationError    error = deserializeJson(doc, p_message->p_payload);
-
-        if (error) {
-          NRF_LOG_ERROR("Parsing discovery response JSON failed!");
-          NRF_LOG_HEXDUMP_ERROR(p_message->p_payload, p_message->payload_len)
-          return;
-        }
-
-        auto ctx = static_cast<Context *>(p_arg);
-        ctx->instance = doc["instance"].as<char *>();
-        ctx->react(config_set{});
+        settings::update(p_message->p_payload, p_message->payload_len);
+        static_cast<Context *>(p_arg)->react(config_set{});
       };
 
       coap_helpers::get(context.mgmt_server_address, MGMT_SERVER_PORT, "v1/devices/" + id, responseHandler, &context);

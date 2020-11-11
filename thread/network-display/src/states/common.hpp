@@ -17,7 +17,6 @@ namespace fsm {
 
     std::unique_ptr<display> disp = std::make_unique<good_display_2in9_4gray>();
     std::string              mgmt_server_address;
-    std::string              instance;
   private:
     state_machine *fsm;
   };
