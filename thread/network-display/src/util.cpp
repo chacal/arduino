@@ -1,4 +1,5 @@
 #include <nrf_log.h>
+#include <crc32.h>
 #include "ArduinoJson-v6.13.0.hpp"
 #include "vcc.hpp"
 #include "thread.hpp"
@@ -44,6 +45,11 @@ namespace util {
             m8[0], m8[1], m8[2], m8[3], m8[4], m8[5], m8[6], m8[7], m8[8], m8[9], m8[10], m8[11], m8[12], m8[13], m8[14], m8[15]
     );
     NRF_LOG_INFO("%s", buf)
+  }
+
+  std::string get_device_id() {
+    auto id = crc32_compute((const uint8_t *) NRF_FICR->DEVICEID, sizeof(NRF_FICR->DEVICEID), nullptr);
+    return n2hexstr(id);
   }
 }
 
