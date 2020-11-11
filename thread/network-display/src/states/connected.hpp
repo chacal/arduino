@@ -26,7 +26,7 @@ namespace states {
                                  on_display_image_post,
                                  &settings::get_as_json,
                                  &settings::update,
-                                 &util::get_status_json,
+                                 [&]() { return util::get_status_json(context.instance); }
                                });
       coap_tick_timer.start(&context);
     }

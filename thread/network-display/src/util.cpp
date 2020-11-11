@@ -4,7 +4,6 @@
 #include "vcc.hpp"
 #include "thread.hpp"
 
-#define DEVICE_NAME         "D108"
 
 using namespace ArduinoJson;
 
@@ -21,10 +20,10 @@ namespace util {
     return rc;
   }
 
-  std::string get_status_json() {
+  std::string get_status_json(std::string &instance) {
     StaticJsonDocument<512> doc;
     doc["vcc"]      = vcc::measure();
-    doc["instance"] = DEVICE_NAME;
+    doc["instance"] = instance;
 
     auto       parent_info = thread::get_parent_info();
     JsonObject parent      = doc.createNestedObject("parent");

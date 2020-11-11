@@ -5,20 +5,64 @@
 #include "common.hpp"
 #include "connected.hpp"
 
+#define CONFIG_TIMER_PERIOD   std::chrono::seconds(60)
+#define MGMT_SERVER_PORT      5683
+
 using namespace fsm;
 
 namespace states {
 
   struct configure : Base {
+    struct config_timer_elapsed {
+    };
+    struct config_set {
+    };
 
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Configuring..");
+      config_timer.start(&context);
+      get_configuration(context);
     }
 
-    void transition(Control &control, Context &context) {
+    virtual void react(const config_set &event, Control &control, Context &context) {
+      NRF_LOG_INFO("Configured. Instance: %s", context.instance.c_str())
       control.changeTo<connected>();
     }
 
+    virtual void react(const config_timer_elapsed &event, Control &control, Context &context) {
+      get_configuration(context);
+    }
+
     using Base::react;
+
+  private:
+    periodic_timer config_timer{CONFIG_TIMER_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(config_timer_elapsed{}); }};
+
+    void get_configuration(Context &context) {
+      auto id = util::get_device_id();
+      NRF_LOG_INFO("Getting configuration from %s. Device ID: %s", context.mgmt_server_address.c_str(), id.c_str());
+
+      auto responseHandler = [](uint32_t status, void *p_arg, coap_message_t *p_message) {
+        if (status != NRF_SUCCESS) {
+          NRF_LOG_ERROR("Error status from config response. Status: %d", status)
+          return;
+        }
+
+        ArduinoJson::StaticJsonDocument<500> doc;
+        ArduinoJson::DeserializationError    error = deserializeJson(doc, p_message->p_payload);
+
+        if (error) {
+          NRF_LOG_ERROR("Parsing discovery response JSON failed!");
+          NRF_LOG_HEXDUMP_ERROR(p_message->p_payload, p_message->payload_len)
+          return;
+        }
+
+        auto ctx = static_cast<Context *>(p_arg);
+        ctx->instance = doc["instance"].as<char *>();
+        ctx->react(config_set{});
+      };
+
+      coap_helpers::get(context.mgmt_server_address, MGMT_SERVER_PORT, "v1/devices/" + id, responseHandler, &context);
+    }
   };
 }
