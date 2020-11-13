@@ -4,6 +4,7 @@
 #include "vcc.hpp"
 #include "thread.hpp"
 #include "settings.hpp"
+#include "util.hpp"
 
 
 using namespace ArduinoJson;
@@ -51,5 +52,36 @@ namespace util {
     auto id = crc32_compute((const uint8_t *) NRF_FICR->DEVICEID, sizeof(NRF_FICR->DEVICEID), nullptr);
     return n2hexstr(id);
   }
-}
 
+  otNetifAddress create_ip6_addr_for_prefix(const otBorderRouterConfig &conf) {
+    otNetifAddress addr{0};
+    auto           prefix = conf.mPrefix;
+    addr.mPrefixLength = prefix.mLength;
+    addr.mPreferred    = conf.mPreferred;
+    addr.mValid        = true;
+    memcpy(&addr.mAddress, &prefix.mPrefix, OT_IP6_PREFIX_SIZE);
+    memcpy(&addr.mAddress.mFields.m8[OT_IP6_PREFIX_SIZE], (const uint8_t *) NRF_FICR->DEVICEID, OT_IP6_ADDRESS_SIZE - OT_IP6_PREFIX_SIZE);
+    return addr;
+  }
+
+  bool has_addr_for_prefix(otInstance *instance, const otIp6Prefix &prefix) {
+    bool found = false;
+
+    for (auto *addr = otIp6GetUnicastAddresses(instance); addr; addr = addr->mNext) {
+      if (addr->mPrefixLength == prefix.mLength && otIp6PrefixMatch(&addr->mAddress, &prefix.mPrefix) >= prefix.mLength) {
+        found = true;
+        break;
+      }
+    }
+
+    return found;
+  }
+
+  void print_addresses(otInstance *instance) {
+    NRF_LOG_INFO("All IP6 addresses:")
+    const otNetifAddress *addr = (otIp6GetUnicastAddresses(instance));
+    for (; addr; addr = addr->mNext) {
+      util::log_ipv6_address(addr->mAddress.mFields.m8);
+    }
+  }
+}

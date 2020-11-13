@@ -1,10 +1,10 @@
 #include "thread_credentials.h"
 #include <openthread/ip6.h>
 #include <openthread/child_supervision.h>
-#include <nrf_log_ctrl.h>
 #include <nrf_log.h>
 #include <nrf_log_default_backends.h>
 #include <app_timer.h>
+#include <openthread/server.h>
 
 #include "thread.hpp"
 #include "util.hpp"
@@ -13,7 +13,6 @@ extern "C" {
 #include <thread_utils.h>
 }
 
-#define LOG_IP6_ADDRESSES                   true
 #define TX_POWER                               0  // dBm
 #define SED_NORMAL_POLL_PERIOD_MS           5000
 #define SED_INCREASED_POLL_PERIOD_MS         400
@@ -26,23 +25,28 @@ namespace thread {
   static milliseconds          m_normal_poll_period          = milliseconds(SED_NORMAL_POLL_PERIOD_MS);
   static milliseconds          m_increased_poll_period       = milliseconds(SED_INCREASED_POLL_PERIOD_MS);
   static milliseconds          m_increased_poll_duration     = milliseconds(SED_INCREASED_POLL_DURATION_MS);
-  static bool                  m_using_increased_poll_period = false;
-  APP_TIMER_DEF(m_increased_poll_rate_timer);
+  static bool                  m_using_increased_poll_period = false;APP_TIMER_DEF(m_increased_poll_rate_timer);
 
-  static void print_addresses() {
-    if (LOG_IP6_ADDRESSES) {
-      const otNetifAddress *addr = (otIp6GetUnicastAddresses(thread_ot_instance_get()));
-      for (; addr; addr = addr->mNext) {
-        util::log_ipv6_address(addr->mAddress.mFields.m8);
+  static void ensure_ip6_addresses(otInstance *instance) {
+    otNetworkDataIterator it = OT_NETWORK_DATA_ITERATOR_INIT;
+    otBorderRouterConfig  conf;
+    while (otNetDataGetNextOnMeshPrefix(instance, &it, &conf) == OT_ERROR_NONE) {
+      if (!util::has_addr_for_prefix(instance, conf.mPrefix)) {
+        auto new_addr = util::create_ip6_addr_for_prefix(conf);
+        NRF_LOG_INFO("Adding address:")
+        util::log_ipv6_address(new_addr.mAddress.mFields.m8);
+        otIp6AddUnicastAddress(instance, &new_addr);
       }
     }
   }
 
   static void thread_state_changed_callback(uint32_t flags, void *p_context) {
-    otDeviceRole role = otThreadGetDeviceRole(static_cast<otInstance *>(p_context));
+    auto         instance = static_cast<otInstance *>(p_context);
+    otDeviceRole role     = otThreadGetDeviceRole(instance);
     NRF_LOG_INFO("State changed! Flags: 0x%08x Current role: %d", flags, role);
     if ((flags & OT_CHANGED_THREAD_NETDATA) != 0) {
-      print_addresses();
+      ensure_ip6_addresses(instance);
+      util::print_addresses(instance);
     }
     m_thread_role_handler(role);
   }
@@ -81,7 +85,7 @@ namespace thread {
 
     otLinkSetPollPeriod(ot, m_normal_poll_period.count());
     otThreadSetChildTimeout(ot, CHILD_TIMEOUT_S);
-    otIp6SetSlaacEnabled(ot, true);
+    otIp6SetSlaacEnabled(ot, false);
 
     NRF_LOG_INFO("802.15.4 Channel: %d", otLinkGetChannel(ot));
     NRF_LOG_INFO("802.15.4 PAN ID:  0x%04x", otLinkGetPanId(ot));
