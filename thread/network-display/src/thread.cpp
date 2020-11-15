@@ -34,7 +34,7 @@ namespace thread {
       if (!util::has_addr_for_prefix(instance, conf.mPrefix)) {
         auto new_addr = util::create_ip6_addr_for_prefix(conf);
         NRF_LOG_INFO("Adding address:")
-        util::log_ipv6_address(new_addr.mAddress.mFields.m8);
+        util::log_ipv6_address(new_addr);
         otIp6AddUnicastAddress(instance, &new_addr);
       }
     }

@@ -11,7 +11,9 @@ namespace util {
 
   std::string get_status_json();
 
-  void log_ipv6_address(const uint8_t *address);
+  void log_ipv6_address(const otNetifAddress &address);
+
+  std::string ipv6_to_str(const otNetifAddress &address);
 
   std::string get_device_id();
 
