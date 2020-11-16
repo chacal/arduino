@@ -11,6 +11,7 @@ using namespace ArduinoJson;
 
 namespace settings {
   std::string m_instance;
+  std::string m_mgmt_server;
 
   void updateFromCoapData(const coap_service::post_data &coap_data) {
     update(coap_data.data, coap_data.len);

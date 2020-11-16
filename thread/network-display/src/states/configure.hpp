@@ -41,7 +41,7 @@ namespace states {
 
     void get_configuration(Context &context) {
       auto id = util::get_device_id();
-      NRF_LOG_INFO("Getting configuration from %s. Device ID: %s", context.mgmt_server_address.c_str(), id.c_str());
+      NRF_LOG_INFO("Getting configuration from %s. Device ID: %s", settings::m_mgmt_server.c_str(), id.c_str());
 
       auto responseHandler = [](uint32_t status, void *p_arg, coap_message_t *p_message) {
         if (status != NRF_SUCCESS) {
@@ -52,7 +52,7 @@ namespace states {
         static_cast<Context *>(p_arg)->react(config_set{});
       };
 
-      coap_helpers::get(context.mgmt_server_address, MGMT_SERVER_PORT, "v1/devices/" + id, responseHandler, &context);
+      coap_helpers::get(settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/devices/" + id, responseHandler, &context);
     }
   };
 }

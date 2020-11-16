@@ -8,6 +8,7 @@ using namespace std::chrono;
 
 namespace settings {
   extern std::string m_instance;
+  extern std::string m_mgmt_server;
 
   struct settings {
     std::optional<std::string>  instance;

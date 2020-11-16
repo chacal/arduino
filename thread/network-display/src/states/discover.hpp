@@ -38,7 +38,7 @@ namespace states {
     }
 
     virtual void react(const mgmt_server_set &event, Control &control, Context &context) {
-      NRF_LOG_INFO("Discovered mgmt server! %s", context.mgmt_server_address.c_str())
+      NRF_LOG_INFO("Discovered mgmt server! %s", settings::m_mgmt_server.c_str())
       mgmt_server_discovery_timer.stop();
       configure_delay_timer.start(&context);
     }
@@ -76,8 +76,8 @@ namespace states {
           return;
         }
 
+        settings::m_mgmt_server = doc["mgmtServer"].as<char *>();
         auto ctx = static_cast<Context *>(p_arg);
-        ctx->mgmt_server_address = doc["mgmtServer"].as<char *>();
         ctx->react(mgmt_server_set{});
       };
 
