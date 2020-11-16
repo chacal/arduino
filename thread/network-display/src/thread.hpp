@@ -24,6 +24,7 @@ namespace thread {
   };
 
   otInstance *initialize(const thread_role_handler_t &);
+  otInstance *get_instance();
 
   void run();
 

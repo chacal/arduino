@@ -55,6 +55,10 @@ namespace thread {
     end_increased_poll_rate();
   }
 
+  otInstance *get_instance() {
+    return thread_ot_instance_get();
+  }
+
   otInstance *initialize(const thread_role_handler_t &role_handler) {
     m_thread_role_handler = role_handler;
 

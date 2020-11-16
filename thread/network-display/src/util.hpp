@@ -22,4 +22,6 @@ namespace util {
   bool has_addr_for_prefix(otInstance *instance, const otIp6Prefix &prefix);
 
   void print_addresses(otInstance *instance);
+
+  std::string create_ip6_post_payload(otInstance *instance);
 }

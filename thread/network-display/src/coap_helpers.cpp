@@ -172,7 +172,8 @@ namespace coap_helpers {
     send_and_delete(p_response);
   }
 
-  void get(const std::string &addr, uint16_t port, const std::string &path, coap_response_callback_t response_callback, void *ctx) {
+  void coap_send(coap_msg_code_t code, const std::string &addr, uint16_t port, const std::string &path, const std::string &payload,
+                 coap_content_type_t ct, coap_response_callback_t response_callback, void *ctx) {
     coap_message_t      *p_request;
     coap_message_conf_t message_conf;
     uint32_t            handle;
@@ -180,7 +181,7 @@ namespace coap_helpers {
     memset(&message_conf, 0, sizeof(message_conf));
 
     message_conf.type              = COAP_TYPE_NON;
-    message_conf.code              = COAP_CODE_GET;
+    message_conf.code              = code;
     message_conf.port.port_number  = DFU_UDP_PORT;  // Source port needs to be the on used by DFU as it is the only one opened
     message_conf.id                = 0; // Auto-generate message ID.
     message_conf.token_len         = 2;
@@ -195,8 +196,21 @@ namespace coap_helpers {
     p_request->p_arg = ctx;
     APP_ERROR_CHECK(coap_message_opt_str_add(p_request, COAP_OPT_URI_PATH, (uint8_t *) path.c_str(), path.length()));
     APP_ERROR_CHECK(coap_message_remote_addr_set(p_request, &remote_device));
+    if (!payload.empty()) {
+      APP_ERROR_CHECK(coap_message_opt_uint_add(p_request, COAP_OPT_CONTENT_FORMAT, ct));
+      APP_ERROR_CHECK(coap_message_payload_set(p_request, (void *) payload.c_str(), payload.length()));
+    }
     APP_ERROR_CHECK(coap_message_send(&handle, p_request));
 
     coap_message_delete(p_request);
+  }
+
+  void get(const std::string &addr, uint16_t port, const std::string &path, coap_response_callback_t response_callback, void *ctx) {
+    coap_send(COAP_CODE_GET, addr, port, path, "", COAP_CT_PLAIN_TEXT, response_callback, ctx);
+  }
+
+  void post_json(const std::string &addr, uint16_t port, const std::string &path, const std::string &payload,
+                 coap_response_callback_t response_callback, void *ctx) {
+    coap_send(COAP_CODE_POST, addr, port, path, payload, COAP_CT_APP_JSON, response_callback, ctx);
   }
 }

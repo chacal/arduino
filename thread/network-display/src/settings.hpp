@@ -4,6 +4,8 @@
 
 #include "coap_service.hpp"
 
+#define MGMT_SERVER_PORT      5683
+
 using namespace std::chrono;
 
 namespace settings {

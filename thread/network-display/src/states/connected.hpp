@@ -29,6 +29,7 @@ namespace states {
                                  &util::get_status_json
                                });
       coap_tick_timer.start(&context);
+      post_ip6_addresses();
     }
 
     virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {
@@ -53,6 +54,18 @@ namespace states {
         auto error_code = std::get<int>(result);
         NRF_LOG_ERROR("Error uncompressing image! Error code: %d", error_code)
       }
+    }
+
+    void post_ip6_addresses() const {
+      NRF_LOG_INFO("Posting IP6 addresses:")
+      NRF_LOG_INFO("%s", util::create_ip6_post_payload(thread::get_instance()).c_str())
+
+      coap_helpers::post_json(
+        settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/ip6/" + util::get_device_id(), util::create_ip6_post_payload(thread::get_instance()),
+        [](uint32_t status, void *p_arg, coap_message_t *p_message) {
+          NRF_LOG_INFO("IP6 post status: %d", status)
+          NRF_LOG_INFO("IP6 post reponse code: %d", p_message->header.code)
+        }, nullptr);
     }
   };
 }

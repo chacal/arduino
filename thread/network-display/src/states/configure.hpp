@@ -6,7 +6,6 @@
 #include "connected.hpp"
 
 #define CONFIG_TIMER_PERIOD   std::chrono::seconds(60)
-#define MGMT_SERVER_PORT      5683
 
 using namespace fsm;
 

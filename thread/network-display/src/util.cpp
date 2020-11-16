@@ -87,4 +87,14 @@ namespace util {
       util::log_ipv6_address(*addr);
     }
   }
+
+  std::string create_ip6_post_payload(otInstance *instance) {
+    StaticJsonDocument<512> doc;
+
+    for (auto addr = otIp6GetUnicastAddresses(instance); addr; addr = addr->mNext) {
+      doc.add(util::ipv6_to_str(*addr));
+    }
+
+    return doc.as<std::string>();
+  }
 }
