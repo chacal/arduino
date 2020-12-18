@@ -88,11 +88,13 @@ namespace util {
     }
   }
 
-  std::string create_ip6_post_payload(otInstance *instance) {
+  std::string create_state_post_payload(otInstance *instance) {
     StaticJsonDocument<512> doc;
 
+    JsonArray addresses = doc.createNestedArray("addresses");
+
     for (auto addr = otIp6GetUnicastAddresses(instance); addr; addr = addr->mNext) {
-      doc.add(util::ipv6_to_str(*addr));
+      addresses.add(util::ipv6_to_str(*addr));
     }
 
     return doc.as<std::string>();

@@ -29,7 +29,7 @@ namespace states {
                                  &util::get_status_json
                                });
       coap_tick_timer.start(&context);
-      post_ip6_addresses();
+      post_state_to_mgmt_server();
     }
 
     virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {
@@ -56,15 +56,18 @@ namespace states {
       }
     }
 
-    void post_ip6_addresses() const {
-      NRF_LOG_INFO("Posting IP6 addresses:")
-      NRF_LOG_INFO("%s", util::create_ip6_post_payload(thread::get_instance()).c_str())
+    void post_state_to_mgmt_server() const {
+      auto state = util::create_state_post_payload(thread::get_instance());
+
+      NRF_LOG_INFO("Posting state to mgmt server:")
+      NRF_LOG_INFO("%s", state.c_str())
 
       coap_helpers::post_json(
-        settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/ip6/" + util::get_device_id(), util::create_ip6_post_payload(thread::get_instance()),
+        settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/state/" + util::get_device_id(),
+        state,
         [](uint32_t status, void *p_arg, coap_message_t *p_message) {
-          NRF_LOG_INFO("IP6 post status: %d", status)
-          NRF_LOG_INFO("IP6 post reponse code: %d", p_message->header.code)
+          NRF_LOG_INFO("State post status: %d", status)
+          NRF_LOG_INFO("State post reponse code: %d", p_message->header.code)
         }, nullptr);
     }
   };

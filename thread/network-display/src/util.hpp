@@ -23,5 +23,5 @@ namespace util {
 
   void print_addresses(otInstance *instance);
 
-  std::string create_ip6_post_payload(otInstance *instance);
+  std::string create_state_post_payload(otInstance *instance);
 }
