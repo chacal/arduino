@@ -21,6 +21,8 @@ using namespace fsm;
 namespace states {
 
   struct discover : Base {
+    struct coap_timer_ticked {
+    };
     struct mgmt_server_discovery_timer_ticked {
     };
     struct mgmt_server_set {
@@ -30,7 +32,12 @@ namespace states {
 
     virtual void enter(Context &context) {
       mgmt_server_discovery_timer.start(&context);
+      coap_tick_timer.start(&context);
       discover_mgmt_server(context);
+    }
+
+    virtual void react(const coap_timer_ticked &event, Control &control, Context &context) {
+      coap_time_tick();
     }
 
     virtual void react(const mgmt_server_discovery_timer_ticked &event, Control &control, Context &context) {
@@ -40,6 +47,7 @@ namespace states {
     virtual void react(const mgmt_server_set &event, Control &control, Context &context) {
       NRF_LOG_INFO("Discovered mgmt server! %s", settings::m_mgmt_server.c_str())
       mgmt_server_discovery_timer.stop();
+      coap_tick_timer.stop();
       configure_delay_timer.start(&context);
     }
 
@@ -51,6 +59,9 @@ namespace states {
 
 
   private:
+    periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) {
+      static_cast<Context *>(ctx)->react(coap_timer_ticked{});
+    }};
     periodic_timer mgmt_server_discovery_timer{MGMT_DISCOVERY_PERIOD, [](void *ctx) {
       static_cast<Context *>(ctx)->react(mgmt_server_discovery_timer_ticked{});
     }};
@@ -64,21 +75,22 @@ namespace states {
       auto responseHandler = [](uint32_t status, void *p_arg, coap_message_t *p_message) {
         if (status != NRF_SUCCESS) {
           NRF_LOG_ERROR("Error status from discover response. Status: %d", status)
-          return;
+        } else if(p_message->header.code != COAP_CODE_205_CONTENT) {
+          NRF_LOG_ERROR("Unexpected discovery server response code: %d", p_message->header.code)
+        } else {
+          ArduinoJson::StaticJsonDocument<500> doc;
+          ArduinoJson::DeserializationError    error = deserializeJson(doc, p_message->p_payload);
+
+          if (error) {
+            NRF_LOG_ERROR("Parsing discovery response JSON failed!");
+            NRF_LOG_HEXDUMP_ERROR(p_message->p_payload, p_message->payload_len)
+            return;
+          }
+
+          settings::m_mgmt_server = doc["mgmtServer"].as<char *>();
+          auto ctx = static_cast<Context *>(p_arg);
+          ctx->react(mgmt_server_set{});
         }
-
-        ArduinoJson::StaticJsonDocument<500> doc;
-        ArduinoJson::DeserializationError    error = deserializeJson(doc, p_message->p_payload);
-
-        if (error) {
-          NRF_LOG_ERROR("Parsing discovery response JSON failed!");
-          NRF_LOG_HEXDUMP_ERROR(p_message->p_payload, p_message->payload_len)
-          return;
-        }
-
-        settings::m_mgmt_server = doc["mgmtServer"].as<char *>();
-        auto ctx = static_cast<Context *>(p_arg);
-        ctx->react(mgmt_server_set{});
       };
 
       coap_helpers::get(DISCOVERY_SERVER_ADDR, DISCOVERY_SERVER_PORT, DISCOVERY_SERVER_PATH, responseHandler, &context);
