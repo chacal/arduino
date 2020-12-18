@@ -66,7 +66,7 @@ namespace states {
         }
       };
 
-      coap_helpers::get(settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/devices/" + id, responseHandler, &context);
+      coap_helpers::get(settings::m_mgmt_server, MGMT_SERVER_PORT, "v1/defaults/" + id, responseHandler, &context);
     }
   };
 }
