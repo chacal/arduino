@@ -43,6 +43,8 @@ namespace settings {
     if (s->increasedPollDuration) {
       thread::set_increased_poll_duration(milliseconds(*s->increasedPollDuration));
     }
+
+    NRF_LOG_DEBUG("Updated settings: %s", get_as_json().c_str())
   }
 
   std::string get_as_json() {
