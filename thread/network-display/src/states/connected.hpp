@@ -26,7 +26,7 @@ namespace states {
                                  on_display_image_post,
                                  &settings::get_as_json,
                                  &settings::updateFromCoapData,
-                                 &util::get_status_json
+                                 &util::get_state_json
                                });
       coap_tick_timer.start(&context);
       post_state_to_mgmt_server();
@@ -57,7 +57,7 @@ namespace states {
     }
 
     void post_state_to_mgmt_server() const {
-      auto state = util::create_state_post_payload(thread::get_instance());
+      auto state = util::get_state_json();
 
       NRF_LOG_INFO("Posting state to mgmt server:")
       NRF_LOG_INFO("%s", state.c_str())

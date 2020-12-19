@@ -9,7 +9,7 @@
 namespace util {
   using rtc_ticks = std::chrono::duration<uint32_t, std::ratio<1, APP_TIMER_CLOCK_FREQ>>;
 
-  std::string get_status_json();
+  std::string get_state_json();
 
   void log_ipv6_address(const otNetifAddress &address);
 
@@ -22,6 +22,4 @@ namespace util {
   bool has_addr_for_prefix(otInstance *instance, const otIp6Prefix &prefix);
 
   void print_addresses(otInstance *instance);
-
-  std::string create_state_post_payload(otInstance *instance);
 }

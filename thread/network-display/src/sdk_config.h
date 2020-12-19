@@ -2034,7 +2034,7 @@
 
 
 #ifndef COAP_MESSAGE_DATA_MAX_SIZE
-#define COAP_MESSAGE_DATA_MAX_SIZE 256
+#define COAP_MESSAGE_DATA_MAX_SIZE 1024
 #endif
 
 // <o> COAP_MESSAGE_QUEUE_SIZE - Maximum number of smartCoAP messages that can be in transmission at a time.  <1-65535>

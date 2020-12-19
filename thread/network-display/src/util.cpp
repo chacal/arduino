@@ -22,8 +22,8 @@ namespace util {
     return rc;
   }
 
-  std::string get_status_json() {
-    StaticJsonDocument<512> doc;
+  std::string get_state_json() {
+    StaticJsonDocument<1024> doc;
     doc["vcc"]      = vcc::measure();
     doc["instance"] = settings::m_instance;
 
@@ -35,6 +35,12 @@ namespace util {
     parent["linkQualityOut"] = parent_info.link_quality_out;
     parent["avgRssi"]        = parent_info.avg_rssi;
     parent["latestRssi"]     = parent_info.latest_rssi;
+
+    JsonArray addresses = doc.createNestedArray("addresses");
+
+    for (auto addr = otIp6GetUnicastAddresses(thread::get_instance()); addr; addr = addr->mNext) {
+      addresses.add(util::ipv6_to_str(*addr));
+    }
 
     return doc.as<std::string>();
   }
@@ -86,17 +92,5 @@ namespace util {
     for (auto addr = otIp6GetUnicastAddresses(instance); addr; addr = addr->mNext) {
       util::log_ipv6_address(*addr);
     }
-  }
-
-  std::string create_state_post_payload(otInstance *instance) {
-    StaticJsonDocument<512> doc;
-
-    JsonArray addresses = doc.createNestedArray("addresses");
-
-    for (auto addr = otIp6GetUnicastAddresses(instance); addr; addr = addr->mNext) {
-      addresses.add(util::ipv6_to_str(*addr));
-    }
-
-    return doc.as<std::string>();
   }
 }
