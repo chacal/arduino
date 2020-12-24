@@ -24,8 +24,10 @@ namespace util {
 
   std::string get_state_json() {
     StaticJsonDocument<1024> doc;
-    doc["vcc"]      = vcc::measure();
-    doc["instance"] = settings::m_instance;
+    doc["vcc"]        = vcc::measure();
+    doc["instance"]   = settings::m_instance;
+    doc["txPower"]    = thread::get_tx_power();
+    doc["pollPeriod"] = thread::get_normal_poll_period().count();
 
     auto       parent_info = thread::get_parent_info();
     JsonObject parent      = doc.createNestedObject("parent");
