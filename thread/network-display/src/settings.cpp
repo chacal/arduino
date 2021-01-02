@@ -6,12 +6,17 @@
 
 #include "ArduinoJson-v6.13.0.hpp"
 #include "thread.hpp"
+#include <eink_display/good_display/good_display_1in54.hpp>
+#include <eink_display/good_display/good_display_2in13.hpp>
+#include <eink_display/good_display/good_display_2in9.hpp>
+#include <eink_display/good_display/good_display_2in9_4gray.hpp>
 
 using namespace ArduinoJson;
 
 namespace settings {
-  std::string m_instance = "D000";
-  std::string m_mgmt_server;
+  std::string                m_instance     = "D000";
+  std::string                m_mgmt_server;
+  std::optional<DisplayType> m_display_type = std::nullopt;
 
   void updateFromCoapData(const coap_service::post_data &coap_data) {
     update(coap_data.data, coap_data.len);
@@ -44,6 +49,10 @@ namespace settings {
       thread::set_increased_poll_duration(milliseconds(*s->increasedPollDuration));
     }
 
+    if (s->displayType) {
+      m_display_type = s->displayType;
+    }
+
     NRF_LOG_DEBUG("Updated settings: %s", get_as_json().c_str())
   }
 
@@ -54,6 +63,7 @@ namespace settings {
     doc["pollPeriod"]            = thread::get_normal_poll_period().count();
     doc["increasedPollPeriod"]   = thread::get_increased_poll_period().count();
     doc["increasedPollDuration"] = thread::get_increased_poll_duration().count();
+    doc["displayType"]           = toString(m_display_type);
     return doc.as<std::string>();
   }
 
@@ -108,6 +118,67 @@ namespace settings {
       }
     }
 
+    if (doc.containsKey("displayType")) {
+      if (doc["displayType"].is<char *>()) {
+        auto displayType = displayTypeFromString(doc["displayType"]);
+        if (displayType) {
+          m_display_type = *displayType;
+        } else {
+          NRF_LOG_ERROR("Unknown display type! %s", doc["displayType"]);
+        }
+      } else {
+        NRF_LOG_ERROR("Display type must be a string!");
+      }
+    }
+
     return s;
+  }
+
+  std::unique_ptr<display> createDisplay(DisplayType displayType) {
+    switch (displayType) {
+      case GOOD_DISPLAY_1_54IN:
+        return std::make_unique<good_display_1in54>();
+      case GOOD_DISPLAY_2_13IN:
+        return std::make_unique<good_display_2in13>();
+      case GOOD_DISPLAY_2_9IN:
+        return std::make_unique<good_display_2in9>();
+      case GOOD_DISPLAY_2_9IN_4GRAY:
+        return std::make_unique<good_display_2in9_4gray>();
+      default:  // Just to make compiler happy..
+        return std::make_unique<good_display_2in13>();
+    }
+  }
+
+  std::string toString(std::optional<DisplayType> displayType) {
+    if (displayType) {
+      switch (*displayType) {
+        case GOOD_DISPLAY_1_54IN:
+          return "GOOD_DISPLAY_1_54IN";
+        case GOOD_DISPLAY_2_13IN:
+          return "GOOD_DISPLAY_2_13IN";
+        case GOOD_DISPLAY_2_9IN:
+          return "GOOD_DISPLAY_2_9IN";
+        case GOOD_DISPLAY_2_9IN_4GRAY:
+          return "GOOD_DISPLAY_2_9IN_4GRAY";
+        default:
+          return "";
+      }
+    } else {
+      return "";
+    }
+  }
+
+  std::optional<DisplayType> displayTypeFromString(const std::string &str) {
+    if (str == "GOOD_DISPLAY_1_54IN") {
+      return GOOD_DISPLAY_1_54IN;
+    } else if (str == "GOOD_DISPLAY_2_13IN") {
+      return GOOD_DISPLAY_2_13IN;
+    } else if (str == "GOOD_DISPLAY_2_9IN") {
+      return GOOD_DISPLAY_2_9IN;
+    } else if (str == "GOOD_DISPLAY_2_9IN_4GRAY") {
+      return GOOD_DISPLAY_2_9IN_4GRAY;
+    } else {
+      return std::nullopt;
+    }
   }
 }

@@ -26,7 +26,7 @@ namespace states {
       get_configuration(context);
     }
 
-    virtual void leave(Context &context)  {
+    virtual void leave(Context &context) {
       config_timer.stop();
       coap_tick_timer.stop();
     }
@@ -58,11 +58,15 @@ namespace states {
       auto responseHandler = [](uint32_t status, void *p_arg, coap_message_t *p_message) {
         if (status != NRF_SUCCESS) {
           NRF_LOG_ERROR("Error status from config response. Status: %d", status)
-        } else if(p_message->header.code != COAP_CODE_205_CONTENT) {
+        } else if (p_message->header.code != COAP_CODE_205_CONTENT) {
           NRF_LOG_ERROR("Unexpected management server response code: %d", p_message->header.code)
         } else {
           settings::update(p_message->p_payload, p_message->payload_len);
-          static_cast<Context *>(p_arg)->react(config_set{});
+          auto ctx = static_cast<Context *>(p_arg);
+          if (settings::m_display_type) {
+            ctx->disp = settings::createDisplay(*settings::m_display_type);
+          }
+          ctx->react(config_set{});
         }
       };
 
