@@ -8,6 +8,7 @@
 #include "gzip.hpp"
 
 #define COAP_TICK_PERIOD       std::chrono::seconds(1)
+#define RENDER_DELAY           std::chrono::milliseconds(100)
 
 using namespace fsm;
 
@@ -44,6 +45,12 @@ namespace states {
 
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
+    oneshot_timer  render_timer{RENDER_DELAY, [](void *ctx) {
+      auto context = static_cast<Context *>(ctx);
+      if (context->disp) {
+        context->disp->render();
+      }
+    }};
 
     void handle_settings_post(const coap_service::post_data &coap_data, Context &context) {
       settings::updateFromCoapData(coap_data);
@@ -60,7 +67,7 @@ namespace states {
         NRF_LOG_DEBUG("Uncompressed image size: %d bytes", uncompressed.size())
         if (context.disp) {
           context.disp->draw_fullscreen_bitmap(uncompressed);
-          context.disp->render();  // TODO: Post this to app scheduler
+          render_timer.start(&context);
         }
       } else {
         auto error_code = std::get<int>(result);
