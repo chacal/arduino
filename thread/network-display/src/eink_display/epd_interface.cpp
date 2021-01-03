@@ -24,11 +24,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <nrf_gpio.h>
-#include <nrf_delay.h>
 #include <nrfx_spim.h>
 #include <nrfx_rtc.h>
 #include <app_timer.h>
+#include <nrfx_gpiote.h>
 #include "epd_interface.hpp"
 
 bool        m_initialized = false;
@@ -78,13 +77,22 @@ void epd_interface::spi_transfer(unsigned char data) {
 
 void epd_interface::wait_for_pin_state(uint8_t pin, uint8_t state) {
   if (digital_read(pin) != state) {
-    nrf_gpio_cfg_sense_set(pin, state > 0 ? NRF_GPIO_PIN_SENSE_HIGH : NRF_GPIO_PIN_SENSE_LOW);
+    nrfx_gpiote_in_config_t pin_config;
+    if (state > 0) {
+      pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_LOTOHI(false);
+    } else {
+      pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+    }
+    APP_ERROR_CHECK(nrfx_gpiote_in_init(pin, &pin_config, nullptr));
+    nrfx_gpiote_in_event_enable(pin, true);
+
     while (digital_read(pin) != state) {
       __SEV();
       __WFE();
       __WFE();
     }
-    nrf_gpio_cfg_sense_set(pin, NRF_GPIO_PIN_NOSENSE);
+    nrfx_gpiote_in_event_disable(pin);
+    nrfx_gpiote_in_uninit(pin);
   }
 }
 
@@ -122,10 +130,12 @@ int epd_interface::init() {
 
     APP_ERROR_CHECK(initialize_rtc());
     APP_ERROR_CHECK(initialize_spi());
+    if (!nrfx_gpiote_is_init()) {
+      APP_ERROR_CHECK(nrfx_gpiote_init());
+    }
 
     nrf_gpio_cfg_output(RST_PIN);
     nrf_gpio_cfg_output(DC_PIN);
-    nrf_gpio_cfg_input(BUSY_PIN, NRF_GPIO_PIN_NOPULL);
 
     m_initialized = true;
   }
