@@ -76,24 +76,25 @@ void epd_interface::spi_transfer(unsigned char data) {
 }
 
 void epd_interface::wait_for_pin_state(uint8_t pin, uint8_t state) {
-  if (digital_read(pin) != state) {
-    nrfx_gpiote_in_config_t pin_config;
-    if (state > 0) {
-      pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_LOTOHI(false);
-    } else {
-      pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
-    }
-    APP_ERROR_CHECK(nrfx_gpiote_in_init(pin, &pin_config, nullptr));
-    nrfx_gpiote_in_event_enable(pin, true);
+  nrfx_gpiote_in_config_t pin_config;
+  if (state > 0) {
+    pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_LOTOHI(false);
+  } else {
+    pin_config = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
+  }
+  APP_ERROR_CHECK(nrfx_gpiote_in_init(pin, &pin_config, nullptr));
 
+  if (digital_read(pin) != state) {
+    nrfx_gpiote_in_event_enable(pin, true);
     while (digital_read(pin) != state) {
       __SEV();
       __WFE();
       __WFE();
     }
     nrfx_gpiote_in_event_disable(pin);
-    nrfx_gpiote_in_uninit(pin);
   }
+
+  nrfx_gpiote_in_uninit(pin);
 }
 
 int initialize_rtc() {
