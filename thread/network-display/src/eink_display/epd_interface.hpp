@@ -39,17 +39,6 @@
 #define SPI_CS_PIN      5
 */
 
-// Pin definition, own custom board
-#define RST_PIN        31
-#define DC_PIN         29
-#define BUSY_PIN       30
-
-#define SPI_SCK_PIN    28
-#define SPI_MOSI_PIN    3
-#define SPI_MISO_PIN    4  // Not used
-#define SPI_CS_PIN      2
-
-
 namespace epd_interface {
   int init();
 

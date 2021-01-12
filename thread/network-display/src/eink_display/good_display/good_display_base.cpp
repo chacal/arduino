@@ -1,3 +1,4 @@
+#include <settings.hpp>
 #include "good_display_base.hpp"
 #include "eink_display/epd_interface.hpp"
 
@@ -17,18 +18,18 @@ void good_display_base::on() {
 
 
 void good_display_base::send_command(unsigned char command) {
-  digital_write(DC_PIN, LOW);
+  digital_write(settings::m_pin_config.epd_dc_pin, LOW);
   spi_transfer(command);
 }
 
 void good_display_base::send_data(unsigned char data) {
-  digital_write(DC_PIN, HIGH);
+  digital_write(settings::m_pin_config.epd_dc_pin, HIGH);
   spi_transfer(data);
 }
 
 void good_display_base::reset() {
-  digital_write(RST_PIN, LOW);                //module reset
+  digital_write(settings::m_pin_config.epd_rst_pin, LOW);                //module reset
   delay_ms(10);
-  digital_write(RST_PIN, HIGH);
+  digital_write(settings::m_pin_config.epd_rst_pin, HIGH);
   delay_ms(10);
 }

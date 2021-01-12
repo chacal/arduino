@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cmath>
 #include <nrf_log.h>
+#include <settings.hpp>
 #include "good_display_base.hpp"
 #include "il3820_display_base.hpp"
 #include "eink_display/epd_interface.hpp"
@@ -142,5 +143,5 @@ void il3820_display_base::sleep() {
 }
 
 void il3820_display_base::wait_until_idle() {
-  epd_interface::wait_for_pin_state(BUSY_PIN, LOW);
+  epd_interface::wait_for_pin_state(settings::m_pin_config.epd_busy_pin, LOW);
 }

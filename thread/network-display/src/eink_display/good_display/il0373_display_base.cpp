@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <nrf_log.h>
+#include <settings.hpp>
 #include "good_display_base.hpp"
 #include "il0373_display_base.hpp"
 #include "eink_display/epd_interface.hpp"
@@ -122,5 +123,5 @@ void il0373_display_base::sleep() {
 }
 
 void il0373_display_base::wait_until_idle() {
-  epd_interface::wait_for_pin_state(BUSY_PIN, HIGH);
+  epd_interface::wait_for_pin_state(settings::m_pin_config.epd_busy_pin, HIGH);
 }

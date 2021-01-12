@@ -28,6 +28,7 @@
 #include <nrfx_rtc.h>
 #include <app_timer.h>
 #include <nrfx_gpiote.h>
+#include <settings.hpp>
 #include "epd_interface.hpp"
 
 bool        m_initialized = false;
@@ -115,11 +116,12 @@ int initialize_rtc() {
 int initialize_spi() {
   m_spim_instance = NRFX_SPIM_INSTANCE(0);
 
+  auto               pins   = settings::m_pin_config;
   nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG;
-  config.sck_pin   = SPI_SCK_PIN;
-  config.mosi_pin  = SPI_MOSI_PIN;
-  config.miso_pin  = SPI_MISO_PIN;
-  config.ss_pin    = SPI_CS_PIN;
+  config.sck_pin   = pins.spi_clk_pin;
+  config.mosi_pin  = pins.spi_mosi_pin;
+  config.miso_pin  = pins.spi_miso_pin;
+  config.ss_pin    = pins.epd_cs_pin;
   config.frequency = NRF_SPIM_FREQ_2M;
 
   return nrfx_spim_init(&m_spim_instance, &config, nullptr, nullptr);
@@ -135,8 +137,9 @@ int epd_interface::init() {
       APP_ERROR_CHECK(nrfx_gpiote_init());
     }
 
-    nrf_gpio_cfg_output(RST_PIN);
-    nrf_gpio_cfg_output(DC_PIN);
+    auto pins = settings::m_pin_config;
+    nrf_gpio_cfg_output(pins.epd_rst_pin);
+    nrf_gpio_cfg_output(pins.epd_dc_pin);
 
     m_initialized = true;
   }

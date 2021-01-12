@@ -17,9 +17,40 @@ namespace settings {
     GOOD_DISPLAY_2_9IN_4GRAY
   };
 
+  struct pin_config {
+    uint8_t epd_rst_pin;
+    uint8_t epd_dc_pin;
+    uint8_t epd_busy_pin;
+    uint8_t epd_cs_pin;
+    uint8_t epd_reset_ctl1_pin;
+    uint8_t epd_reset_ctl2_pin;
+    uint8_t spi_clk_pin;
+    uint8_t spi_mosi_pin;
+    uint8_t spi_miso_pin;
+    uint8_t lis3dh_cs_pin;
+    uint8_t lis3dh_int1_pin;
+    uint8_t lis3dh_int2_pin;
+  };
+
+  const pin_config E73_BOARD_PINOUT = {
+    .epd_rst_pin = 31,
+    .epd_dc_pin = 29,
+    .epd_busy_pin = 30,
+    .epd_cs_pin = 2,
+    .epd_reset_ctl1_pin = 0,
+    .epd_reset_ctl2_pin = 0,
+    .spi_clk_pin = 28,
+    .spi_mosi_pin = 3,
+    .spi_miso_pin = 4,
+    .lis3dh_cs_pin = 0,
+    .lis3dh_int1_pin = 0,
+    .lis3dh_int2_pin = 0
+  };
+
   extern std::string                m_instance;
   extern std::string                m_mgmt_server;
   extern std::optional<DisplayType> m_display_type;
+  extern pin_config                 m_pin_config;
 
   struct settings {
     std::optional<std::string>  instance;
