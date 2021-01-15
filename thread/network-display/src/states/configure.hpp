@@ -63,7 +63,7 @@ namespace states {
         } else {
           settings::update(p_message->p_payload, p_message->payload_len);
           auto ctx = static_cast<Context *>(p_arg);
-          if (settings::m_display_type) {
+          if (settings::m_display_type && settings::m_hw_version) {
             ctx->disp = settings::createDisplay(*settings::m_display_type);
           }
           ctx->react(config_set{});

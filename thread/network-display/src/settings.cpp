@@ -14,10 +14,11 @@
 using namespace ArduinoJson;
 
 namespace settings {
-  std::string                m_instance     = "D000";
-  std::string                m_mgmt_server;
-  std::optional<DisplayType> m_display_type = std::nullopt;
-  pin_config                 m_pin_config   = E73_BOARD_PINOUT;
+  std::string                    m_instance     = "D000";
+  std::string                    m_mgmt_server;
+  std::optional<DisplayType>     m_display_type = std::nullopt;
+  std::optional<HardwareVersion> m_hw_version   = std::nullopt;
+  pin_config                     m_pin_config   = E73_BOARD_PINOUT;
 
   void updateFromCoapData(const coap_service::post_data &coap_data) {
     update(coap_data.data, coap_data.len);
@@ -54,6 +55,15 @@ namespace settings {
       m_display_type = s->displayType;
     }
 
+    if (s->hwVersion) {
+      m_hw_version = s->hwVersion;
+      if (m_hw_version == E73) {
+        m_pin_config = E73_BOARD_PINOUT;
+      } else {
+        m_pin_config = MS88SF2_BOARD_PINOUT;
+      }
+    }
+
     NRF_LOG_DEBUG("Updated settings: %s", get_as_json().c_str())
   }
 
@@ -65,6 +75,7 @@ namespace settings {
     doc["increasedPollPeriod"]   = thread::get_increased_poll_period().count();
     doc["increasedPollDuration"] = thread::get_increased_poll_duration().count();
     doc["displayType"]           = toString(m_display_type);
+    doc["hwVersion"]             = toString(m_hw_version);
     return doc.as<std::string>();
   }
 
@@ -123,12 +134,25 @@ namespace settings {
       if (doc["displayType"].is<char *>()) {
         auto displayType = displayTypeFromString(doc["displayType"]);
         if (displayType) {
-          m_display_type = *displayType;
+          s.displayType = displayType;
         } else {
           NRF_LOG_ERROR("Unknown display type! %s", doc["displayType"]);
         }
       } else {
         NRF_LOG_ERROR("Display type must be a string!");
+      }
+    }
+
+    if (doc.containsKey("hwVersion")) {
+      if (doc["hwVersion"].is<char *>()) {
+        auto hwVersion = hwVersionFromString(doc["hwVersion"]);
+        if (hwVersion) {
+          s.hwVersion = hwVersion;
+        } else {
+          NRF_LOG_ERROR("Unknown hardware version! %s", doc["hwVersion"]);
+        }
+      } else {
+        NRF_LOG_ERROR("Hardware version must be a string!");
       }
     }
 
@@ -178,6 +202,31 @@ namespace settings {
       return GOOD_DISPLAY_2_9IN;
     } else if (str == "GOOD_DISPLAY_2_9IN_4GRAY") {
       return GOOD_DISPLAY_2_9IN_4GRAY;
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string toString(std::optional<HardwareVersion> hwVersion) {
+    if (hwVersion) {
+      switch (*hwVersion) {
+        case E73:
+          return "E73";
+        case MS88SF2_V1_0:
+          return "MS88SF2_V1_0";
+        default:
+          return "";
+      }
+    } else {
+      return "";
+    }
+  }
+
+  std::optional<HardwareVersion> hwVersionFromString(const std::string &str) {
+    if (str == "E73") {
+      return E73;
+    } else if (str == "MS88SF2_V1_0") {
+      return MS88SF2_V1_0;
     } else {
       return std::nullopt;
     }
