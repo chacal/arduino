@@ -33,6 +33,9 @@ void il0373_display_base::draw_fullscreen_bitmap(const std::vector<uint8_t> &vec
 }
 
 int il0373_display_base::init() {
+  if (settings::m_pin_config.epd_reset_ctl2_pin > 0) {
+    epd_interface::digital_write(settings::m_pin_config.epd_reset_ctl2_pin, HIGH);
+  }
   reset();
   send_command(0x01);     //POWER SETTING
   send_data(0x03);
@@ -120,6 +123,9 @@ void il0373_display_base::sleep() {
   wait_until_idle();
   send_command(0x07);   //deep sleep
   send_data(0xA5);
+  if (settings::m_pin_config.epd_reset_ctl2_pin > 0) {
+    epd_interface::digital_write(settings::m_pin_config.epd_reset_ctl2_pin, LOW);
+  }
 }
 
 void il0373_display_base::wait_until_idle() {

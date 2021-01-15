@@ -140,6 +140,12 @@ int epd_interface::init() {
     auto pins = settings::m_pin_config;
     nrf_gpio_cfg_output(pins.epd_rst_pin);
     nrf_gpio_cfg_output(pins.epd_dc_pin);
+    if (pins.epd_reset_ctl1_pin > 0) {
+      nrf_gpio_cfg_output(pins.epd_reset_ctl1_pin);
+    }
+    if (pins.epd_reset_ctl2_pin > 0) {
+      nrf_gpio_cfg_output(pins.epd_reset_ctl2_pin);
+    }
 
     m_initialized = true;
   }

@@ -66,6 +66,9 @@ void il3820_display_base::clear() {
 }
 
 int il3820_display_base::init() {
+  if (settings::m_pin_config.epd_reset_ctl1_pin > 0) {
+    epd_interface::digital_write(settings::m_pin_config.epd_reset_ctl1_pin, HIGH);
+  }
   /* EPD hardware init start */
   reset();
   send_command(DRIVER_OUTPUT_CONTROL);
@@ -140,6 +143,9 @@ void il3820_display_base::set_memory_pointer(uint32_t x, uint32_t y) {
 void il3820_display_base::sleep() {
   send_command(DEEP_SLEEP_MODE);
   send_data(0x01);
+  if (settings::m_pin_config.epd_reset_ctl1_pin > 0) {
+    epd_interface::digital_write(settings::m_pin_config.epd_reset_ctl1_pin, LOW);
+  }
 }
 
 void il3820_display_base::wait_until_idle() {
