@@ -14,17 +14,19 @@
 #include "ntc_thermometer_sensor.h"
 #include "tank_sensor.h"
 #include "dcdc_selector.h"
+#include "voltage_sensor.h"
 
 #define SENSOR_TYPE_BME280       1
 #define SENSOR_TYPE_PIR          2
 #define SENSOR_TYPE_INA226       3
 #define SENSOR_TYPE_NTC          4
 #define SENSOR_TYPE_TANK_LEVEL   5
+#define SENSOR_TYPE_EXT_VOLTAGE  7
 
 
-#define DEVICE_NAME         S218
+#define DEVICE_NAME         V500
 #define DCDC_MODE           DCDC_MODE_BY_DEVICE_NAME   // Either DCDC_MODE_DISABLED, DCDC_MODE_ENABLED or DCDC_MODE_BY_DEVICE_NAME
-#define SENSOR_TYPE         SENSOR_TYPE_BME280         // Remember also to check the PIR sensor pins in pir_sensor.c!
+#define SENSOR_TYPE         SENSOR_TYPE_EXT_VOLTAGE    // Remember also to check the PIR sensor pins in pir_sensor.c!
 
 
 static void on_dfu_triggered() {
@@ -64,6 +66,8 @@ static void start_selected_sensor() {
   ntc_thermometer_sensor_start();
 #elif SENSOR_TYPE == SENSOR_TYPE_TANK_LEVEL
   tank_sensor_start();
+#elif SENSOR_TYPE == SENSOR_TYPE_EXT_VOLTAGE
+  voltage_sensor_start();
 #else
 #error Unknown sensor type!
 #endif
