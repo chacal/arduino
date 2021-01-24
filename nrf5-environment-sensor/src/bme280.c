@@ -122,7 +122,7 @@ double calculate_pressure(int32_t raw, int32_t t_fine) {
   var2 = var2 + (((int64_t) dig_P4) << 35);
   var1 = ((var1 * var1 * (int64_t) dig_P3) >> 8) + ((var1 * (int64_t) dig_P2) << 12);
   var1 = (((((int64_t) 1) << 47) + var1)) * ((int64_t) dig_P1) >> 33;
-  if(var1 == 0) { return NAN; }                                                         // Don't divide by zero.
+  if (var1 == 0) { return NAN; }                                                         // Don't divide by zero.
   pressure = 1048576 - raw;
   pressure = (((pressure << 31) - var2) * 3125) / var1;
   var1     = (((int64_t) dig_P9) * (pressure >> 13) * (pressure >> 13)) >> 25;
@@ -137,7 +137,7 @@ double calculate_pressure(int32_t raw, int32_t t_fine) {
 
 // Returns humidity as %H
 double calculate_humidity(int32_t raw, int32_t t_fine) {
-  // Code based on calibration algorthim provided by Bosch.
+  // Code based on calibration algorithm provided by Bosch.
   int32_t var1;
   uint8_t dig_H1 = m_dig[24];
   int16_t dig_H2 = (m_dig[26] << 8) | m_dig[25];
@@ -148,8 +148,8 @@ double calculate_humidity(int32_t raw, int32_t t_fine) {
 
   var1 = (t_fine - ((int32_t) 76800));
   var1 = (((((raw << 14) - (((int32_t) dig_H4) << 20) - (((int32_t) dig_H5) * var1)) +
-            ((int32_t) 16384)) >> 15) * (((((((var1 * ((int32_t) dig_H6)) >> 10) * (((var1 *
-                                                                                      ((int32_t) dig_H3)) >> 11) + ((int32_t) 32768))) >> 10) +
+            ((int32_t) 16384)) >> 15) * (((((((var1 * ((int32_t) dig_H6)) >> 10) *
+                                             (((var1 * ((int32_t) dig_H3)) >> 11) + ((int32_t) 32768))) >> 10) +
                                            ((int32_t) 2097152)) *
                                           ((int32_t) dig_H2) + 8192) >> 14));
   var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7) * ((int32_t) dig_H1)) >> 4));
@@ -165,7 +165,7 @@ static void read_raw_data(int32_t *result) {
   // Registers are in order. So we can start at the pressure register and read 8 bytes.
   read(BME280_REG_PRESSURE, buffer, BME280_SENSOR_DATA_LENGTH);
 
-  for(int i = 0; i < BME280_SENSOR_DATA_LENGTH; ++i) {
+  for (int i = 0; i < BME280_SENSOR_DATA_LENGTH; ++i) {
     result[i] = (int32_t) buffer[i];
   }
 }
@@ -201,11 +201,11 @@ static void trigger_measurements() {
 
 static void twi_init(void) {
   const nrf_drv_twi_config_t twi_config = {
-      .scl                = PIN_SCL,
-      .sda                = PIN_SDA,
-      .frequency          = NRF_TWI_FREQ_400K,
-      .interrupt_priority = APP_IRQ_PRIORITY_LOW,
-      .clear_bus_init     = false
+    .scl                = PIN_SCL,
+    .sda                = PIN_SDA,
+    .frequency          = NRF_TWI_FREQ_400K,
+    .interrupt_priority = APP_IRQ_PRIORITY_LOW,
+    .clear_bus_init     = false
   };
 
   APP_ERROR_CHECK(nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL));
@@ -232,7 +232,7 @@ static void bme280_power_off() {
 static void on_measurement_timer(void *ctx) {
   bme280_timer_cmd_t cmd = (bme280_timer_cmd_t) ctx;
 
-  switch(cmd) {
+  switch (cmd) {
     case BME280_TIMER_POWER_ON:
       bme280_power_on();
       app_timer_start(m_measurement_timer, APP_TIMER_TICKS(BME280_STARTUP_TIME_MS), (void *) BME280_TIMER_START_MEASUREMENTS);
@@ -275,7 +275,7 @@ void bme280_init(uint32_t measurement_interval_ms, bme280_measurement_cb_t callb
   uint8_t bme280_id;
   read(BME280_REG_ID, &bme280_id, sizeof(bme280_id));
 
-  if(bme280_id == BME280_DEVICE_ID) {
+  if (bme280_id == BME280_DEVICE_ID) {
     NRF_LOG_INFO("BME280 connected.")
     calibrate();
     app_timer_create(&m_measurement_timer, APP_TIMER_MODE_SINGLE_SHOT, on_measurement_timer);
