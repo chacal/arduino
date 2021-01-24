@@ -32,7 +32,7 @@
 #define BME280_ADDRESS                 0x76
 #define BME280_DEVICE_ID               0x60
 #define BME280_MEASUREMENT_TIME_MS       10
-#define BME280_STARTUP_TIME_MS            5
+#define BME280_STARTUP_TIME_MS           50
 
 #define BME280_CALIBRATION_BYTE_COUNT    32
 #define BME280_TEMP_DIG_LENGTH            6
