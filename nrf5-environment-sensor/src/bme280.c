@@ -10,11 +10,23 @@
 
 #include "sdk_config.h"
 
+//#define BME280_SENSOR_HW_1_1
+
+
+#ifdef BME280_SENSOR_HW_1_1
+
+#define PIN_SDA           3
+#define PIN_SCL           2
+#define PIN_BME280_POWER 12
+
+#else
+
 #define PIN_SDA           2
 #define PIN_SCL           3
 #define PIN_BME280_GND    4
 #define PIN_BME280_POWER  5
 
+#endif
 
 #define BME280_ADDRESS                 0x76
 #define BME280_DEVICE_ID               0x60
