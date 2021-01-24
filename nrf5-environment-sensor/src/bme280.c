@@ -8,25 +8,12 @@
 #include <nrf_drv_gpiote.h>
 #include <drivers_nrf/delay/nrf_delay.h>
 
-#ifdef NRF51
-
-#include "sdk_config_nrf51/sdk_config.h"
-
-#define PIN_SCA           0
-#define PIN_SCL           1
-#define PIN_BME280_POWER 12
-
-
-#else
-
 #include "sdk_config.h"
 
 #define PIN_SDA           2
 #define PIN_SCL           3
 #define PIN_BME280_GND    4
 #define PIN_BME280_POWER  5
-
-#endif  // #ifdef NRF51
 
 
 #define BME280_ADDRESS                 0x76

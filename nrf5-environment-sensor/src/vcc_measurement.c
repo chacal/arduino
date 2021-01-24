@@ -1,6 +1,8 @@
 #include "vcc_measurement.h"
 #include <app_error.h>
 #include <app_timer.h>
+#include <nrf_drv_saadc.h>
+#include "sdk_config.h"
 
 #define EXT_VOLTAGE_MEAS_PIN    NRF_SAADC_INPUT_AIN4  // P0.28
 #define VOLTAGE_DIVIDER_R1      1000     // Resistor between VIN and VIN_MEAS pin
@@ -9,47 +11,6 @@
 static vcc_measurement_cb_t m_measurement_cb;
 static vcc_measurement_cb_t m_ext_measurement_cb;
 
-
-/*
- * ------------------------------------------------------------------------------------------------
- * Implementation for NRF51 family
- * ------------------------------------------------------------------------------------------------
- */
-#ifdef NRF51
-#include <nrf_drv_adc.h>
-#include <sdk_config_nrf51/sdk_config.h>
-
-static nrf_drv_adc_channel_t m_adc_channel_config;
-
-static void sample_vcc(void *ctx) {
-  nrf_adc_value_t value;
-  nrf_drv_adc_sample_convert(&m_adc_channel_config, &value);
-  uint16_t vcc = (uint16_t) (value / (float) 1023 * 3 * 1.2 * 1000);  // ADC value * prescale (1/3) * 1.2V reference * mV
-  m_measurement_cb(vcc);
-}
-
-static void adc_init() {
-  nrf_drv_adc_config_t config = NRF_DRV_ADC_DEFAULT_CONFIG;
-  APP_ERROR_CHECK(nrf_drv_adc_init(&config, NULL));
-
-  m_adc_channel_config.config.config.input              = NRF_ADC_CONFIG_SCALING_SUPPLY_ONE_THIRD;
-  m_adc_channel_config.config.config.external_reference = NRF_ADC_CONFIG_REF_VBG;
-  m_adc_channel_config.config.config.resolution         = NRF_ADC_CONFIG_RES_10BIT;
-
-  nrf_drv_adc_channel_enable(&m_adc_channel_config);
-}
-
-
-#else
-
-
-/*
- * ------------------------------------------------------------------------------------------------
- * Implementation for NRF52 family
- * ------------------------------------------------------------------------------------------------
- */
-#include <nrf_drv_saadc.h>
-#include "sdk_config.h"
 
 #define INT_ADC_CHANNEL       0   // ADC channel to use to measure internal VCC
 #define EXT_ADC_CHANNEL       2   // ADC channel to use to measure external voltage
@@ -99,14 +60,6 @@ static void ext_adc_init() {
   APP_ERROR_CHECK(nrf_drv_saadc_channel_init(EXT_ADC_CHANNEL, &channel_config));
 }
 
-#endif
-
-
-/*
- * ------------------------------------------------------------------------------------------------
- * Common implementation
- * ------------------------------------------------------------------------------------------------
- */
 void vcc_measurement_init(uint32_t measurement_interval_ms, vcc_measurement_cb_t callback) {
   m_measurement_cb = callback;
   int_adc_init();
