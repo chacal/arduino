@@ -5,6 +5,7 @@
 #include "states/context.hpp"
 #include "states/base_configure.hpp"
 #include "connected.hpp"
+#include "settings.hpp"
 
 using namespace fsm;
 
@@ -16,8 +17,7 @@ namespace states {
 
     virtual void react(const config_set &event, typename M::Control &control, typename M::Context &context) {
       NRF_LOG_INFO("Configured:")
-      // TODO: Log configuration here
-      // NRF_LOG_INFO("%s", settings::get_as_json().c_str())
+      NRF_LOG_INFO("%s", settings::get_as_json().c_str())
       control.template changeTo<connected>();
     }
 
@@ -33,8 +33,7 @@ namespace states {
         } else if (p_message->header.code != COAP_CODE_205_CONTENT) {
           NRF_LOG_ERROR("Unexpected management server response code: %d", p_message->header.code)
         } else {
-          // TODO: Parse and save settings
-          NRF_LOG_HEXDUMP_INFO(p_message->p_payload, p_message->payload_len)
+          settings::update(p_message->p_payload, p_message->payload_len);
           auto ctx = static_cast<typename M::Context *>(p_arg);
           ctx->react(config_set{});
         }

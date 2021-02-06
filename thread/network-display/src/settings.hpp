@@ -4,6 +4,7 @@
 #include <memory>
 #include <display.hpp>
 #include "coap_service.hpp"
+#include "base_settings.hpp"
 
 #define MGMT_SERVER_PORT      5683
 
@@ -72,12 +73,7 @@ namespace settings {
   extern std::optional<HardwareVersion> m_hw_version;
   extern pin_config                     m_pin_config;
 
-  struct settings {
-    std::optional<std::string>     instance;
-    std::optional<int8_t>          txPower;
-    std::optional<milliseconds>    pollPeriod;
-    std::optional<milliseconds>    increasedPollPeriod;
-    std::optional<milliseconds>    increasedPollDuration;
+  struct settings : base_settings {
     std::optional<DisplayType>     displayType;
     std::optional<HardwareVersion> hwVersion;
   };

@@ -5,7 +5,6 @@
 #define JSON_PARSE_BUFFER_SIZE      2000
 
 #include "ArduinoJson-v6.13.0.hpp"
-#include "thread.hpp"
 #include <eink_display/good_display/good_display_1in54.hpp>
 #include <eink_display/good_display/good_display_2in13.hpp>
 #include <eink_display/good_display/good_display_2in9.hpp>
@@ -30,24 +29,10 @@ namespace settings {
       return;
     }
 
+    set_thread_settings(s);
+
     if (s->instance) {
       m_instance = *s->instance;
-    }
-
-    if (s->pollPeriod) {
-      thread::set_tx_power(*s->txPower);
-    }
-
-    if (s->pollPeriod) {
-      thread::set_normal_poll_period(milliseconds(*s->pollPeriod));
-    }
-
-    if (s->increasedPollPeriod) {
-      thread::set_increased_poll_period(milliseconds(*s->increasedPollPeriod));
-    }
-
-    if (s->increasedPollDuration) {
-      thread::set_increased_poll_duration(milliseconds(*s->increasedPollDuration));
     }
 
     if (s->displayType) {
@@ -68,18 +53,14 @@ namespace settings {
 
   std::string get_as_json() {
     StaticJsonDocument<JSON_PARSE_BUFFER_SIZE> doc;
-    doc["instance"]              = m_instance;
-    doc["txPower"]               = thread::get_tx_power();
-    doc["pollPeriod"]            = thread::get_normal_poll_period().count();
-    doc["increasedPollPeriod"]   = thread::get_increased_poll_period().count();
-    doc["increasedPollDuration"] = thread::get_increased_poll_duration().count();
-    doc["displayType"]           = toString(m_display_type);
-    doc["hwVersion"]             = toString(m_hw_version);
+    write_thread_settings_to_json(doc);
+    doc["instance"]    = m_instance;
+    doc["displayType"] = toString(m_display_type);
+    doc["hwVersion"]   = toString(m_hw_version);
     return doc.as<std::string>();
   }
 
   std::optional<settings> fromJson(const uint8_t *jsonData, uint32_t len) {
-    settings                                   s{};
     StaticJsonDocument<JSON_PARSE_BUFFER_SIZE> doc;
     DeserializationError                       error = deserializeJson(doc, jsonData);
 
@@ -89,45 +70,7 @@ namespace settings {
       return std::nullopt;
     }
 
-    if (doc.containsKey("instance")) {
-      if (doc["instance"].is<char *>()) {
-        s.instance = doc["instance"].as<char *>();
-      } else {
-        NRF_LOG_ERROR("Instance must be a string!");
-      }
-    }
-
-    if (doc.containsKey("txPower")) {
-      if (doc["txPower"].is<int8_t>()) {
-        s.txPower = doc["txPower"];
-      } else {
-        NRF_LOG_ERROR("Tx power must be an integer!");
-      }
-    }
-
-    if (doc.containsKey("pollPeriod")) {
-      if (doc["pollPeriod"].is<uint32_t>()) {
-        s.pollPeriod = milliseconds(doc["pollPeriod"]);
-      } else {
-        NRF_LOG_ERROR("Poll period must be an integer!");
-      }
-    }
-
-    if (doc.containsKey("increasedPollPeriod")) {
-      if (doc["increasedPollPeriod"].is<uint32_t>()) {
-        s.increasedPollPeriod = milliseconds(doc["increasedPollPeriod"]);
-      } else {
-        NRF_LOG_ERROR("Increased poll period must be an integer!");
-      }
-    }
-
-    if (doc.containsKey("increasedPollDuration")) {
-      if (doc["increasedPollDuration"].is<uint32_t>()) {
-        s.increasedPollDuration = milliseconds(doc["increasedPollDuration"]);
-      } else {
-        NRF_LOG_ERROR("Increased poll duration must be an integer!");
-      }
-    }
+    settings s{base_settings_from_json(doc)};
 
     if (doc.containsKey("displayType")) {
       if (doc["displayType"].is<char *>()) {
