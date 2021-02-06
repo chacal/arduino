@@ -28,11 +28,12 @@ namespace states {
       auto on_settings_post      = [&](auto coap_data) { handle_settings_post(coap_data, context); };
       auto on_state_get          = []() { return util::get_state_json(settings::m_instance); };
       coap_service::initialize({
-                                 on_display_image_post,
                                  &settings::get_as_json,
                                  on_settings_post,
                                  on_state_get
-                               });
+                               },
+                               on_display_image_post
+      );
       coap_tick_timer.start(&context);
       post_state_to_mgmt_server(context.mgmt_server);
     }
