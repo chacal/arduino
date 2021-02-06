@@ -3,6 +3,8 @@
 #include <variant>
 #include <nrf_log.h>
 #include <coap_helpers.hpp>
+#include <coap_service.hpp>
+#include <settings.hpp>
 #include "states/context.hpp"
 #include "gzip.hpp"
 
@@ -19,6 +21,16 @@ namespace states {
 
     virtual void enter(Context &context) {
       NRF_LOG_INFO("Connected!");
+
+      auto on_settings_post = [&](auto coap_data) { handle_settings_post(coap_data, context); };
+      auto on_state_get     = []() { return util::get_state_json(settings::m_instance); };
+      coap_service::initialize({
+                                 &settings::get_as_json,
+                                 on_settings_post,
+                                 on_state_get
+                               }
+      );
+
       coap_tick_timer.start(&context);
       post_state_to_mgmt_server(context.mgmt_server);
     }
@@ -33,9 +45,12 @@ namespace states {
   private:
     periodic_timer coap_tick_timer{COAP_TICK_PERIOD, [](void *ctx) { static_cast<Context *>(ctx)->react(coap_timer_ticked{}); }};
 
+    void handle_settings_post(const coap_helpers::post_data &coap_data, Context &context) {
+      settings::updateFromCoapData(coap_data);
+    }
+
     void post_state_to_mgmt_server(const std::string &mgmt_server) const {
-      // TODO: Get instance from settings
-      auto state = util::get_state_json("0000");
+      auto state = util::get_state_json(settings::m_instance);
 
       NRF_LOG_INFO("Posting state to mgmt server:")
       NRF_LOG_INFO("%s", state.c_str())
