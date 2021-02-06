@@ -13,6 +13,9 @@ SRC_DIR            := $(PROJ_DIR)/src
 TEMPLATE_PATH      := $(SDK_ROOT)/components/toolchain/gcc
 SDK_CONFIG_FILE    := $(SRC_DIR)/sdk_config.h
 
+THREAD_COMMON_PATH := $(PROJ_DIR)/../common
+COMMON_SOURCES     := $(wildcard $(THREAD_COMMON_PATH)/src/*.cpp)
+
 U8G2_PATH          := $(HOME)/arduino/u8g2
 U8G2_SOURCES       := $(wildcard $(U8G2_PATH)/csrc/*.c)
 
@@ -109,21 +112,15 @@ SRC_FILES += \
   $(SDK_ROOT)/external/nano-pb/pb_decode.c \
   $(U8G2_SOURCES) \
   $(SRC_DIR)/main.cpp \
-  $(SRC_DIR)/thread.cpp \
   $(SRC_DIR)/dfu_public_key.c \
-  $(SRC_DIR)/timer.cpp \
   $(SRC_DIR)/coap_service.cpp \
-  $(SRC_DIR)/coap_helpers.cpp \
-  $(SRC_DIR)/power_manager.cpp \
-  $(SRC_DIR)/vcc.cpp \
-  $(SRC_DIR)/util.cpp \
   $(SRC_DIR)/settings.cpp \
   $(SRC_DIR)/eink_display/good_display/good_display_base.cpp \
   $(SRC_DIR)/eink_display/good_display/il3820_display_base.cpp \
   $(SRC_DIR)/eink_display/good_display/il0373_display_base.cpp \
   $(SRC_DIR)/eink_display/epd_interface.cpp \
   $(UZLIB_SOURCES) \
-  $(SRC_DIR)/gzip.cpp \
+  $(COMMON_SOURCES) \
 
 INC_FOLDERS += \
   $(SDK_ROOT)/external/nrf_security/include \
@@ -201,6 +198,7 @@ INC_FOLDERS += \
   $(U8G2_PATH)/csrc \
   $(HFSM_PATH)/include \
   $(UZLIB_PATH)/src \
+  $(THREAD_COMMON_PATH)/src \
 
 #
 # Original Nordic SDK Openthread libraries

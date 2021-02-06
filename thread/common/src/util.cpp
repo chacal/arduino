@@ -3,7 +3,6 @@
 #include "ArduinoJson-v6.13.0.hpp"
 #include "vcc.hpp"
 #include "thread.hpp"
-#include "settings.hpp"
 #include "util.hpp"
 
 
@@ -22,10 +21,10 @@ namespace util {
     return rc;
   }
 
-  std::string get_state_json() {
+  std::string get_state_json(const std::string &instance) {
     StaticJsonDocument<1024> doc;
     doc["vcc"]        = vcc::measure();
-    doc["instance"]   = settings::m_instance;
+    doc["instance"]   = instance;
     doc["txPower"]    = thread::get_tx_power();
     doc["pollPeriod"] = thread::get_normal_poll_period().count();
 

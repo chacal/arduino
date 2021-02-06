@@ -8,6 +8,7 @@ set(SDK_ROOT "$ENV{HOME}/nonbackupped/nRF5_SDK_for_Thread_and_Zigbee_v4.1.0")
 set(U8G2_ROOT "$ENV{HOME}/arduino/u8g2")
 set(UZLIB_ROOT "$ENV{HOME}/Documents/dev/uzlib")
 set(HFSM_ROOT "$ENV{HOME}/Documents/dev/HFSM")
+set(THREAD_COMMON_PATH "${PROJECT_SOURCE_DIR}/../common")
 
 add_definitions(-DNRF52840_XXAA)
 add_definitions(-DBOARD_PCA10056)
@@ -75,7 +76,8 @@ include_directories("${SDK_ROOT}/external/micro-ecc/micro-ecc")
 include_directories("${U8G2_ROOT}/csrc")
 include_directories("${HFSM_ROOT}/include")
 include_directories("${UZLIB_ROOT}/src")
+include_directories("${THREAD_COMMON_PATH}/src")
 
-file(GLOB_RECURSE SRC_LIST "*.cpp")
+file(GLOB_RECURSE SRC_LIST "*.cpp" "${THREAD_COMMON_PATH}/src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})

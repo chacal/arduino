@@ -15,12 +15,11 @@ using namespace ArduinoJson;
 
 namespace settings {
   std::string                    m_instance     = "D000";
-  std::string                    m_mgmt_server;
   std::optional<DisplayType>     m_display_type = std::nullopt;
   std::optional<HardwareVersion> m_hw_version   = std::nullopt;
   pin_config                     m_pin_config   = E73_BOARD_PINOUT;
 
-  void updateFromCoapData(const coap_service::post_data &coap_data) {
+  void updateFromCoapData(const coap_helpers::post_data &coap_data) {
     update(coap_data.data, coap_data.len);
   }
 

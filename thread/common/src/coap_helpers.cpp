@@ -100,7 +100,7 @@ namespace coap_helpers {
 
   std::vector<uint8_t> msg_buf;
 
-  void handle_block1_post(coap_message_t *p_request, const coap_service::post_handler &handler) {
+  void handle_block1_post(coap_message_t *p_request, const post_handler &handler) {
     auto block1_request_opt = get_opt_block1(p_request);
     NRF_LOG_DEBUG("Block1: payload: %dB, num: %d, more: %d", p_request->payload_len, block1_request_opt.number, block1_request_opt.more)
 
@@ -125,7 +125,7 @@ namespace coap_helpers {
     }
   }
 
-  void handle_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler,
+  void handle_post(coap_resource_t *p_resource, coap_message_t *p_request, const post_handler &handler,
                    uint32_t content_type_mask) {
     if (has_content_type(p_request, content_type_mask)) {
       if (coap_message_opt_present(p_request, COAP_OPT_BLOCK1) == NRF_SUCCESS) {
@@ -148,15 +148,15 @@ namespace coap_helpers {
     }
   }
 
-  void handle_json_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
+  void handle_json_post(coap_resource_t *p_resource, coap_message_t *p_request, const post_handler &handler) {
     handle_post(p_resource, p_request, handler, COAP_CT_MASK_APP_JSON);
   }
 
-  void handle_binary_post(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::post_handler &handler) {
+  void handle_binary_post(coap_resource_t *p_resource, coap_message_t *p_request, const post_handler &handler) {
     handle_post(p_resource, p_request, handler, COAP_CT_MASK_APP_OCTET_STREAM);
   }
 
-  void handle_json_get(coap_resource_t *p_resource, coap_message_t *p_request, const coap_service::get_handler &handler) {
+  void handle_json_get(coap_resource_t *p_resource, coap_message_t *p_request, const get_handler &handler) {
     coap_message_t      *p_response;
     coap_content_type_t content_type;
     uint32_t            err_code = coap_message_ct_match_select(&content_type, p_request, p_resource);

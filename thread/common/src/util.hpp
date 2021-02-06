@@ -9,7 +9,7 @@
 namespace util {
   using rtc_ticks = std::chrono::duration<uint32_t, std::ratio<1, APP_TIMER_CLOCK_FREQ>>;
 
-  std::string get_state_json();
+  std::string get_state_json(const std::string &instance);
 
   void log_ipv6_address(const otNetifAddress &address);
 

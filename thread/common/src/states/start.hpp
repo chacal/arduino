@@ -9,7 +9,7 @@ extern "C" {
 #include <coap_dfu.h>
 }
 
-#include "common.hpp"
+#include "states/context.hpp"
 #include "named_type.hpp"
 #include "power_manager.hpp"
 #include "vcc.hpp"
@@ -17,11 +17,11 @@ extern "C" {
 using namespace fsm;
 
 namespace states {
-  struct discover;
   using thread_role = named_type<otDeviceRole, struct thread_role_param>;
 
-  struct start : Base {
-    virtual void enter(Context &context) {
+  template<typename M, typename DISCOVER>
+  struct start : M::Base {
+    virtual void enter(typename M::Context &context) {
       APP_ERROR_CHECK(nrf_mem_init());
       power_manager::init();
       vcc::init();
@@ -34,13 +34,13 @@ namespace states {
       APP_ERROR_CHECK(coap_dfu_init(ot));
     }
 
-    virtual void react(const thread_role &role, Control &control, Context &context) {
+    virtual void react(const thread_role &role, typename M::Control &control, typename M::Context &context) {
       if (role.get() == OT_DEVICE_ROLE_CHILD) {
         NRF_LOG_INFO("Joined network as child.")
-        control.changeTo<discover>();
+        control.template changeTo<DISCOVER>();
       }
     }
 
-    using Base::react;
+    using M::Base::react;
   };
 }

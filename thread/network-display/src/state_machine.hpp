@@ -22,14 +22,10 @@ public:
   }
 
 private:
-  Context                                             ctx;
-  M::PeerRoot <start, discover, configure, connected> hfsm_root;
+  Context ctx;
+
+  using conf = configure<M>;
+  using disc = discover<M, conf>;
+  using sta = start<M, disc>;
+  M::PeerRoot <sta, disc, conf, connected> hfsm_root;
 };
-
-
-namespace fsm {
-  template<typename T>
-  void Context::react(const T &event) {
-    fsm->react(event);
-  }
-}

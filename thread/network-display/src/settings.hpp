@@ -68,7 +68,6 @@ namespace settings {
   };
 
   extern std::string                    m_instance;
-  extern std::string                    m_mgmt_server;
   extern std::optional<DisplayType>     m_display_type;
   extern std::optional<HardwareVersion> m_hw_version;
   extern pin_config                     m_pin_config;
@@ -83,7 +82,7 @@ namespace settings {
     std::optional<HardwareVersion> hwVersion;
   };
 
-  void updateFromCoapData(const coap_service::post_data &coap_data);
+  void updateFromCoapData(const coap_helpers::post_data &coap_data);
 
   void update(const uint8_t *data, uint32_t len);
 
