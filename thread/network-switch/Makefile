@@ -110,6 +110,7 @@ SRC_FILES += \
   $(SRC_DIR)/main.cpp \
   $(SRC_DIR)/settings.cpp \
   $(SRC_DIR)/coap_service.cpp \
+  $(SRC_DIR)/gpio_switch.cpp \
   $(SRC_DIR)/dfu_public_key.c \
   $(UZLIB_SOURCES) \
   $(COMMON_SOURCES) \
