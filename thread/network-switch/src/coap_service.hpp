@@ -7,7 +7,7 @@
 
 namespace coap_service {
 
-  void initialize(const common_request_handler &);
+  void initialize(const common_request_handler &, const coap_helpers::post_handler &on_switch_post);
 }
 
 
