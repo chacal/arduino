@@ -2,6 +2,6 @@
 
 #include <WString.h>
 
-void webServerInit();
+void webServerInit(const std::function<void()> &configUpdated);
 
 void webServerBroadcastWs(const String &msg);

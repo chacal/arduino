@@ -14,9 +14,10 @@
 #define HOSTNAME             "esp-fan-controller"
 
 
-WiFiManager wifiManager;
-SetPoint    setPoint;
-bool fanOn = false;
+WiFiManager   wifiManager;
+SetPoint      setPoint;
+bool fanOn                  = false;
+volatile bool configUpdated = false;
 
 void turnFanOn() {
   fanOn = true;
@@ -57,7 +58,7 @@ void setup() {
   initializeSetpoint();
 
   connectWiFi(wifiManager, HOSTNAME);
-  webServerInit();
+  webServerInit([]() { configUpdated = true; });
   MDNS.begin(HOSTNAME);
   ArduinoOTA.begin();
 }
@@ -77,6 +78,12 @@ void loop() {
 
   blink(fanOn ? 3 : 1);
   ArduinoOTA.handle();
+
+  if (configUpdated) {
+    configUpdated = false;
+    turnFanOff();
+    initializeSetpoint();
+  }
 
   delay(1000);
 }
