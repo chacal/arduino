@@ -1,15 +1,15 @@
 #include <ESPAsyncWebServer.h>
-#include <FS.h>
+#include "LittleFS.h"
 
 
 static AsyncWebServer server(80);
 static AsyncWebSocket ws("/ws");
 
 void webServerInit() {
-  SPIFFS.begin();
+  LittleFS.begin();
   server.addHandler(&ws);
 
-  server.serveStatic("/", SPIFFS, "/");
+  server.serveStatic("/", LittleFS, "/");
   server.begin();
 }
 
