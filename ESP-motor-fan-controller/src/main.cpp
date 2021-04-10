@@ -9,6 +9,8 @@
 
 #define FAN_TURN_ON_TEMP     60
 #define FAN_TURN_OFF_TEMP    45
+#define MAX_FAN_SPEED      1023
+#define MIN_FAN_SPEED       800
 #define FAN_MOSFET_GATE_PIN  D1
 #define NTC_MEASUREMENT_PIN  A0
 #define RESET_PIN            D7   // Pull this to GND during bootup to reset all settings (Wifi & configuration)
@@ -21,12 +23,10 @@ bool fanOn = false;
 
 void turnFanOn() {
   fanOn = true;
-  digitalWrite(FAN_MOSFET_GATE_PIN, HIGH);
 }
 
 void turnFanOff() {
   fanOn = false;
-  digitalWrite(FAN_MOSFET_GATE_PIN, LOW);
 }
 
 void initializeSetpoint() {
@@ -36,6 +36,12 @@ void initializeSetpoint() {
   setPoint.attach(RISING_EDGE, turnFanOn);
   setPoint.attach(FALLING_EDGE, turnFanOff);
   setPoint.update(0);
+}
+
+int calculateFanSpeed(double temperature) {
+  auto pwmUnitsPerOneDegreeTemp = ((double) MAX_FAN_SPEED - MIN_FAN_SPEED) / (FAN_TURN_ON_TEMP - FAN_TURN_OFF_TEMP);
+  int  fanSpeed                 = round(MIN_FAN_SPEED + (temperature - FAN_TURN_OFF_TEMP) * pwmUnitsPerOneDegreeTemp);
+  return max(MIN_FAN_SPEED, min(MAX_FAN_SPEED, fanSpeed));
 }
 
 void setup() {
@@ -62,8 +68,14 @@ void loop() {
   auto temp = measure_ntc_temp(NTC_MEASUREMENT_PIN);
   setPoint.update(temp);
 
+  if (fanOn) {
+    analogWrite(FAN_MOSFET_GATE_PIN, calculateFanSpeed(temp));
+  } else {
+    digitalWrite(FAN_MOSFET_GATE_PIN, LOW);
+  }
+
   Serial.println(String("Temp: ") + temp);
-  webServerBroadcastWs(String(temp) + "°C, fan state: " + (fanOn ? "on" : "off"));
+  webServerBroadcastWs(String(temp) + "°C, fan state: " + (fanOn ? "on, fan speed: " + String(calculateFanSpeed(temp)) : "off"));
 
   blink(fanOn ? 3 : 1);
   ArduinoOTA.handle();
