@@ -30,9 +30,9 @@ void turnFanOff() {
 }
 
 void initializeSetpoint() {
-  auto setpoint_temperature = (FAN_TURN_ON_TEMP + FAN_TURN_OFF_TEMP) / 2;
-  auto hysteresis           = (FAN_TURN_ON_TEMP - FAN_TURN_OFF_TEMP) / 2;
-  setPoint.begin(setpoint_temperature, hysteresis);
+  auto setpoint_temperature = ((double) FAN_TURN_ON_TEMP + FAN_TURN_OFF_TEMP) / 2;
+  auto hysteresis           = ((double) FAN_TURN_ON_TEMP - FAN_TURN_OFF_TEMP) / 2;
+  setPoint.begin(setpoint_temperature * 100, hysteresis * 100);
   setPoint.attach(RISING_EDGE, turnFanOn);
   setPoint.attach(FALLING_EDGE, turnFanOff);
   setPoint.update(0);
@@ -66,7 +66,7 @@ void setup() {
 
 void loop() {
   auto temp = measure_ntc_temp(NTC_MEASUREMENT_PIN);
-  setPoint.update(temp);
+  setPoint.update(temp * 100);
 
   if (fanOn) {
     analogWrite(FAN_MOSFET_GATE_PIN, calculateFanSpeed(temp));
