@@ -6,3 +6,29 @@ html {
 h3 {
     margin-top: 40px;
 }
+
+input {
+    width: 200px;
+    font-size: 14px;
+}
+
+input[type="button"] {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-image: none;
+    text-align: center;
+}
+
+#config label {
+    width: 190px;
+    display: inline-block;
+}
+
+#config input[type="number"] {
+    width: 60px;
+    text-align: right;
+}
+
+#config #saveConfig {
+    width: 70px;
+}
