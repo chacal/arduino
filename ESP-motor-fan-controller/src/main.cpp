@@ -6,11 +6,8 @@
 #include "utils.hpp"
 #include "wifi.hpp"
 #include "web_server.hpp"
+#include "config.hpp"
 
-#define FAN_TURN_ON_TEMP     60
-#define FAN_TURN_OFF_TEMP    45
-#define MAX_FAN_SPEED      1023
-#define MIN_FAN_SPEED       800
 #define FAN_MOSFET_GATE_PIN  D1
 #define NTC_MEASUREMENT_PIN  A0
 #define RESET_PIN            D7   // Pull this to GND during bootup to reset all settings (Wifi & configuration)
@@ -30,8 +27,8 @@ void turnFanOff() {
 }
 
 void initializeSetpoint() {
-  auto setpoint_temperature = ((double) FAN_TURN_ON_TEMP + FAN_TURN_OFF_TEMP) / 2;
-  auto hysteresis           = ((double) FAN_TURN_ON_TEMP - FAN_TURN_OFF_TEMP) / 2;
+  auto setpoint_temperature = (config.fanTurnOnTemp + config.fanTurnOffTemp) / 2;
+  auto hysteresis           = (config.fanTurnOnTemp - config.fanTurnOffTemp) / 2;
   setPoint.begin(setpoint_temperature * 100, hysteresis * 100);
   setPoint.attach(RISING_EDGE, turnFanOn);
   setPoint.attach(FALLING_EDGE, turnFanOff);
@@ -39,14 +36,15 @@ void initializeSetpoint() {
 }
 
 int calculateFanSpeed(double temperature) {
-  auto pwmUnitsPerOneDegreeTemp = ((double) MAX_FAN_SPEED - MIN_FAN_SPEED) / (FAN_TURN_ON_TEMP - FAN_TURN_OFF_TEMP);
-  int  fanSpeed                 = round(MIN_FAN_SPEED + (temperature - FAN_TURN_OFF_TEMP) * pwmUnitsPerOneDegreeTemp);
-  return max(MIN_FAN_SPEED, min(MAX_FAN_SPEED, fanSpeed));
+  auto     pwmUnitsPerOneDegreeTemp = (config.maxFanSpeed - config.minFanSpeed) / (config.fanTurnOnTemp - config.fanTurnOffTemp);
+  uint16_t fanSpeed                 = round(config.minFanSpeed + (temperature - config.fanTurnOffTemp) * pwmUnitsPerOneDegreeTemp);
+  return max(config.minFanSpeed, min(config.maxFanSpeed, fanSpeed));
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting ESP-motor-fan-controller..");
+  loadConfigFromFile();
 
   pinMode(LED_BUILTIN, OUTPUT);
   blink(1);
