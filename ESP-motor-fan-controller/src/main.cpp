@@ -35,6 +35,7 @@ void initializeSetpoint() {
   setPoint.begin(setpoint_temperature, hysteresis);
   setPoint.attach(RISING_EDGE, turnFanOn);
   setPoint.attach(FALLING_EDGE, turnFanOff);
+  setPoint.update(0);
 }
 
 void setup() {
@@ -55,10 +56,6 @@ void setup() {
   webServerInit();
   MDNS.begin(HOSTNAME);
   ArduinoOTA.begin();
-
-  if (measure_ntc_temp(NTC_MEASUREMENT_PIN) >= FAN_TURN_ON_TEMP) {
-    turnFanOn();
-  }
 }
 
 void loop() {
